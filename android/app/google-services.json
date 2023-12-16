@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "905393707829",
+    "project_id": "dtuclimbing",
+    "storage_bucket": "dtuclimbing.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:905393707829:android:288a63b070aa5b9c884a7c",
+        "android_client_info": {
+          "package_name": "com.example.seven_x_c"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCc18jUlaAjyGEbeN_iLlCPUNC2IlAEQsg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
