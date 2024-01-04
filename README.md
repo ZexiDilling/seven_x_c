@@ -1,6 +1,6 @@
 # seven_x_c
 
-A new Flutter project.
+AN APP!!! 
 
 ## Getting Started
 
