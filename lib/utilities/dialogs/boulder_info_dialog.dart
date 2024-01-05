@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:seven_x_c/helpters/charts.dart';
+import 'package:seven_x_c/utilities/charts/charts.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -250,10 +250,10 @@ Future<void> showBoulderInformation(BuildContext context, boulder, setState,
   int attempts = 0;
   bool flashed = false;
   bool topped = false;
-  // const gradingSystem = "colour";
-  // String gradingSystem = currentProfile.gradingSystem.toString().toLowerCase();
+  // const gradingSystem = "coloured";
+  String gradingSystem = currentProfile.gradingSystem.toString().toLowerCase();
   // const gradingSystem = "v_grade";
-  const gradingSystem = "french";
+  // const gradingSystem = "french";
   String? gradingShow = "";
   bool editing = false;
   int difficultyLevel = 1;
@@ -417,7 +417,7 @@ Future<void> showBoulderInformation(BuildContext context, boulder, setState,
                       ? Column(
                           children: [
                             SizedBox(
-                              width: 200,
+                              width: 250,
                               child: DropdownButtonFormField<Color>(
                                 value: gradeColor,
                                 onChanged: (Color? value) {
@@ -458,6 +458,7 @@ Future<void> showBoulderInformation(BuildContext context, boulder, setState,
                               height: 150,
                               child: BarChart(
                                 BarChartData(
+                                  gridData: const FlGridData(show: false),
                                   groupsSpace: 12,
                                   borderData: FlBorderData(show: false),
                                   titlesData: const FlTitlesData(show: false),
@@ -470,7 +471,7 @@ Future<void> showBoulderInformation(BuildContext context, boulder, setState,
                       : Column(
                           children: [
                             SizedBox(
-                              width: 200,
+                              width: 250,
                               child: DropdownButtonFormField<String>(
                                 value: selectedGrade!.isNotEmpty
                                     ? selectedGrade
@@ -520,7 +521,7 @@ Future<void> showBoulderInformation(BuildContext context, boulder, setState,
                             const SizedBox(height: 20),
                             SizedBox(
                               width: 250,
-                              height: 100,
+                              height: 200,
                               child: BarChart(
                                 BarChartData(
                                   gridData: const FlGridData(show: false),
@@ -567,6 +568,7 @@ Future<void> showBoulderInformation(BuildContext context, boulder, setState,
                       } else {
                         gradeValue = null;
                       }
+                      print(topped);
                       boulderService.updatBoulder(
                         boulderID: boulder?.boulderID,
                         climberTopped: updateClimberToppedMap(
@@ -580,11 +582,13 @@ Future<void> showBoulderInformation(BuildContext context, boulder, setState,
                             gradeArrowVoted: difficultyLevel),
                       );
                       if (topped == true) {
+
                         userService.updateUser(
                             boulderPoints: boulderPoints,
                             currentProfile: currentProfile,
                             climbedBoulders: updateClimbedBouldersMap(
                                 boulder: boulder,
+                                topped: topped,
                                 attempts: attempts,
                                 flashed: flashed,
                                 gradeColour: gradeColorChoice,
@@ -608,11 +612,6 @@ Future<void> showBoulderInformation(BuildContext context, boulder, setState,
                       // Info button pressed
                       // You can add logic to display additional information
                       // For example, show a Snackbar or navigate to another screen
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Additional information here!'),
-                        ),
-                      );
                     },
                     child: const Text('Info'),
                   ),

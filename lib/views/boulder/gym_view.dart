@@ -13,6 +13,7 @@ import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/boulder_info.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder_info_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/logout_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/slides/filter.dart';
 
 import 'package:vector_math/vector_math_64.dart' as VM;
 
@@ -41,9 +42,29 @@ class _GymViewState extends State<GymView> {
   late CloudProfile? currentProfile;
   bool profileLoaded = false;
   bool editing = false;
+  bool filterEnabled = false;
 
   late final FirebaseCloudStorage _boulderService;
   late final FirebaseCloudStorage _userService;
+
+  Stream<Iterable<CloudBoulder>> getFilteredBouldersStream() {
+  // Replace this with your actual filtering logic based on the drawer values
+  return _boulderService.getAllBoulders().map((boulders) {
+    // Example: Filter based on selected regions
+     if (selectedColors.isNotEmpty) {
+      boulders = boulders.where((boulder) =>
+          selectedColors.contains(boulder.gradeColour.toLowerCase()));
+    }
+
+    // Example: Filter based on the gradeRangeSlider
+    boulders = boulders.where((boulder) =>
+        boulder.gradeNumberSetter >= gradeSliderRange.start &&
+        boulder.gradeNumberSetter <= gradeSliderRange.end);
+
+    // If no filters are applied, return the original stream
+    return boulders;
+  });
+}
 
   @override
   void initState() {
@@ -88,6 +109,15 @@ class _GymViewState extends State<GymView> {
                 });
               },
             ),
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.filter_list),
+              onPressed: () {
+                // Open the Drawer to show the filter panel
+                Scaffold.of(context).openDrawer();
+              },
+            ),
+          ),
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {
               switch (value) {
@@ -122,7 +152,7 @@ class _GymViewState extends State<GymView> {
         ],
       ),
       body: StreamBuilder(
-        stream: _boulderService.getAllBoulders(),
+        stream: getFilteredBouldersStream(),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
@@ -150,7 +180,7 @@ class _GymViewState extends State<GymView> {
                         ),
                       ),
                       child: CustomPaint(
-                        painter: GymPainter(allBoulders),
+                        painter: GymPainter(allBoulders, currentProfile!),
                       ),
                     ),
                   ),
@@ -163,6 +193,7 @@ class _GymViewState extends State<GymView> {
           }
         },
       ),
+      drawer: filterDrawer(context, setState, currentProfile!),
     );
   }
 
@@ -212,7 +243,7 @@ class _GymViewState extends State<GymView> {
 
         String? wall;
 
-        for (final region in backgroundRegions) {
+        for (final region in wallRegions) {
           double regionTop = region.regionTop;
           double regionBottom = region.regionBottom;
 

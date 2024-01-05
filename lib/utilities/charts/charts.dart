@@ -2,22 +2,27 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import 'package:seven_x_c/utilities/boulder_info.dart'
-    show
-        allGrading,
-        getColorFromName,
-        gradeColorMap;
+    show allGrading, getColorFromName, gradeColorMap;
+
+double barRoundness = 2;
+double barWidth = 10;
 
 List<BarChartGroupData> getGradeColourChartData(boulder) {
   Map<String, int> colorVotes = {};
 
-  boulder.climberTopped.forEach((userId, climbInfo) {
-    String gradeColour = climbInfo['gradeColour'];
-    colorVotes[gradeColour] = (colorVotes[gradeColour] ?? 0) + 1;
-  });
+  if (boulder.climberTopped != null && boulder.climberTopped.isNotEmpty) {
+    boulder.climberTopped.forEach((userId, climbInfo) {
+      if (climbInfo['gradeColour'] != "") {
+      String gradeColour = climbInfo['gradeColour'];
+      colorVotes[gradeColour] = (colorVotes[gradeColour] ?? 0) + 1;}
+    });
+  }
 
   List<BarChartGroupData> barGroups = colorVotes.entries.map((entry) {
     String gradeColour = entry.key;
+    
     int voteCount = entry.value;
+    print(voteCount);
     Color color = getColorFromName(gradeColour) ?? Colors.grey;
 
     return BarChartGroupData(
@@ -26,8 +31,8 @@ List<BarChartGroupData> getGradeColourChartData(boulder) {
         BarChartRodData(
           toY: voteCount.toDouble(),
           color: color,
-          width: 10,
-          borderRadius: BorderRadius.circular(8),
+          width: barWidth,
+          borderRadius: BorderRadius.circular(barRoundness),
         ),
       ],
     );
@@ -42,14 +47,18 @@ List<BarChartGroupData> getGradeNumberChartData(boulder, gradingSystem) {
   if (gradingSystem.toLowerCase() == "coloured") {
     gradingSystem = "french";
   }
+  if (boulder.climberTopped != null && boulder.climberTopped.isNotEmpty) {
+    boulder.climberTopped.forEach((userId, climbInfo) {
+      if (climbInfo['gradeNumber'] == int) {
+        int gradeNumber = climbInfo['gradeNumber'];
 
-  boulder.climberTopped.forEach((userId, climbInfo) {
-    int gradeNumber = climbInfo['gradeNumber'];
+        gradeVotes[gradeNumber] = (gradeVotes[gradeNumber] ?? 0) + 1;
+      }
+    });
+  }
 
-    gradeVotes[gradeNumber] = (gradeVotes[gradeNumber] ?? 0) + 1;
-  });
-
-  Map<int, int> gradeMapNumber = getSortedGrades(gradeVotes);
+  Map<int, int> gradeMapNumber =
+      getSortedGrades(gradeVotes, boulder.gradeNumberSetter);
 
   List<BarChartGroupData> barGroups = gradeMapNumber.entries.map((entry) {
     int gradeNumber = entry.key;
@@ -61,8 +70,8 @@ List<BarChartGroupData> getGradeNumberChartData(boulder, gradingSystem) {
         BarChartRodData(
           toY: voteCount.toDouble(),
           color: getColorFromName(boulder.gradeColour),
-          width: 10,
-          borderRadius: BorderRadius.circular(8),
+          width: barWidth,
+          borderRadius: BorderRadius.circular(barRoundness),
         ),
       ],
     );
@@ -71,10 +80,16 @@ List<BarChartGroupData> getGradeNumberChartData(boulder, gradingSystem) {
   return barGroups;
 }
 
-Map<int, int> getSortedGrades(Map<int, int> gradeVotes) {
+Map<int, int> getSortedGrades(Map<int, int> gradeVotes, int gradeNumberSetter) {
   // Get a list of sorted grade numbers
-  List<int> sortedGrades = gradeVotes.keys.toList()..sort();
+  List<int> sortedGrades;
 
+  if (gradeVotes.isNotEmpty) {
+    sortedGrades = gradeVotes.keys.toList()..sort();
+  } else {
+    // If gradeVotes is empty, use gradeNumberSetter as the only value
+    sortedGrades = [gradeNumberSetter];
+  }
   // If there are fewer than 7 grades, include additional grades as needed
   while (sortedGrades.length < 7) {
     if (sortedGrades.isEmpty) {
@@ -99,7 +114,7 @@ Map<int, int> getSortedGrades(Map<int, int> gradeVotes) {
   Map<int, int> result = {};
 
   // Assign zero votes to all grades initially
-  result = { for (var grade in sortedGrades) grade : 0 };
+  result = {for (var grade in sortedGrades) grade: 0};
 
   // Update votes based on the provided gradeVotes
   gradeVotes.forEach((grade, votes) {
@@ -109,8 +124,8 @@ Map<int, int> getSortedGrades(Map<int, int> gradeVotes) {
   return result;
 }
 
-
-Widget getBottomTitlesNumberGrade(double value, TitleMeta meta, String gradeSystem) {
+Widget getBottomTitlesNumberGrade(
+    double value, TitleMeta meta, String gradeSystem) {
   const style = TextStyle(
     color: Colors.grey,
     fontWeight: FontWeight.bold,
@@ -118,15 +133,14 @@ Widget getBottomTitlesNumberGrade(double value, TitleMeta meta, String gradeSyst
   );
 
   // Initialize text to a default value
-  Widget text = const Text("Default Text", style: style);
+  Widget text = const Text("", style: style);
 
   // Check if allGrading[value]?[gradeSystem] is not null
   if (allGrading[value] != null && allGrading[value]![gradeSystem] != null) {
     // Update text if the value is not null
     text = Text(allGrading[value]![gradeSystem]!, style: style);
   }
- 
- // ignore: sort_child_properties_last
- return SideTitleWidget(child: text, axisSide: meta.axisSide);
 
+  // ignore: sort_child_properties_last
+  return SideTitleWidget(child: text, axisSide: meta.axisSide);
 }

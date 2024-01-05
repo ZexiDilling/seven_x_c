@@ -24,6 +24,7 @@ Map<String, dynamic> updateClimberBoulderSetMap(
     "holdColour": holdColour,
     "wall": wall,
     "points": setterPoints,
+    "date": DateTime.now()
   };
 
   Map<String, dynamic> bouldersClimbedData = existingData ?? {};
@@ -36,20 +37,23 @@ Map<String, dynamic> updateClimbedBouldersMap(
     {required CloudBoulder boulder,
     required int attempts,
     required bool flashed,
+    bool? topped,
     String? gradeColour,
     int? gradeArrow,
     double? boulderPoints,
     Map<String, dynamic>? existingData}) {
-  String? boulderID = boulder.boulderID;
-  int? gradeNumberBoulder = boulder.gradeNumberSetter;
+    String? boulderID = boulder.boulderID;
+    int? gradeNumberBoulder = boulder.gradeNumberSetter;
 
   Map<String, dynamic> newData = {
     "gradeNumber": gradeNumberBoulder,
     "gradeColour": gradeColour,
     "gradeArrow": gradeArrow,
     'attempts': attempts,
+    "topped": topped,
     'flashed': flashed,
     "points": boulderPoints,
+    "date": DateTime.now()
   };
 
   Map<String, dynamic> bouldersClimbedData = existingData ?? {};
@@ -86,7 +90,7 @@ Map<String, dynamic> updateClimberToppedMap(
     Map<String, dynamic>? existingData}) {
   String displayName = currentProfile.displayName;
   bool isAnonymous = currentProfile.isAnonymous;
-  String userID = "currentProfile.userID";
+  String userID = currentProfile.userID;
 
   Map<String, dynamic> newData = {
     "displayName": displayName,
