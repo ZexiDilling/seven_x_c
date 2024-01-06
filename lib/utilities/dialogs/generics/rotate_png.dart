@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class RotatedImage extends StatelessWidget {
   final String imagePath;
 
-  const RotatedImage({Key? key, required this.imagePath}) : super(key: key);
+  const RotatedImage({super.key, required this.imagePath});
 
   @override
   Widget build(BuildContext context) {

@@ -42,7 +42,7 @@ class GymPainter extends CustomPainter {
     if (userFlashed && !userTopped) {
       final Paint glowPaint = Paint()
         ..color = Colors.purple.withOpacity(0.2) // Semi-transparent white color
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, 0.1); // Adjust the radius as needed
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.1); // Adjust the radius as needed
 
       canvas.drawCircle(
         Offset(boulder.cordX, boulder.cordY),

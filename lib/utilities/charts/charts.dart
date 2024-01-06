@@ -22,7 +22,6 @@ List<BarChartGroupData> getGradeColourChartData(boulder) {
     String gradeColour = entry.key;
     
     int voteCount = entry.value;
-    print(voteCount);
     Color color = getColorFromName(gradeColour) ?? Colors.grey;
 
     return BarChartGroupData(

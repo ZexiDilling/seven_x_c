@@ -11,6 +11,7 @@ import 'package:seven_x_c/services/auth/bloc/auth_event.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
+import 'package:seven_x_c/utilities/dialogs/boulder/stripping_boulder.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/add_new_boulder.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/show_boulder_info.dart';
@@ -28,7 +29,7 @@ void main() {
 GlobalKey _gymKey = GlobalKey();
 
 class GymView extends StatefulWidget {
-  const GymView({Key? key}) : super(key: key);
+  const GymView({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -39,7 +40,7 @@ class _GymViewState extends State<GymView> {
   final List<CircleInfo> allBoulders = [];
   final double minZoomThreshold =
       0; // Adjust this threshold as needed this is for changing when you can add boulders. set to zero for testing purpose
-  //ToDO change this
+  // TODO: Handle this case.
   final TransformationController _controller = TransformationController();
   String get userId => AuthService.firebase().currentUser!.id;
 
@@ -50,6 +51,8 @@ class _GymViewState extends State<GymView> {
 
   late final FirebaseCloudStorage _boulderService;
   late final FirebaseCloudStorage _userService;
+
+  late Stream<Iterable<CloudBoulder>> filteredBouldersStream;
 
   Stream<Iterable<CloudBoulder>> getFilteredBouldersStream() {
     return _boulderService.getAllBoulders().map((boulders) {
@@ -100,7 +103,6 @@ class _GymViewState extends State<GymView> {
     });
   }
 
-
   @override
   void initState() {
     _boulderService = FirebaseCloudStorage();
@@ -108,6 +110,7 @@ class _GymViewState extends State<GymView> {
 
     _initializeCurrentProfile();
     super.initState();
+    filteredBouldersStream = getFilteredBouldersStream();
   }
 
   Future<void> _initializeCurrentProfile() async {
@@ -227,18 +230,40 @@ class _GymViewState extends State<GymView> {
             // Navigate to the settings screen
             Navigator.of(context).pushNamed(profileSettings);
             break;
+          case MenuAction.stripping:
+            Map<String, WallRegion> wallRegionMap = {
+              for (var region in wallRegions) region.wallID: region
+            };
+            try {
+              setState(() {
+                stripping(context, setState, filteredBouldersStream,
+                    _boulderService, wallRegionMap);
+              });
+            } catch (error) {
+              // Handle the error
+              // ignore: avoid_print
+              print(error);
+            }
+            for (WallRegion wall in wallRegions) {
+              wallRegionMap[wall.wallID]!.isSelected = false;
+            }
         }
       },
       itemBuilder: (context) {
         return [
-          const PopupMenuItem<MenuAction>(
+          const PopupMenuItem(
             value: MenuAction.settings,
             child: Text("Settings"),
           ),
-          const PopupMenuItem<MenuAction>(
+          const PopupMenuItem(
             value: MenuAction.logout,
             child: Text("Log out"),
           ),
+          if (currentProfile!.isSetter)
+            const PopupMenuItem(
+              value: MenuAction.stripping,
+              child: Text("Stripping"),
+            ),
         ];
       },
     );
@@ -288,11 +313,11 @@ class _GymViewState extends State<GymView> {
         String? wall;
 
         for (final region in wallRegions) {
-          double regionTop = region.regionTop;
-          double regionBottom = region.regionBottom;
+          double regionTop = region.wallXMax;
+          double regionBottom = region.wallXMin;
 
           if (tempCenterY >= regionBottom && tempCenterY <= regionTop) {
-            wall = region.attribute;
+            wall = region.wallName;
             break;
           }
         }

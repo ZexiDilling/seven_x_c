@@ -3,7 +3,7 @@ import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 
 class ProfileSettingsView extends StatefulWidget {
-  const ProfileSettingsView({Key? key}) : super(key: key);
+  const ProfileSettingsView({super.key});
 
   @override
   State<ProfileSettingsView> createState() => _ProfileSettingsViewState();

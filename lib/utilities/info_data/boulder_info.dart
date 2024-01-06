@@ -239,87 +239,138 @@ Map<String, List<String>> climbingGrades = {
   ],
 };
 
-class BackgroundRegion {
-  final String regionId;
-  final double regionTop;
-  final double regionBottom;
-  final String attribute;
+class WallRegion {
+  final String wallID;
+  final double wallXMax;
+  final double wallXMin;
+  final String wallName;
+  final int section;
+  bool isSelected;
 
-  BackgroundRegion({
-    required this.regionId,
-    required this.regionTop,
-    required this.regionBottom,
-    required this.attribute,
+  WallRegion({
+    required this.wallID,
+    required this.wallXMax,
+    required this.wallXMin,
+    required this.wallName,
+    required this.section,
+    required this.isSelected,
+
   });
 }
 
-List<BackgroundRegion> wallRegions = [
-  BackgroundRegion(
-    regionId: 'slap',
-    regionTop: double.infinity,
-    regionBottom: 626,
-    attribute: 'Slap',
+List<WallRegion> wallRegions = [
+  WallRegion(
+    wallID: 'slap',
+    wallXMax: double.infinity,
+    wallXMin: 626,
+    wallName: 'Slap',
+    section: 1,
+    isSelected: false,
   ),
-  BackgroundRegion(
-    regionId: 'dyno',
-    regionTop: 626,
-    regionBottom: 561,
-    attribute: 'Dyno',
+  WallRegion(
+    wallID: 'dyno',
+    wallXMax: 626,
+    wallXMin: 561,
+    wallName: 'Dyno',
+    section: 1,
+    isSelected: false,
   ),
-  BackgroundRegion(
-    regionId: 'chimney',
-    regionTop: 561,
-    regionBottom: 556,
-    attribute: 'Chimney',
+  WallRegion(
+    wallID: 'chimney',
+    wallXMax: 561,
+    wallXMin: 556,
+    wallName: 'Chimney',
+    section: 1,
+    isSelected: false,
   ),
-  BackgroundRegion(
-    regionId: 'diamond',
-    regionTop: 556,
-    regionBottom: 490,
-    attribute: 'Diamond',
+  WallRegion(
+    wallID: 'diamond',
+    wallXMax: 556,
+    wallXMin: 490,
+    wallName: 'Diamond',
+    section: 1,
+    isSelected: false,
   ),
-  BackgroundRegion(
-    regionId: 'face',
-    regionTop: 490,
-    regionBottom: 435,
-    attribute: 'Face',
+  WallRegion(
+    wallID: 'face',
+    wallXMax: 490,
+    wallXMin: 435,
+    wallName: 'Face',
+    section: 1,
+    isSelected: false,
   ),
-  BackgroundRegion(
-    regionId: 'shroom',
-    regionTop: 435,
-    regionBottom: 385,
-    attribute: 'Shroom',
+  WallRegion(
+    wallID: 'shroom',
+    wallXMax: 435,
+    wallXMin: 385,
+    wallName: 'Shroom',
+    section: 2,
+    isSelected: false,
   ),
-  BackgroundRegion(
-    regionId: 'Onyd',
-    regionTop: 385,
-    regionBottom: 280,
-    attribute: 'Onyd',
+  WallRegion(
+    wallID: 'Onyd',
+    wallXMax: 385,
+    wallXMin: 280,
+    wallName: 'Onyd',
+    section: 2,
+    isSelected: false,
   ),
-  BackgroundRegion(
-    regionId: 'door',
-    regionTop: 280,
-    regionBottom: 256,
-    attribute: 'Door',
+  WallRegion(
+    wallID: 'door',
+    wallXMax: 280,
+    wallXMin: 256,
+    wallName: 'Door',
+    section: 2,
+    isSelected: false,
   ),
-  BackgroundRegion(
-    regionId: 'ARG',
-    regionTop: 256,
-    regionBottom: 216,
-    attribute: 'ARG',
+  WallRegion(
+    wallID: 'ARG',
+    wallXMax: 256,
+    wallXMin: 216,
+    wallName: 'ARG',
+    section: 2,
+    isSelected: false,
   ),
-  BackgroundRegion(
-    regionId: 'Roof',
-    regionTop: 216,
-    regionBottom: 138,
-    attribute: 'Roof',
+  WallRegion(
+    wallID: 'Roof',
+    wallXMax: 216,
+    wallXMin: 138,
+    wallName: 'Roof',
+    section: 3,
+    isSelected: false,
   ),
-  BackgroundRegion(
-    regionId: 'cave',
-    regionTop: 138,
-    regionBottom: 0,
-    attribute: 'Cave',
+  WallRegion(
+    wallID: 'cave',
+    wallXMax: 138,
+    wallXMin: 0,
+    wallName: 'Cave',
+    section: 3,
+    isSelected: false,
   ),
+];
+
+class WallSection {
+  final int sectionID;
+  final String sectionName;
+
+  WallSection({
+    required this.sectionID,
+    required this.sectionName,
+  });
+}
+
+List<WallSection> wallSections = [
+  WallSection(
+    sectionID: 1,
+    sectionName: "1",
+  ),
+    WallSection(
+    sectionID: 2,
+    sectionName: "2",
+  ),  WallSection(
+    sectionID: 3,
+    sectionName: "3",
+  )
 ];
 
 //  To get the coordinates, use a print statment on "tempCenterY" on the _tapping function in Gym view
@@ -349,5 +400,3 @@ class CircleData {
     this.gradeColor,
   });
 }
-
-
