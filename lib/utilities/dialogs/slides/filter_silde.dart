@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
-import 'package:seven_x_c/utilities/boulder_info.dart';
+import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 
-double filterSliderValue = 20.0;
 String? filterDropdownValue;
-bool filterCheckbox1 = false;
-bool filterCheckbox2 = false;
-bool filterCheckbox3 = false;
-bool filterCheckbox4 = false;
+bool missingFilter = false;
+bool newFilter = false;
+bool updateFilter = false;
+bool compFilter = false;
 RangeValues gradeSliderRange = RangeValues(
     allGrading.keys.first.toDouble(), allGrading.keys.last.toDouble());
 
@@ -23,7 +22,7 @@ Drawer filterDrawer(
 
   String mapLabelToValue(double label) {
     int currentValue = label.round();
-    
+
     String startGrade = allGrading[currentValue]![gradingSystem] ?? '';
 
     return startGrade;
@@ -41,21 +40,26 @@ Drawer filterDrawer(
           ),
         ),
         gradeFilterSlider(setState, mapLabelToValue),
-        Column (children: _createColorRows(setState),),
+        Column(
+          children: _createColorRows(setState),
+        ),
         specFilterCheck(setState),
         ListTile(
           title: const Text('Clear Filters'),
           onTap: () {
             setState(() {
-              // Clear all filters
-              filterSliderValue = 0.0;
               filterDropdownValue = null;
-              filterCheckbox1 = false;
-              filterCheckbox2 = false;
-              filterCheckbox3 = false;
-              filterCheckbox4 = false;
+              gradeSliderRange = RangeValues(
+                allGrading.keys.first.toDouble(),
+                allGrading.keys.last.toDouble(),
+              );
+              selectedColors.clear();
+              missingFilter = false;
+              newFilter = false;
+              updateFilter = false;
+              compFilter = false;
             });
-            Navigator.pop(context); // Close the Drawer
+            // Navigator.pop(context); // Close the Drawer
           },
         ),
       ],
@@ -65,68 +69,68 @@ Drawer filterDrawer(
 
 ListTile specFilterCheck(setState) {
   return ListTile(
-        title: const Text('Checkboxes'),
-        subtitle: Column(
-          children: [
-            CheckboxListTile(
-              title: const Text('Checkbox 1'),
-              value: filterCheckbox1,
-              onChanged: (value) {
-                setState(() {
-                  filterCheckbox1 = value!;
-                });
-              },
-            ),
-            CheckboxListTile(
-              title: const Text('Checkbox 2'),
-              value: filterCheckbox2,
-              onChanged: (value) {
-                setState(() {
-                  filterCheckbox2 = value!;
-                });
-              },
-            ),
-            CheckboxListTile(
-              title: const Text('Checkbox 3'),
-              value: filterCheckbox3,
-              onChanged: (value) {
-                setState(() {
-                  filterCheckbox3 = value!;
-                });
-              },
-            ),
-            CheckboxListTile(
-              title: const Text('Checkbox 4'),
-              value: filterCheckbox4,
-              onChanged: (value) {
-                setState(() {
-                  filterCheckbox4 = value!;
-                });
-              },
-            ),
-          ],
+    title: const Text('Checkboxes'),
+    subtitle: Column(
+      children: [
+        CheckboxListTile(
+          title: const Text("Missing"),
+          value: missingFilter,
+          onChanged: (value) {
+            setState(() {
+              missingFilter = value!;
+            });
+          },
         ),
-      );
+        CheckboxListTile(
+          title: const Text('New'),
+          value: newFilter,
+          onChanged: (value) {
+            setState(() {
+              newFilter = value!;
+            });
+          },
+        ),
+        CheckboxListTile(
+          title: const Text('Updated'),
+          value: updateFilter,
+          onChanged: (value) {
+            setState(() {
+              updateFilter = value!;
+            });
+          },
+        ),
+        CheckboxListTile(
+          title: const Text('Comp'),
+          value: compFilter,
+          onChanged: (value) {
+            setState(() {
+              compFilter = value!;
+            });
+          },
+        ),
+      ],
+    ),
+  );
 }
 
-RangeSlider gradeFilterSlider(setState, String Function(double label) mapLabelToValue) {
+RangeSlider gradeFilterSlider(
+    setState, String Function(double label) mapLabelToValue) {
   return RangeSlider(
-        values: gradeSliderRange,
-        onChanged: (RangeValues newValues) {
-          setState(() {
-            gradeSliderRange = newValues;
-          });
-        },
-        min: allGrading.keys.first.toDouble(),
-        max: allGrading.keys.last.toDouble(),
-        divisions: allGrading.keys.length - 1,
-        labels: RangeLabels(
-          mapLabelToValue(gradeSliderRange.start),
-          mapLabelToValue(gradeSliderRange.end),
-        ),
-      );
+    values: gradeSliderRange,
+    onChanged: (RangeValues newValues) {
+      setState(() {
+        gradeSliderRange = newValues;
+      });
+    },
+    min: allGrading.keys.first.toDouble(),
+    max: allGrading.keys.last.toDouble(),
+    divisions: allGrading.keys.length - 1,
+    labels: RangeLabels(
+      mapLabelToValue(gradeSliderRange.start),
+      mapLabelToValue(gradeSliderRange.end),
+    ),
+  );
 }
-
 
 Set<String> selectedColors = {};
 
@@ -139,14 +143,8 @@ List<Widget> _createColorRows(setState) {
   const colorsPerRow = 4;
 
   for (int i = 0; i < colorEntries.length; i += colorsPerRow) {
-
-    
-    List<MapEntry<Color, String>> rowColors = colorEntries
-        .skip(i)
-        .take(colorsPerRow)
-        .toList(growable: false);
-
-    
+    List<MapEntry<Color, String>> rowColors =
+        colorEntries.skip(i).take(colorsPerRow).toList(growable: false);
 
     List<Widget> buttons = rowColors.map((entry) {
       Color color = entry.key;
@@ -197,7 +195,6 @@ List<Widget> _createColorRows(setState) {
   return colorRows;
 }
 
-
 List<MapEntry<Color, String>> getVibrantColors() {
   // Increase saturation for vibrant colors
   List<MapEntry<Color, String>> vibrantColors = gradeColorMap.entries
@@ -215,4 +212,3 @@ Color _adjustColorSaturation(Color color, double factor) {
       .withSaturation(hslSaturation * factor)
       .toColor();
 }
-

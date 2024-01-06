@@ -13,7 +13,10 @@ const gradingSetterFieldName = "gradeNumberSetter";
 const gradingClimbersFieldName = "gradeNumberClimbers";
 const topOutFieldName = "topOut";
 const challengeFieldName = "challenge";
-const activefieldName = "active";
+const activeFieldName = "active";
+const compBoulderFieldName = "compBoulder";
+const setDateBoulderFiledName = "setDateBoulder";
+const updateDateBoulderFiledName = "updateDateBoulder";
 const climberToppedFieldName = "climberTopped";
 
 //profile

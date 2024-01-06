@@ -50,7 +50,7 @@ class FirebaseCloudStorage {
     );
   }
 
-  Future<void> deletBoulder({required String boulderID}) async {
+  Future<void> deleteBoulder({required String boulderID}) async {
     try {
       await boulders.doc(boulderID).delete();
     } catch (e) {
@@ -69,6 +69,8 @@ class FirebaseCloudStorage {
     int? gradeNumberSetter,
     bool? topOut,
     bool? active,
+    bool? compBoulder,
+    Timestamp? updateDateBoulder,
     Map<String, dynamic>? challenge,
     Map<String, dynamic>? gradeNumberClimbers,
     Map<String, dynamic>? climberTopped,
@@ -84,18 +86,14 @@ class FirebaseCloudStorage {
       if (wall != null) updatedData[wallFieldName] = wall;
       if (holdColour != null) updatedData[holdColourFieledName] = holdColour;
       if (gradeColour != null) updatedData[gradeColourFieledName] = gradeColour;
-      if (gradeNumberSetter != null) {
-        updatedData[gradingSetterFieldName] = gradeNumberSetter;
-      }
+      if (gradeNumberSetter != null) {updatedData[gradingSetterFieldName] = gradeNumberSetter;}
       if (topOut != null) updatedData[topOutFieldName] = topOut;
-      if (active != null) updatedData[activefieldName] = active;
+      if (active != null) updatedData[activeFieldName] = active;
+      if (compBoulder != null) updatedData[compBoulderFieldName] = compBoulder;
+      if (updateDateBoulder != null) updatedData[updateDateBoulderFiledName] = updateDateBoulder;
       if (challenge != null) updatedData[challengeFieldName] = challenge;
-      if (gradeNumberClimbers != null) {
-        updatedData[gradingClimbersFieldName] = gradeNumberClimbers;
-      }
-      if (climberTopped != null) {
-        updatedData[climberToppedFieldName] = climberTopped;
-      }
+      if (gradeNumberClimbers != null) {updatedData[gradingClimbersFieldName] = gradeNumberClimbers;}
+      if (climberTopped != null) {updatedData[climberToppedFieldName] = climberTopped;}
 
       // Update the document with the non-null fields
       await boulders.doc(boulderID).update(updatedData);
@@ -106,7 +104,7 @@ class FirebaseCloudStorage {
 
   Stream<Iterable<CloudBoulder>> getAllBoulders() {
     final allBoulders = boulders
-        .where(activefieldName, isEqualTo: true)
+        .where(activeFieldName, isEqualTo: true)
         .snapshots()
         .map(
             (event) => event.docs.map((doc) => CloudBoulder.fromSnapshot(doc)));
@@ -132,6 +130,9 @@ class FirebaseCloudStorage {
     required int gradeNumberSetter,
     required bool topOut,
     required bool active,
+    required bool compBoulder,
+    required Timestamp setDateBoulder,
+    Timestamp? updateDateBoulder,
     Map<String, dynamic>? challenge,
     Map<String, dynamic>? gradeNumberClimber,
     Map<String, dynamic>? climberTopped,
@@ -145,7 +146,10 @@ class FirebaseCloudStorage {
       gradeColourFieledName: gradeColour,
       gradingSetterFieldName: gradeNumberSetter,
       topOutFieldName: topOut,
-      activefieldName: active,
+      activeFieldName: active,
+      compBoulderFieldName: compBoulder,
+      setDateBoulderFiledName: setDateBoulder,
+      updateDateBoulderFiledName: setDateBoulder,
       if (challenge != null) challengeFieldName: challenge,
       if (gradeNumberClimber != null)
         gradingClimbersFieldName: gradeNumberClimber,
@@ -165,6 +169,9 @@ class FirebaseCloudStorage {
       gradeNumberSetter,
       topOut,
       active,
+      compBoulder,
+      setDateBoulder,
+      setDateBoulder,
       boulderID: fetchBoulder.id,
     );
   }
@@ -209,7 +216,7 @@ class FirebaseCloudStorage {
         updatedData[climbedBouldersFieldName] = climbedBoulders;
       }
       if (setBoulders != null) updatedData[setBouldersFieldName] = setBoulders;
-      if (comp != null) updatedData[compFieldName] = comp;
+      if (comp != null) updatedData[compBoulderFieldName] = comp;
       if (email != null) updatedData[emailFieldName] = email;
       if (displayName != null) updatedData[displayNameFieldName] = displayName;
       if (gradingSystem != null) {
@@ -244,7 +251,7 @@ class FirebaseCloudStorage {
       isAnonymousFieldName: isAnonymous,
       if (climbedBoulders != null) climbedBouldersFieldName: climbedBoulders,
       if (setBoulders != null) setBouldersFieldName: setBoulders,
-      if (comp != null) compFieldName: comp,
+      if (comp != null) compBoulderFieldName: comp,
       emailFieldName: email,
       displayNameFieldName: displayName,
       gradingSystemFieldName: gradingSystem,

@@ -4,16 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:seven_x_c/constants/routes.dart';
 import 'package:seven_x_c/enums/menu_action.dart';
+import 'package:seven_x_c/helpters/painter.dart';
 import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_event.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
-import 'package:seven_x_c/utilities/boulder_info.dart';
-import 'package:seven_x_c/utilities/dialogs/boulder_info_dialog.dart';
+import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
+import 'package:seven_x_c/utilities/dialogs/boulder/add_new_boulder.dart';
+import 'package:seven_x_c/utilities/dialogs/boulder/show_boulder_info.dart';
 import 'package:seven_x_c/utilities/dialogs/logout_dialog.dart';
-import 'package:seven_x_c/utilities/dialogs/slides/filter.dart';
+import 'package:seven_x_c/utilities/dialogs/slides/filter_silde.dart';
 
 import 'package:vector_math/vector_math_64.dart' as VM;
 
@@ -35,7 +37,9 @@ class GymView extends StatefulWidget {
 
 class _GymViewState extends State<GymView> {
   final List<CircleInfo> allBoulders = [];
-  final double minZoomThreshold = 0; // Adjust this threshold as needed
+  final double minZoomThreshold =
+      0; // Adjust this threshold as needed this is for changing when you can add boulders. set to zero for testing purpose
+  //ToDO change this
   final TransformationController _controller = TransformationController();
   String get userId => AuthService.firebase().currentUser!.id;
 
@@ -48,23 +52,54 @@ class _GymViewState extends State<GymView> {
   late final FirebaseCloudStorage _userService;
 
   Stream<Iterable<CloudBoulder>> getFilteredBouldersStream() {
-  // Replace this with your actual filtering logic based on the drawer values
-  return _boulderService.getAllBoulders().map((boulders) {
-    // Example: Filter based on selected regions
-     if (selectedColors.isNotEmpty) {
+    return _boulderService.getAllBoulders().map((boulders) {
+      if (selectedColors.isNotEmpty) {
+        boulders = boulders.where((boulder) =>
+            selectedColors.contains(boulder.gradeColour.toLowerCase()));
+      }
+
       boulders = boulders.where((boulder) =>
-          selectedColors.contains(boulder.gradeColour.toLowerCase()));
-    }
+          boulder.gradeNumberSetter >= gradeSliderRange.start &&
+          boulder.gradeNumberSetter <= gradeSliderRange.end);
 
-    // Example: Filter based on the gradeRangeSlider
-    boulders = boulders.where((boulder) =>
-        boulder.gradeNumberSetter >= gradeSliderRange.start &&
-        boulder.gradeNumberSetter <= gradeSliderRange.end);
+      if (missingFilter) {
+        // Filter out boulders where the current user has topped
+        boulders = boulders.where((boulder) {
+          var userClimbInfo = boulder.climberTopped?[currentProfile!.userID];
+          return (userClimbInfo?['topped'] ?? false) == false;
+        });
+      }
 
-    // If no filters are applied, return the original stream
-    return boulders;
-  });
-}
+      if (newFilter) {
+        // Filter boulders where setDate is less than 5 days ago
+        final currentDate = DateTime.now();
+        boulders = boulders.where((boulder) {
+          final setDate = (boulder.setDateBoulder).toDate();
+          return currentDate.difference(setDate).inDays < 5;
+        });
+      }
+
+      if (updateFilter) {
+        // Filter boulders where updateDate is different from setDate
+        boulders = boulders.where((boulder) {
+          final setDate = (boulder.setDateBoulder).toDate();
+          final updateDate = (boulder.updateDateBoulder)?.toDate();
+
+          // Include the boulder in the result if both dates are non-null and different
+          return updateDate != null && setDate != updateDate;
+        });
+      }
+
+      if (compFilter) {
+        // Filter boulders where comp is true
+        boulders = boulders.where((boulder) => boulder.compBoulder == true);
+      }
+
+      // If no filters are applied, return the original stream
+      return boulders;
+    });
+  }
+
 
   @override
   void initState() {
@@ -97,7 +132,24 @@ class _GymViewState extends State<GymView> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: const Text("DTU Climbing"),
+        title: StreamBuilder<Iterable<CloudBoulder>>(
+          stream: getFilteredBouldersStream(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // Stream is still loading
+              return const Text('DTU Climbing - ??');
+            }
+
+            if (snapshot.hasError) {
+              // Handle error
+              return Text('Error: ${snapshot.error}');
+            }
+
+            // Use the length of the boulders list to update the app bar title
+            final bouldersCount = snapshot.data?.length ?? 0;
+            return Text('DTU Climbing - $bouldersCount');
+          },
+        ),
         backgroundColor: const Color.fromRGBO(255, 17, 0, 1),
         actions: [
           if (currentProfile!.isAdmin || currentProfile!.isSetter)
@@ -109,46 +161,7 @@ class _GymViewState extends State<GymView> {
                 });
               },
             ),
-          Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.filter_list),
-              onPressed: () {
-                // Open the Drawer to show the filter panel
-                Scaffold.of(context).openDrawer();
-              },
-            ),
-          ),
-          PopupMenuButton<MenuAction>(
-            onSelected: (value) async {
-              switch (value) {
-                case MenuAction.logout:
-                  final shouldLogout = await showLogOutDialog(context);
-                  if (shouldLogout) {
-                    // ignore: use_build_context_synchronously
-                    context.read<AuthBloc>().add(
-                          const AuthEventLogOut(),
-                        );
-                    break;
-                  }
-                case MenuAction.settings:
-                  // Navigate to the settings screen
-                  Navigator.of(context).pushNamed(profileSettings);
-                  break;
-              }
-            },
-            itemBuilder: (context) {
-              return [
-                const PopupMenuItem<MenuAction>(
-                  value: MenuAction.logout,
-                  child: Text("Log out"),
-                ),
-                const PopupMenuItem<MenuAction>(
-                  value: MenuAction.settings,
-                  child: Text("Settings"),
-                ),
-              ];
-            },
-          )
+          extraMenu(context)
         ],
       ),
       body: StreamBuilder(
@@ -197,6 +210,40 @@ class _GymViewState extends State<GymView> {
     );
   }
 
+  PopupMenuButton<MenuAction> extraMenu(BuildContext context) {
+    return PopupMenuButton<MenuAction>(
+      onSelected: (value) async {
+        switch (value) {
+          case MenuAction.logout:
+            final shouldLogout = await showLogOutDialog(context);
+            if (shouldLogout) {
+              // ignore: use_build_context_synchronously
+              context.read<AuthBloc>().add(
+                    const AuthEventLogOut(),
+                  );
+              break;
+            }
+          case MenuAction.settings:
+            // Navigate to the settings screen
+            Navigator.of(context).pushNamed(profileSettings);
+            break;
+        }
+      },
+      itemBuilder: (context) {
+        return [
+          const PopupMenuItem<MenuAction>(
+            value: MenuAction.settings,
+            child: Text("Settings"),
+          ),
+          const PopupMenuItem<MenuAction>(
+            value: MenuAction.logout,
+            child: Text("Log out"),
+          ),
+        ];
+      },
+    );
+  }
+
   Future<void> _tapping(BuildContext context, TapUpDetails details,
       Iterable<CloudBoulder> allBoulders, currentProfile, userService) async {
     // Only add circles when zoomed in
@@ -205,13 +252,10 @@ class _GymViewState extends State<GymView> {
     if (_controller.value.getMaxScaleOnAxis() >= minZoomThreshold) {
       final RenderBox referenceBox =
           _gymKey.currentContext?.findRenderObject() as RenderBox;
-
       // Convert the tap position to scene coordinates considering the transformation
       final localPosition = referenceBox.globalToLocal(details.globalPosition);
-
       // Create a copy of the transformation matrix and invert it
       final Matrix4 invertedMatrix = _controller.value.clone()..invert();
-
       // Create a Vector4 from the tap position
       final VM.Vector4 tapVector =
           VM.Vector4(localPosition.dx, localPosition.dy, 0, 1);
@@ -221,7 +265,7 @@ class _GymViewState extends State<GymView> {
           invertedMatrix.transform(tapVector);
       const double minDistance =
           minBoulderDistance; // Set a minimum distance to avoid overlap
-
+      final setters = await userService.getSetters();
       if (editing) {
         // Check for existing circles and avoid overlap
         double tempCenterX = transformedPosition.x;
@@ -253,7 +297,6 @@ class _GymViewState extends State<GymView> {
           }
         }
         try {
-          final setters = await userService.getSetters();
           setState(() {
             showAddNewBoulder(context, _boulderService, _userService,
                 tempCenterX, tempCenterY, wall!, gradingSystem, setters);
@@ -269,8 +312,11 @@ class _GymViewState extends State<GymView> {
               (boulders.cordY - transformedPosition.y).abs();
           if (distance < minDistance) {
             // Tapped inside the circle, perform the desired action
-            showBoulderInformation(context, boulders, setState, currentProfile,
-                _boulderService, _userService);
+            setState(() {
+              showBoulderInformation(context, boulders, setState,
+                  currentProfile, _boulderService, _userService, setters);
+            });
+
             break;
           }
         }

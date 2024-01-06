@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import 'package:seven_x_c/utilities/boulder_info.dart'
+import 'package:seven_x_c/utilities/info_data/boulder_info.dart'
     show allGrading, getColorFromName, gradeColorMap;
 
 double barRoundness = 2;

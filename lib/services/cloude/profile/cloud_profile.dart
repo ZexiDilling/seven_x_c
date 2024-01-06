@@ -44,7 +44,7 @@ class CloudProfile {
             snapshot.data()[climbedBouldersFieldName] as Map<String, dynamic>?,
         setBoulders =
             snapshot.data()[setBouldersFieldName] as Map<String, dynamic>?,
-        comp = snapshot.data()[compFieldName] as Map<String, dynamic>?,
+        comp = snapshot.data()[compBoulderFieldName] as Map<String, dynamic>?,
         email = snapshot.data()[emailFieldName] as String,
         displayName = snapshot.data()[displayNameFieldName] as String,
         gradingSystem = snapshot.data()[gradingSystemFieldName] as String,
