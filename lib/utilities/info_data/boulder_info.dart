@@ -94,6 +94,16 @@ String getArrowFromNumberAndColor(int gradeNumber, String colour) {
   }
 }
 
+int getdifficultyFromArrow(String arrow) {
+  for (final entry in arrowDict().entries) {
+    if (entry.value["arrow"] == arrow) {
+      return entry.key;
+    }
+  }
+  // If the arrow is not found, you can handle it accordingly.
+  throw Exception("Arrow not found: $arrow");
+}
+
 List<String> mapNumberToColors(int number) {
   List<String> matchingColors = [];
 

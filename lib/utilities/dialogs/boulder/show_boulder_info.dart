@@ -55,7 +55,7 @@ Future<void> showBoulderInformation(
         voted = true;
       }
       gradeColour =
-          getColorFromName(userClimbInfo["gradeColour"] ?? boulder.gradeColour);
+          getColorFromName(userClimbInfo["gradeColour"] ?? getColorFromName(boulder.gradeColour));
       gradeColorChoice = gradeColorMap[gradeColour];
       selectedGrade = allGrading[gradeValue]![gradingSystem];
       // difficultyLevel = userClimbInfo["gradeArrowVoted"] ?? 0;
@@ -136,6 +136,10 @@ Future<void> showBoulderInformation(
                             onPressed: () {
                               labelText =
                                   editing ? "Vote a Grade" : "Choose a Grade";
+                                  gradeColour = getColorFromName(boulder.gradeColour);
+                                  gradeColorChoice = gradeColorMap[gradeColour];
+                                  gradeValue = boulder.gradeNumberSetter;
+                                  difficultyLevel = getdifficultyFromArrow(getArrowFromNumberAndColor(gradeValue!, boulder.gradeColour));
                               setState(() {
                                 editing = !editing;
                               });
@@ -557,6 +561,7 @@ Future<void> showBoulderInformation(
                                       gradeNumberSetter: gradeValue,
                                       compBoulder: compBoulder,
                                     );
+                                    Navigator.of(context).pop();
                                   },
                                   child: const Text("Apply"))),
                           ElevatedButton(
