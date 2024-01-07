@@ -6,6 +6,7 @@ import 'package:seven_x_c/services/cloude/cloud_storage_exceptions.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
 class FirebaseCloudStorage {
+  // Todo Remove notes from this
   final notes = FirebaseFirestore.instance.collection("notes");
   final boulders = FirebaseFirestore.instance.collection("boulders");
   final profile = FirebaseFirestore.instance.collection("profile");
@@ -86,14 +87,21 @@ class FirebaseCloudStorage {
       if (wall != null) updatedData[wallFieldName] = wall;
       if (holdColour != null) updatedData[holdColourFieledName] = holdColour;
       if (gradeColour != null) updatedData[gradeColourFieledName] = gradeColour;
-      if (gradeNumberSetter != null) {updatedData[gradingSetterFieldName] = gradeNumberSetter;}
+      if (gradeNumberSetter != null) {
+        updatedData[gradingSetterFieldName] = gradeNumberSetter;
+      }
       if (topOut != null) updatedData[topOutFieldName] = topOut;
       if (active != null) updatedData[activeFieldName] = active;
       if (compBoulder != null) updatedData[compBoulderFieldName] = compBoulder;
-      if (updateDateBoulder != null) updatedData[updateDateBoulderFiledName] = updateDateBoulder;
+      if (updateDateBoulder != null)
+        updatedData[updateDateBoulderFiledName] = updateDateBoulder;
       if (challenge != null) updatedData[challengeFieldName] = challenge;
-      if (gradeNumberClimbers != null) {updatedData[gradingClimbersFieldName] = gradeNumberClimbers;}
-      if (climberTopped != null) {updatedData[climberToppedFieldName] = climberTopped;}
+      if (gradeNumberClimbers != null) {
+        updatedData[gradingClimbersFieldName] = gradeNumberClimbers;
+      }
+      if (climberTopped != null) {
+        updatedData[climberToppedFieldName] = climberTopped;
+      }
 
       // Update the document with the non-null fields
       await boulders.doc(boulderID).update(updatedData);
@@ -188,11 +196,13 @@ class FirebaseCloudStorage {
     required CloudProfile currentProfile,
     double? boulderPoints,
     double? setterPoints,
+    double? challengePoints,
     bool? isSetter,
     bool? isAdmin,
     bool? isAnonymous,
     Map<String, dynamic>? climbedBoulders,
     Map<String, dynamic>? setBoulders,
+    Map<String, dynamic>? challengeProfile,
     Map<String, dynamic>? comp,
     String? email,
     String? displayName,
@@ -209,6 +219,10 @@ class FirebaseCloudStorage {
       if (setterPoints != null) {
         updatedData[setterPointsFieldName] = setterPoints;
       }
+      if (challengePoints != null) {
+        updatedData[challengePointsFieldName] = setterPoints;
+      }
+
       if (isSetter != null) updatedData[isSetterFieldName] = isSetter;
       if (isAdmin != null) updatedData[isAdminFieldName] = isAdmin;
       if (isAnonymous != null) updatedData[isAnonymousFieldName] = isAnonymous;
@@ -216,12 +230,17 @@ class FirebaseCloudStorage {
         updatedData[climbedBouldersFieldName] = climbedBoulders;
       }
       if (setBoulders != null) updatedData[setBouldersFieldName] = setBoulders;
+      if (challengeProfile != null) {
+        updatedData[challengeProfileFieldName] = challengeProfile;
+      }
       if (comp != null) updatedData[compBoulderFieldName] = comp;
       if (email != null) updatedData[emailFieldName] = email;
       if (displayName != null) updatedData[displayNameFieldName] = displayName;
       if (gradingSystem != null) {
         updatedData[gradingSystemFieldName] = gradingSystem;
       }
+
+      updatedData[updateDateProfileFieldName] = Timestamp.now();
       // Update the document with the non-null fields
       await profile.doc(currentProfile.profileID).update(updatedData);
     } catch (e) {
@@ -232,45 +251,63 @@ class FirebaseCloudStorage {
   Future<CloudProfile> createNewUser({
     required double boulderPoints,
     required double setterPoints,
+    required double challengePoints,
     required bool isSetter,
     required bool isAdmin,
     required bool isAnonymous,
     Map<String, dynamic>? climbedBoulders,
     Map<String, dynamic>? setBoulders,
+    Map<String, dynamic>? challengeProfile,
     Map<String, dynamic>? comp,
     required String email,
     required String displayName,
     required String gradingSystem,
     required String userID,
+    required int maxToppedGrade,
+    required int maxFlahsedGrade,
+    required Timestamp createdDateProfile,
+    required Timestamp updateDateProfile,
   }) async {
     final document = await profile.add({
       boulderPointsFieldName: boulderPoints,
       setterPointsFieldName: setterPoints,
+      challengePointsFieldName: challengePoints,
       isSetterFieldName: isSetter,
       isAdminFieldName: isAdmin,
       isAnonymousFieldName: isAnonymous,
       if (climbedBoulders != null) climbedBouldersFieldName: climbedBoulders,
       if (setBoulders != null) setBouldersFieldName: setBoulders,
+      if (challengeProfile != null) challengeProfileFieldName: challengeProfile,
       if (comp != null) compBoulderFieldName: comp,
       emailFieldName: email,
       displayNameFieldName: displayName,
       gradingSystemFieldName: gradingSystem,
-      userIDfieldName: userID,
+      userIDFieldName: userID,
+      maxToppedGradeFieldName: maxToppedGrade,
+      maxFlashedGradeFieldName: maxFlahsedGrade,
+      createdDateProfileFieldName: createdDateProfile,
+      updateDateProfileFieldName: updateDateProfile,
     });
     final fetchUser = await document.get();
     return CloudProfile(
       boulderPoints,
       setterPoints,
+      challengePoints,
       isSetter,
       isAdmin,
       isAnonymous,
       climbedBoulders,
       setBoulders,
+      challengeProfile,
       comp,
       email,
       displayName,
       gradingSystem,
       userID,
+      maxToppedGrade,
+      maxFlahsedGrade,
+      createdDateProfile,
+      updateDateProfile,
       profileID: fetchUser.id,
     );
   }
@@ -286,11 +323,27 @@ class FirebaseCloudStorage {
 
   Stream<Iterable<CloudProfile>> getUser({required String userID}) {
     final currentProfile = profile
-        .where(userIDfieldName, isEqualTo: userID)
+        .where(userIDFieldName, isEqualTo: userID)
         .snapshots()
         .map(
             (event) => event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
     return currentProfile;
+  }
+
+  Future<bool> isDisplayNameUnique(
+      String displayName, String currentUserId) async {
+    try {
+      final querySnapshot = await profile
+          .where(displayNameFieldName, isEqualTo: displayName)
+          .where(userIDFieldName, isNotEqualTo: currentUserId)
+          .get();
+
+      return querySnapshot.docs.isEmpty;
+    } catch (e) {
+      // Handle any errors that might occur during the process
+      print('Error checking displayName uniqueness: $e');
+      throw CouldNotCheckDisplayNameException();
+    }
   }
 
   static final FirebaseCloudStorage _shared =

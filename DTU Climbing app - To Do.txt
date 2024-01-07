@@ -1,0 +1,152 @@
+Stuff that is done:
+------------------------------------------------------------------------------------------------------------------------
+Done - Profil setup for firebase. 
+Done - Make it possible for eveyone to grade a boulder. 
+Done - A boulder should keep track of "setter grade" and "public grade" 
+Done - Filter for boulders - on "grade", 
+Done - a way to easely see if you topped a boulder or not
+Done - A counter for boulders, updated depending on filter
+Done - keep track of what boulders a profile have topped, even if the boulde is deleted. 
+Done - keep track of what boulders a profile have set, even if the boulde is deleted.
+Done - edit boulder Change grade, hold colour, setter, comp-status, if updated/changed
+Done - a way to delet/inactive boulders for a whole section
+Done - if currentProfile do not have display name, go to displayNameView. 
+Done - make sure that displayName is uniqe
+Done - Add a Max climbed Grade (used for points)
+Done - add a Max FLashed Grade (used for points)
+Done - add a challenge point to the user
+Done - add created date
+Done - add updated date
+Done - init the settings with the user settings
+Done - Make a delete user-button
+Done - Make a reset points button
+------------------------------------------------------------------------------------------------------------------------
+
+Missing testing:
+------------------------------------------------------------------------------------------------------------------------
+
+
+Done - Filter boulders on other stuff, like comp, not topped, checkbox stuff
+
+ToDO:
+------------------------------------------------------------------------------------------
+
+
+
+Points: 
+	update setter and setter points for creating boulders. 
+	Get points depending on your max grade for topping/flashing and challenges. 
+	Boulder Points!!! 
+	Setter Points!!! 
+
+Admin page:
+	Set/remove setter-status from user
+	Set/remove admin-status from user
+	Set take-down days for boulders / sections. 
+
+filter:
+	filter on "soon to be taken down"
+
+Setter view:
+	Setter rankings ? 
+
+Profile view:
+	grading progression
+	Boulders climb
+		each grade
+	
+	setter overview
+	make it possible to check others profile ? 
+
+
+Boulder view:
+	List ppl who topped a boulder 
+	challenges modul for boulders
+	List ppl who have complete challenges. 
+
+Boulder changes:
+	Add "hid - grade" 
+	Make a unHide all grades button. 
+	add Repeat button ? 
+	Update Max climbed Grade for user if higher than current max climbed grade
+	Update Max FLashed Grade for user if higher than current max flashed grade
+
+comp module:
+	Set-up total boulder comp
+	done - mark comp-boulders
+	sign up for the comp
+		Set max participants 
+		Set time and day slots
+	rankings users - both live and after
+	rankings boulders - both live and after
+	generate final report
+	point system:
+		our standard
+		others
+	Add a comp map to the user ? ?
+		How Do i want to track stuff ? 
+	
+Calender
+	Section cleaning
+	Setting
+
+Map changes:
+	on topped/flashed, make circles smaller
+	Group up and count per wall or section - make it toggle ? 
+	Update gym-painter to colour based on new and updated boulders
+		Purple for changed
+		Orange for new ? 
+
+Challenges:
+	Make it possible to create some
+	give default points for them
+	make a challenges ranking
+	make a difficulty rating for it
+	Make it possible to add a counter for "skipping holds" or other
+	Make a filter for boulders with challenges
+	add a challenge map to the user?
+		How do I want to track this on the user ? 
+
+		
+Extra info:
+	Guidelines
+	Rules
+	Posters
+	Stuff
+	opening-closing times
+	boulder list bar graph ? 
+
+Settings:
+	update settings to work
+	delete / hide options that are not needed
+
+
+Clean up:
+	Remove notes 
+	remove unused code
+
+Low priority/ not sure:
+------------------------------------------------------------------------------------------------------------------------
+Filter:
+	filter on setter
+	
+	Filter Boulders on sections / walls 
+	Mark topped / flashed on all filte boulders
+	Mark topped / flashed on all boulders in view
+
+rankings:
+	Make a list of Boulders set per semester both grading, hold colour, wall, section and setters
+	Make a ranking list per month, per semester, per year and overall. 
+
+Map changes:
+	drag boulders on "hold" gesture. 
+	Add list of all boulders (see top logger for example)
+	Add repeat counter ? 
+
+Settings:
+	Add a "reset points" button
+	Add a Wrap / report button ? 
+
+profil:
+	Make it possible to delete non-active users ? 
+	Make it possible to re-set the different points, instead of them all at the same time

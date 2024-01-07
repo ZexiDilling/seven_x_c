@@ -12,8 +12,9 @@ import 'package:seven_x_c/views/auth_user/verify_email_view.dart';
 import 'package:seven_x_c/views/boulder/gym_view.dart';
 import 'package:seven_x_c/views/notes/create_update_note_view.dart';
 // import 'package:seven_x_c/views/notes/notes_view.dart';
-import 'package:flutter_bloc/flutter_bloc.dart' show BlocConsumer, BlocProvider, ReadContext;
-import 'package:seven_x_c/views/settings/profile_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart'
+    show BlocConsumer, BlocProvider, ReadContext;
+import 'package:seven_x_c/views/auth_user/profile_view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +32,7 @@ void main() {
       routes: {
         createOrUpdateNote: (context) => const CreateUpdateNoteView(),
         profileSettings: (context) => const ProfileSettingsView(),
+        gymView: (context) => const GymView(),
       },
     ),
   );
@@ -41,36 +43,34 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     context.read<AuthBloc>().add(const AuthEventInitialize());
-    return BlocConsumer<AuthBloc, AuthState>
-    (listener: (context, state) {
+    return BlocConsumer<AuthBloc, AuthState>(listener: (context, state) {
       if (state.isLoading) {
-       LoadingSCreen().show(context: context, text: state.loadingText ?? "This is taking forever...",);
+        LoadingSCreen().show(
+          context: context,
+          text: state.loadingText ?? "This is taking forever...",
+        );
       } else {
         LoadingSCreen().hide();
       }
     }, builder: (context, state) {
       if (state is AuthStateLoggedIn) {
-        // return const NotesView();
         return const GymView();
       } else if (state is AuthStateNeedsVerifications) {
         return const VerifyEmailView();
-        // return const NotesView();
-        // return const GymView();
       } else if (state is AuthStateLoggedOut) {
         return const LoginView();
       } else if (state is AuthEventForgotPassword) {
         return const ForgotPasswordView();
       } else if (state is AuthStateRegistering) {
         return const ReisterView();
-      }
-      else {
+      } else {
         return const Scaffold(
           body: CircularProgressIndicator(),
         );
       }
-    } );
+    });
   }
 }
+
 

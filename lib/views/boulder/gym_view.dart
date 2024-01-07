@@ -12,19 +12,13 @@ import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/stripping_boulder.dart';
+import 'package:seven_x_c/utilities/dialogs/error_dialog.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/add_new_boulder.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/show_boulder_info.dart';
 import 'package:seven_x_c/utilities/dialogs/logout_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/slides/filter_silde.dart';
-
 import 'package:vector_math/vector_math_64.dart' as VM;
-
-void main() {
-  runApp(const MaterialApp(
-    home: GymView(),
-  ));
-}
 
 GlobalKey _gymKey = GlobalKey();
 
@@ -116,11 +110,19 @@ class _GymViewState extends State<GymView> {
   Future<void> _initializeCurrentProfile() async {
     await for (final profiles
         in _userService.getUser(userID: userId.toString())) {
-      final CloudProfile profile = profiles.first;
-      setState(() {
-        currentProfile = profile;
-        profileLoaded = true;
-      });
+      if (profiles.isNotEmpty) {
+        final CloudProfile profile = profiles.first;
+        if (profile.displayName == "") {
+          Navigator.of(context).popAndPushNamed(profileSettings);
+        } else {
+          setState(() {
+            currentProfile = profile;
+            profileLoaded = true;
+          });
+        }
+      } else {
+        Navigator.of(context).popAndPushNamed(profileSettings);
+      }
     }
   }
 
@@ -227,9 +229,8 @@ class _GymViewState extends State<GymView> {
               break;
             }
           case MenuAction.settings:
-            // Navigate to the settings screen
             Navigator.of(context).pushNamed(profileSettings);
-            break;
+            
           case MenuAction.stripping:
             Map<String, WallRegion> wallRegionMap = {
               for (var region in wallRegions) region.wallID: region
@@ -240,9 +241,7 @@ class _GymViewState extends State<GymView> {
                     _boulderService, wallRegionMap);
               });
             } catch (error) {
-              // Handle the error
-              // ignore: avoid_print
-              print(error);
+              showErrorDialog(context, error.toString());
             }
             for (WallRegion wall in wallRegions) {
               wallRegionMap[wall.wallID]!.isSelected = false;

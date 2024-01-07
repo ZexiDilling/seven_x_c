@@ -19,3 +19,5 @@ class CouldNotDeleteUserException extends CloudStorageException {}
 class CouldNotUpdateUserException extends CloudStorageException {}
 
 class CouldNotCreateUserException extends CloudStorageException {}
+
+class CouldNotCheckDisplayNameException extends CloudStorageException {}

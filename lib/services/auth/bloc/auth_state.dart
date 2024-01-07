@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:seven_x_c/services/auth/auth_user.dart';
+import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
 @immutable
 abstract class AuthState {
@@ -36,6 +37,7 @@ class AuthStateLoggedIn extends AuthState {
   final AuthUser user;
   const AuthStateLoggedIn({required this.user, required super.isLoading});
 }
+
 
 class AuthStateNeedsVerifications extends AuthState {
   const AuthStateNeedsVerifications({required super.isLoading});
