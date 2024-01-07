@@ -47,9 +47,14 @@ class CloudProfile {
 
   CloudProfile.fromSnapshot(
     QueryDocumentSnapshot<Map<String, dynamic>> snapshot,
-  )   : boulderPoints = snapshot.data()[boulderPointsFieldName] as double,
-        setterPoints = snapshot.data()[setterPointsFieldName] as double,
-        challengePoints = snapshot.data()[challengePointsFieldName] as double,
+  )   : boulderPoints =
+            (snapshot.data()[boulderPointsFieldName] as num?)?.toDouble() ??
+                0.0,
+        setterPoints =
+            (snapshot.data()[setterPointsFieldName] as num?)?.toDouble() ?? 0.0,
+        challengePoints =
+            (snapshot.data()[challengePointsFieldName] as num?)?.toDouble() ??
+                0.0,
         isSetter = snapshot.data()[isSetterFieldName] as bool,
         isAdmin = snapshot.data()[isAdminFieldName] as bool,
         isAnonymous = snapshot.data()[isAnonymousFieldName] as bool,

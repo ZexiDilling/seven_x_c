@@ -21,3 +21,5 @@ class CouldNotUpdateUserException extends CloudStorageException {}
 class CouldNotCreateUserException extends CloudStorageException {}
 
 class CouldNotCheckDisplayNameException extends CloudStorageException {}
+
+class CouldNotGetSetterProfile extends CloudStorageException {}

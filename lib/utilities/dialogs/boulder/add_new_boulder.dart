@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/helpters/functions.dart';
+import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 // import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
@@ -14,6 +15,7 @@ Future<void> showAddNewBoulder(
     double centerY,
     String wall,
     gradingSystem,
+    CloudProfile currentProfile,
     Stream<Iterable<CloudProfile>> settersStream) async {
   Color? holdColour;
   Color? gradeColor;
@@ -210,9 +212,9 @@ Future<void> showAddNewBoulder(
                             gradeValue = difficultyLevelToArrow(
                                 difficultyLevel, gradeColorChoice!);
                           }
-
+                          CloudBoulder? newBoulder;
                           try {
-                            await boulderService.createNewBoulder(
+                            newBoulder = await boulderService.createNewBoulder(
                                 setter: selectedSetter,
                                 cordX: centerX,
                                 cordY: centerY,
@@ -224,8 +226,6 @@ Future<void> showAddNewBoulder(
                                 active: true,
                                 compBoulder: compBoulder,
                                 setDateBoulder: Timestamp.now());
-                            // ignore: use_build_context_synchronously
-                            Navigator.of(context).pop();
                           } catch (e) {
                             if (e.toString().contains(
                                 "type 'Null' is not a subtype of type 'String' of 'holdColour'")) {
@@ -234,8 +234,32 @@ Future<void> showAddNewBoulder(
                             } else {
                               // ignore: use_build_context_synchronously
                               showErrorDialog(context, "$e");
+                              newBoulder = null;
                             }
                           }
+                          if (newBoulder != null) {
+                            try {
+                              var setterProfile = await userService
+                                  .getUserFromDisplayName(selectedSetter)
+                                  .first;
+                                  setterProfile = setterProfile.first;
+
+                              double setterPoints = calculateSetterPoints(
+                                  setterProfile , newBoulder );
+                              await userService.updateUser(
+                                currentProfile: setterProfile,
+                                setBoulders: updateBoulderSet(currentProfile: setterProfile, newBoulder: newBoulder, setterPoints: setterPoints),
+                                setterPoints: setterPoints,
+                              );
+                            } catch (e) {
+                              // ignore: use_build_context_synchronously
+                              showErrorDialog(context, "$e");
+                            }
+                          } else {
+                            print("FUCK!");
+                          }
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pop();
                         },
                         child: const Text('Save'),
                       ),
@@ -253,4 +277,72 @@ Future<void> showAddNewBoulder(
           },
         );
       });
+}
+
+double calculateSetterPoints(
+    setterProfile, newBoulder) {
+      
+      // Calculate points based on the conditions
+  double points = defaultSetterPoints;
+  // Get the setBoulders map from the setterProfile
+      Map<String, dynamic> setBoulders = setterProfile.setBoulders ?? {};
+  
+  // Bonus points for green and yellow
+  if (newBoulder.gradeColour.toLowerCase() == 'green') {
+    points += 3;
+  } else if (newBoulder.gradeColour.toLowerCase() == 'yellow') {
+    points += 2;
+  }
+
+  // If setBoulders is null or empty, return default points
+  if (setBoulders.isEmpty) {
+
+    return points + 5;
+  }
+
+  // Extracting colours from setBoulders
+  List<String> gradeColour = [];
+  for (var boulderData in setBoulders.values) {
+    if (boulderData is Map<String, dynamic> &&
+        boulderData['gradeColour'] is String) {
+      gradeColour.add(boulderData['gradeColour']);
+    }
+  }
+
+  // Count occurrences of each colour
+  Map<String, int> colourOccurrences = {};
+  for (String colour in gradeColour) {
+    colourOccurrences[colour] = (colourOccurrences[colour] ?? 0) + 1;
+  }
+
+  // Sorting colours by occurrence in descending order
+  List<String> mostCreatedColours = colourOccurrences.keys.toList()
+    ..sort((a, b) => colourOccurrences[b]!.compareTo(colourOccurrences[a]!));
+
+  // The least created colour is the last colour in the sorted list
+  String leastCreatedColour =
+      mostCreatedColours.isEmpty ? '' : mostCreatedColours.last;
+
+  // Get the index of the newBoulder's gradeColour in the most created colours list
+  int gradeColourIndex = mostCreatedColours.indexOf(newBoulder.gradeColour);
+
+  
+
+  if (gradeColourIndex == 0) {
+    // Same as most created colour
+    points -= 3;
+  } else if (gradeColourIndex == 1) {
+    // Second most created colour
+    points -= 2;
+  } else if (gradeColourIndex == 2) {
+    // Third most created colour
+    points -= 1;
+  }
+
+  // Bonus points for least created colour
+  if (newBoulder.gradeColour == leastCreatedColour) {
+    points += 2;
+  }
+
+  return points;
 }

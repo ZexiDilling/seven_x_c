@@ -321,6 +321,21 @@ class FirebaseCloudStorage {
     return setters;
   }
 
+  Stream<Iterable<CloudProfile>> getUserFromDisplayName(
+      String profileDisplayName) {
+    try {
+      final currentProfile = profile
+          .where(displayNameFieldName, isEqualTo: profileDisplayName)
+          .snapshots()
+          .map((event) =>
+              event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
+      return currentProfile;
+    } catch (e) {
+      print(e.toString());
+    }
+    throw CouldNotGetSetterProfile();
+  }
+
   Stream<Iterable<CloudProfile>> getUser({required String userID}) {
     final currentProfile = profile
         .where(userIDFieldName, isEqualTo: userID)

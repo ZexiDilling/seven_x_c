@@ -323,7 +323,7 @@ class _GymViewState extends State<GymView> {
         try {
           setState(() {
             showAddNewBoulder(context, _boulderService, _userService,
-                tempCenterX, tempCenterY, wall!, gradingSystem, setters);
+                tempCenterX, tempCenterY, wall!, gradingSystem, currentProfile, setters);
           });
         } catch (error) {
           // Handle the error

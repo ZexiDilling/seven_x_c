@@ -20,13 +20,15 @@ Done - add updated date
 Done - init the settings with the user settings
 Done - Make a delete user-button
 Done - Make a reset points button
+Done - Setter Points!!! 
+Done - update setter 
+Done - Update setter points for creating boulders. 
+Done - Filter boulders on other stuff, like comp, not topped, checkbox stuff
 ------------------------------------------------------------------------------------------------------------------------
 
 Missing testing:
 ------------------------------------------------------------------------------------------------------------------------
 
-
-Done - Filter boulders on other stuff, like comp, not topped, checkbox stuff
 
 ToDO:
 ------------------------------------------------------------------------------------------
@@ -34,10 +36,9 @@ ToDO:
 
 
 Points: 
-	update setter and setter points for creating boulders. 
 	Get points depending on your max grade for topping/flashing and challenges. 
 	Boulder Points!!! 
-	Setter Points!!! 
+	
 
 Admin page:
 	Set/remove setter-status from user
@@ -54,7 +55,6 @@ Profile view:
 	grading progression
 	Boulders climb
 		each grade
-	
 	setter overview
 	make it possible to check others profile ? 
 

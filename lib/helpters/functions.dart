@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
@@ -62,22 +63,32 @@ Map<String, dynamic> updateClimbedBouldersMap(
   return bouldersClimbedData;
 }
 
-// Map<String, dynamic> updateGradeNumberClimbers({
-//   int? gradeNumberClimber,
-//   Map<String, dynamic>? existingData,
-// }) {
-//   Map<String, dynamic> updatedData = existingData ?? {};
-//   print(existingData);
-//   if (updatedData.containsKey(gradeNumberClimber.toString())) {
-//     // If the grade already exists, increment the vote count
-//     updatedData[gradeNumberClimber.toString()] = (updatedData[gradeNumberClimber] ?? 0) + 1;
-//   } else {
-//     // If the grade doesn't exist, create a new entry with a vote count of 1
-//     updatedData[gradeNumberClimber.toString()] = 1;
-//   }
 
-//   return updatedData;
-// }
+
+Map<String, dynamic> updateBoulderSet(
+    {required CloudProfile currentProfile, required CloudBoulder newBoulder, 
+
+required double setterPoints,
+    Map<String, dynamic>? existingData}) {
+
+    String boulderID = newBoulder.boulderID;
+
+  Map<String, dynamic> newData = {
+      'holdColour': newBoulder.holdColour,
+      'gradeColour': newBoulder.gradeColour,
+      'gradeNumberSetter': newBoulder.gradeNumberSetter,
+      'topOut': newBoulder.topOut,
+      'compBoulder': newBoulder.compBoulder,
+      'setDateBoulder': newBoulder.setDateBoulder,
+      "setterPoints": setterPoints,
+  };
+
+  Map<String, dynamic> setBoulder = existingData ?? {};
+  setBoulder[boulderID] = newData;
+
+  return setBoulder;
+}
+
 
 Map<String, dynamic> updateClimberToppedMap(
     {required CloudProfile currentProfile,
