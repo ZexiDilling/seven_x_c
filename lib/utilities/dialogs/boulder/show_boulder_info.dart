@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/charts/charts.dart';
@@ -9,7 +10,7 @@ import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 
 Future<void> showBoulderInformation(
     BuildContext context,
-    boulder,
+    CloudBoulder boulder,
     setState,
     CloudProfile currentProfile,
     FirebaseCloudStorage boulderService,
@@ -46,7 +47,7 @@ Future<void> showBoulderInformation(
 
   if (boulder.climberTopped != null &&
       boulder.climberTopped is Map<String, dynamic>) {
-    boulder.climberTopped.forEach(
+    boulder.climberTopped!.forEach(
       (userId, climbInfo) async {
         if (climbInfo['topped'] == true) {
           final profiles =
@@ -69,8 +70,8 @@ Future<void> showBoulderInformation(
       },
     );
 
-    if (boulder.climberTopped.containsKey(currentProfile.userID)) {
-      var userClimbInfo = boulder.climberTopped[currentProfile.userID];
+    if (boulder.climberTopped!.containsKey(currentProfile.userID)) {
+      var userClimbInfo = boulder.climberTopped![currentProfile.userID];
       attempts = userClimbInfo['attempts'] ?? 0;
       flashed = userClimbInfo['flashed'] ?? false;
       topped = userClimbInfo['topped'] ?? false;
@@ -81,7 +82,8 @@ Future<void> showBoulderInformation(
         voted = true;
       }
       gradeColour = getColorFromName(userClimbInfo["gradeColour"] ??
-          getColorFromName(boulder.gradeColour));
+          boulder.gradeColour);
+      print("gradeColor - $gradeColour");
       gradeColorChoice = gradeColorMap[gradeColour];
       selectedGrade = allGrading[gradeValue]![gradingSystem];
       // difficultyLevel = userClimbInfo["gradeArrowVoted"] ?? 0;
@@ -208,12 +210,6 @@ Future<void> showBoulderInformation(
                                       onChanged: (bool? value) {
                                         setState(() {
                                           topped = value ?? false;
-                                          if (attempts == 0) {
-                                            attempts = 1;
-                                            flashed = true;
-                                          } else if (attempts == 1) {
-                                            flashed = true;
-                                          }
                                         });
                                       },
                                     ),
@@ -594,13 +590,13 @@ Future<void> showBoulderInformation(
                                   gradeValue = null;
                                 }
                                 boulderService.updatBoulder(
-                                  boulderID: boulder?.boulderID,
+                                  boulderID: boulder.boulderID,
                                   climberTopped: updateClimberToppedMap(
                                       currentProfile: currentProfile,
                                       attempts: attempts,
                                       flashed: flashed,
                                       topped: topped,
-                                      existingData: boulder?.climberTopped,
+                                      existingData: boulder.climberTopped,
                                       gradeNumberVoted: gradeValue,
                                       gradeColourVoted: gradeColorChoice,
                                       gradeArrowVoted: difficultyLevel),
@@ -636,7 +632,7 @@ Future<void> showBoulderInformation(
                                       gradeValue = null;
                                     }
                                     boulderService.updatBoulder(
-                                      boulderID: boulder?.boulderID,
+                                      boulderID: boulder.boulderID,
                                       updateDateBoulder: Timestamp.now(),
                                       topOut: topOut,
                                       hiddenGrade: hiddenGrade,

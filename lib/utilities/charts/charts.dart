@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart'
     show allGrading, getColorFromName, gradeColorMap;
@@ -7,12 +8,13 @@ import 'package:seven_x_c/utilities/info_data/boulder_info.dart'
 double barRoundness = 2;
 double barWidth = 10;
 
-List<BarChartGroupData> getGradeColourChartData(boulder) {
+List<BarChartGroupData> getGradeColourChartData(CloudBoulder boulder) {
   Map<String, int> colorVotes = {};
 
-  if (boulder.climberTopped != null && boulder.climberTopped.isNotEmpty) {
-    boulder.climberTopped.forEach((userId, climbInfo) {
-      if (climbInfo['gradeColour'] != "") {
+  if (boulder.climberTopped != null && boulder.climberTopped!.isNotEmpty) {
+    boulder.climberTopped!.forEach((userId, climbInfo) {
+      print(climbInfo);
+      if (climbInfo['gradeColour'] != "" && climbInfo['gradeColour']!= null ) {
       String gradeColour = climbInfo['gradeColour'];
       colorVotes[gradeColour] = (colorVotes[gradeColour] ?? 0) + 1;}
     });

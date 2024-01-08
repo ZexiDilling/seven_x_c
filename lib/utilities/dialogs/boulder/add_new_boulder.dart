@@ -225,7 +225,8 @@ Future<void> showAddNewBoulder(
                                 difficultyLevel, gradeColorChoice!);
                           }
                           CloudBoulder? newBoulder;
-                          print(hiddenGrade);
+                          print("wall - $wall");
+                          print("hiddenGrade - $hiddenGrade");
                           try {
                             newBoulder = await boulderService.createNewBoulder(
                                 setter: selectedSetter,

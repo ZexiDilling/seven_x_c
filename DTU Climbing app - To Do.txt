@@ -24,12 +24,16 @@ Done - Setter Points!!!
 Done - update setter 
 Done - Update setter points for creating boulders. 
 Done - Filter boulders on other stuff, like comp, not topped, checkbox stuff
-Done - 	Set/remove setter-status from user
-Done - 	Set/remove admin-status from user
+Done - Set/remove setter-status from user
+Done - Set/remove admin-status from user
 Done - List ppl who topped a boulder 
 Done - Add "hid - grade"  option when creating a boulder
 Done - Colour boulders a hiddenGradeColour, when hiddenGrade == True
 Done - Make it possible to hid and unhid grade for a single boulder
+Done - Make a unHide all grades button. 
+Done - Update gym-painter to colour based on new and updated boulders
+Done - On topped/flashed, make circles smaller
+
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -41,14 +45,15 @@ Missing testing:
 ToDO:
 ------------------------------------------------------------------------------------------
 
-Boulder view:
-	challenges modul for boulders
-	List ppl who have complete challenges. 
+
+Map changes:
+	Group up and count per wall or section - make it toggle ? 
 
 Boulder changes:
-	Make a unHide all grades button.
-		Put it under "stripping"
-	add Repeat button ? 
+	Add Repeat button 
+	Change "attempts" to repeat when topped is marked and update a counter somewhere to that number...
+	Add Repeat Tracking
+	
 	Update Max climbed Grade for user if higher than current max climbed grade
 	Update Max FLashed Grade for user if higher than current max flashed grade
 
@@ -91,12 +96,11 @@ Calender
 	Section cleaning
 	Setting
 
-Map changes:
-	on topped/flashed, make circles smaller
-	Group up and count per wall or section - make it toggle ? 
-	Update gym-painter to colour based on new and updated boulders
-		Purple for changed
-		Orange for new ? 
+
+
+Boulder view:
+	challenges modul for boulders
+	List ppl who have complete challenges. 
 
 Challenges:
 	Make it possible to create some
@@ -134,6 +138,8 @@ Filter:
 	Filter Boulders on sections / walls 
 	Mark topped / flashed on all filte boulders
 	Mark topped / flashed on all boulders in view
+
+Hide/unHide - move under comp settings ? 
 
 rankings:
 	Make a list of Boulders set per semester both grading, hold colour, wall, section and setters
