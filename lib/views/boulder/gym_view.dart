@@ -230,7 +230,7 @@ class _GymViewState extends State<GymView> {
             }
           case MenuAction.settings:
             Navigator.of(context).pushNamed(profileSettings);
-            
+
           case MenuAction.stripping:
             Map<String, WallRegion> wallRegionMap = {
               for (var region in wallRegions) region.wallID: region
@@ -246,6 +246,8 @@ class _GymViewState extends State<GymView> {
             for (WallRegion wall in wallRegions) {
               wallRegionMap[wall.wallID]!.isSelected = false;
             }
+          case MenuAction.adminPanel:
+            Navigator.of(context).pushNamed(adminPanel);
         }
       },
       itemBuilder: (context) {
@@ -258,11 +260,16 @@ class _GymViewState extends State<GymView> {
             value: MenuAction.logout,
             child: Text("Log out"),
           ),
-          if (currentProfile!.isSetter)
+          if (currentProfile!.isSetter | currentProfile!.isAdmin)
             const PopupMenuItem(
               value: MenuAction.stripping,
               child: Text("Stripping"),
             ),
+          if (currentProfile!.isAdmin)
+            const PopupMenuItem(
+              value: MenuAction.adminPanel,
+              child: Text("Admin"),
+            )
         ];
       },
     );
@@ -322,8 +329,16 @@ class _GymViewState extends State<GymView> {
         }
         try {
           setState(() {
-            showAddNewBoulder(context, _boulderService, _userService,
-                tempCenterX, tempCenterY, wall!, gradingSystem, currentProfile, setters);
+            showAddNewBoulder(
+                context,
+                _boulderService,
+                _userService,
+                tempCenterX,
+                tempCenterY,
+                wall!,
+                gradingSystem,
+                currentProfile,
+                setters);
           });
         } catch (error) {
           // Handle the error

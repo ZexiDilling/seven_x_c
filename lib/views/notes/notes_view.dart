@@ -53,6 +53,8 @@ class _NotesViewState extends State<NotesView> {
                     // TODO: Handle this case.
                   case MenuAction.stripping:
                     // TODO: Handle this case.
+                  case MenuAction.adminPanel:
+                    // TODO: Handle this case.
                 }
               },
               itemBuilder: (context) {

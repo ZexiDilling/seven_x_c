@@ -321,6 +321,19 @@ class FirebaseCloudStorage {
     return setters;
   }
 
+  Stream<Iterable<CloudProfile>> getUserFromEmail(String profileEmail) {
+    try {
+      final currentProfile = profile
+          .where(emailFieldName, isEqualTo: profileEmail)
+          .snapshots()
+          .map((event) =>
+              event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
+      return currentProfile;
+    } catch (e) {
+      throw CouldNotGetSetterProfile();
+    }
+  }
+
   Stream<Iterable<CloudProfile>> getUserFromDisplayName(
       String profileDisplayName) {
     try {
@@ -331,9 +344,8 @@ class FirebaseCloudStorage {
               event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
       return currentProfile;
     } catch (e) {
-      print(e.toString());
+      throw CouldNotGetSetterProfile();
     }
-    throw CouldNotGetSetterProfile();
   }
 
   Stream<Iterable<CloudProfile>> getUser({required String userID}) {

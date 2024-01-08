@@ -5,6 +5,7 @@ import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_event.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_state.dart';
 import 'package:seven_x_c/services/auth/firebase_auth_provider.dart';
+import 'package:seven_x_c/views/admin/admin_view.dart';
 import 'package:seven_x_c/views/auth_user/forgot_password_view.dart';
 import 'package:seven_x_c/views/auth_user/login_view.dart';
 import 'package:seven_x_c/views/auth_user/register_view.dart';
@@ -14,7 +15,7 @@ import 'package:seven_x_c/views/notes/create_update_note_view.dart';
 // import 'package:seven_x_c/views/notes/notes_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'
     show BlocConsumer, BlocProvider, ReadContext;
-import 'package:seven_x_c/views/auth_user/profile_view.dart';
+import 'package:seven_x_c/views/admin/profile_view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +33,7 @@ void main() {
       routes: {
         createOrUpdateNote: (context) => const CreateUpdateNoteView(),
         profileSettings: (context) => const ProfileSettingsView(),
+        adminPanel: (context) => const AdminPanelView(),
         gymView: (context) => const GymView(),
       },
     ),
