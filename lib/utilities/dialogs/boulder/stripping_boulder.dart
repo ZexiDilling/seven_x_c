@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
+import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart'
     show WallRegion, wallRegions, wallSections;
 
@@ -7,11 +8,11 @@ Future<void> stripping(
     context,
     setState,
     Stream<Iterable<CloudBoulder>> filteredBouldersStream,
-    boulderService, wallRegionMap) async {
+    FirebaseCloudStorage boulderService,
+    wallRegionMap) async {
   List<bool> sectionCheckboxes =
       List.generate(wallSections.length, (index) => false);
   List.generate(3, (index) => false);
-
 
   await showDialog(
     context: context,
@@ -23,6 +24,45 @@ Future<void> stripping(
             content: SingleChildScrollView(
               child: Column(
                 children: [
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () async {
+                          // Access the data from the StreamBuilder
+                          Iterable<CloudBoulder>? boulders =
+                              await filteredBouldersStream.first;
+
+                          for (CloudBoulder boulder in boulders) {
+                            if (boulder.hiddenGrade == false) {
+                              await boulderService.updatBoulder(
+                                  boulderID: boulder.boulderID,
+                                  hiddenGrade: true);
+                            }
+                          }
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("Hide all"),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          // Access the data from the StreamBuilder
+                          Iterable<CloudBoulder>? boulders =
+                              await filteredBouldersStream.first;
+
+                          for (CloudBoulder boulder in boulders) {
+                            if (boulder.hiddenGrade == true) {
+                              print(boulder);
+                              await boulderService.updatBoulder(
+                                  boulderID: boulder.boulderID,
+                                  hiddenGrade: false);
+                            }
+                          }
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("UnHide all"),
+                      ),
+                    ],
+                  ),
                   // Section checkboxes
                   for (int i = 0; i < 3; i++)
                     Row(
@@ -158,7 +198,6 @@ Future<void> stripping(
                                         .isSelected) {
                                       await boulderService.deleteBoulder(
                                         boulderID: boulder.boulderID,
-                                        
                                       );
                                     }
                                   }
@@ -190,4 +229,3 @@ Future<void> stripping(
     },
   );
 }
-

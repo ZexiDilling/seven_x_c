@@ -70,6 +70,7 @@ class FirebaseCloudStorage {
     int? gradeNumberSetter,
     bool? topOut,
     bool? active,
+    bool? hiddenGrade,
     bool? compBoulder,
     Timestamp? updateDateBoulder,
     Map<String, dynamic>? challenge,
@@ -92,6 +93,7 @@ class FirebaseCloudStorage {
       }
       if (topOut != null) updatedData[topOutFieldName] = topOut;
       if (active != null) updatedData[activeFieldName] = active;
+      if (hiddenGrade != null) updatedData[hiddenGradeFieldName] = hiddenGrade;
       if (compBoulder != null) updatedData[compBoulderFieldName] = compBoulder;
       if (updateDateBoulder != null)
         updatedData[updateDateBoulderFiledName] = updateDateBoulder;
@@ -138,6 +140,7 @@ class FirebaseCloudStorage {
     required int gradeNumberSetter,
     required bool topOut,
     required bool active,
+    required bool hiddenGrade,
     required bool compBoulder,
     required Timestamp setDateBoulder,
     Timestamp? updateDateBoulder,
@@ -155,6 +158,7 @@ class FirebaseCloudStorage {
       gradingSetterFieldName: gradeNumberSetter,
       topOutFieldName: topOut,
       activeFieldName: active,
+      hiddenGradeFieldName: hiddenGrade,
       compBoulderFieldName: compBoulder,
       setDateBoulderFiledName: setDateBoulder,
       updateDateBoulderFiledName: setDateBoulder,
@@ -177,6 +181,7 @@ class FirebaseCloudStorage {
       gradeNumberSetter,
       topOut,
       active,
+      hiddenGrade,
       compBoulder,
       setDateBoulder,
       setDateBoulder,

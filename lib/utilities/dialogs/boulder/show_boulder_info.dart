@@ -40,6 +40,7 @@ Future<void> showBoulderInformation(
   bool updated = false;
   bool topOut = boulder.topOut;
   bool compBoulder = boulder.compBoulder;
+  bool hiddenGrade = boulder.hiddenGrade;
 
   List<Map<String, dynamic>> toppersList = [];
 
@@ -130,8 +131,10 @@ Future<void> showBoulderInformation(
                               height: 26,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: getColorFromName(capitalizeFirstLetter(
-                                    boulder.gradeColour)), // Inside color
+                                color: boulder.hiddenGrade == true
+                                    ? hiddenGradeColor
+                                    : getColorFromName(capitalizeFirstLetter(
+                                        boulder.gradeColour)), // Inside color
                               ),
                               child: Center(
                                 child: Padding(
@@ -331,6 +334,19 @@ Future<void> showBoulderInformation(
                                           onChanged: (bool? value) {
                                             setState(() {
                                               compBoulder = value ?? false;
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        const Text("Hid Grade?"),
+                                        Checkbox(
+                                          value: hiddenGrade,
+                                          onChanged: (bool? value) {
+                                            setState(() {
+                                              hiddenGrade = value ?? false;
                                             });
                                           },
                                         ),
@@ -623,6 +639,7 @@ Future<void> showBoulderInformation(
                                       boulderID: boulder?.boulderID,
                                       updateDateBoulder: Timestamp.now(),
                                       topOut: topOut,
+                                      hiddenGrade: hiddenGrade,
                                       setter: selectedSetter,
                                       holdColour: holdColorMap[holdColour],
                                       gradeColour: gradeColorChoice,

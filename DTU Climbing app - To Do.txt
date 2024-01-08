@@ -27,9 +27,14 @@ Done - Filter boulders on other stuff, like comp, not topped, checkbox stuff
 Done - 	Set/remove setter-status from user
 Done - 	Set/remove admin-status from user
 Done - List ppl who topped a boulder 
+Done - Add "hid - grade"  option when creating a boulder
+Done - Colour boulders a hiddenGradeColour, when hiddenGrade == True
+Done - Make it possible to hid and unhid grade for a single boulder
+
 ------------------------------------------------------------------------------------------------------------------------
 
 Missing testing:
+
 ------------------------------------------------------------------------------------------------------------------------
 
 
@@ -41,7 +46,6 @@ Boulder view:
 	List ppl who have complete challenges. 
 
 Boulder changes:
-	Add "hid - grade" 
 	Make a unHide all grades button.
 		Put it under "stripping"
 	add Repeat button ? 

@@ -16,7 +16,9 @@ class GymPainter extends CustomPainter {
       
       bool userTopped = false;
       bool userFlashed = false;
-      Color? gradeColour = getColorFromName(capitalizeFirstLetter(boulder.gradeColour));
+      Color? gradeColour = boulder.hiddenGrade == true
+        ? hiddenGradeColor
+        : getColorFromName(capitalizeFirstLetter(boulder.gradeColour));
       Color? holdColour = getColorFromName(boulder.holdColour);
       double fadeEffect = 0.3;
 

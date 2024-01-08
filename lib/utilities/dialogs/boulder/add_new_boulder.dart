@@ -2,25 +2,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
+import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 // import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 
-
 Future<void> showAddNewBoulder(
     BuildContext context,
-    boulderService,
-    userService,
+    FirebaseCloudStorage boulderService,
+    FirebaseCloudStorage userService,
     double centerX,
     double centerY,
     String wall,
-    gradingSystem,
+    String gradingSystem,
     CloudProfile currentProfile,
     Stream<Iterable<CloudProfile>> settersStream) async {
   Color? holdColour;
   Color? gradeColor;
   bool topOut = false;
+  bool hiddenGrade = false;
   bool compBoulder = false;
   String selectedGrade = '';
 
@@ -196,6 +197,16 @@ Future<void> showAddNewBoulder(
                             onChanged: (bool? value) {
                               setState(() {
                                 compBoulder = value ?? false;
+                                hiddenGrade = compBoulder;
+                              });
+                            },
+                          ),
+                          CheckboxListTile(
+                            title: const Text('Hide Grade'),
+                            value: hiddenGrade,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                hiddenGrade = value ?? false;
                               });
                             },
                           ),
@@ -214,17 +225,19 @@ Future<void> showAddNewBoulder(
                                 difficultyLevel, gradeColorChoice!);
                           }
                           CloudBoulder? newBoulder;
+                          print(hiddenGrade);
                           try {
                             newBoulder = await boulderService.createNewBoulder(
                                 setter: selectedSetter,
                                 cordX: centerX,
                                 cordY: centerY,
                                 wall: wall,
-                                holdColour: holdColorMap[holdColour],
-                                gradeColour: gradeColorChoice,
+                                holdColour: holdColorMap[holdColour]!,
+                                gradeColour: gradeColorChoice!,
                                 gradeNumberSetter: gradeValue,
                                 topOut: topOut,
                                 active: true,
+                                hiddenGrade: hiddenGrade,
                                 compBoulder: compBoulder,
                                 setDateBoulder: Timestamp.now());
                           } catch (e) {
@@ -243,7 +256,7 @@ Future<void> showAddNewBoulder(
                               var setterProfiles = await userService
                                   .getUserFromDisplayName(selectedSetter)
                                   .first;
-                             CloudProfile setterProfile = setterProfiles.first;
+                              CloudProfile setterProfile = setterProfiles.first;
 
                               double setterPoints = calculateSetterPoints(
                                   setterProfile, newBoulder);
@@ -255,7 +268,9 @@ Future<void> showAddNewBoulder(
                                   setterPoints: setterPoints,
                                   existingData: setterProfile.setBoulders,
                                 ),
-                                setterPoints: updatePoints(points: setterPoints, existingData: setterProfile.setterPoints),
+                                setterPoints: updatePoints(
+                                    points: setterPoints,
+                                    existingData: setterProfile.setterPoints),
                               );
                             } catch (e) {
                               // ignore: use_build_context_synchronously

@@ -14,6 +14,7 @@ const gradingClimbersFieldName = "gradeNumberClimbers";
 const topOutFieldName = "topOut";
 const challengeFieldName = "challenge";
 const activeFieldName = "active";
+const hiddenGradeFieldName = "hiddenGrade";
 const compBoulderFieldName = "compBoulder";
 const setDateBoulderFiledName = "setDateBoulder";
 const updateDateBoulderFiledName = "updateDateBoulder";

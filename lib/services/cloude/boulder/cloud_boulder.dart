@@ -12,6 +12,7 @@ class CloudBoulder {
   final int gradeNumberSetter;
   final bool topOut;
   final bool active;
+  final bool hiddenGrade;
   final bool compBoulder;
   final Map<String, dynamic>? challenge;
   final Map<String, dynamic>? gradeNumberClimbers;
@@ -32,6 +33,7 @@ class CloudBoulder {
     this.gradeNumberSetter,
     this.topOut,
     this.active,
+    this.hiddenGrade,
     this.compBoulder,
     this.setDateBoulder,
     this.updateDateBoulder, {
@@ -50,6 +52,7 @@ class CloudBoulder {
         gradeNumberSetter = snapshot.data()[gradingSetterFieldName] as int,
         topOut = snapshot.data()[topOutFieldName] as bool,
         active = snapshot.data()[activeFieldName] as bool,
+        hiddenGrade = snapshot.data()[hiddenGradeFieldName] as bool,
         compBoulder = snapshot.data()[compBoulderFieldName] as bool,
         setDateBoulder = snapshot.data()[setDateBoulderFiledName] as Timestamp,
         updateDateBoulder = snapshot.data()[updateDateBoulderFiledName] as Timestamp,
