@@ -43,8 +43,8 @@ Map<String, dynamic> updateClimbedBouldersMap(
     int? gradeArrow,
     double? boulderPoints,
     Map<String, dynamic>? existingData}) {
-    String? boulderID = boulder.boulderID;
-    int? gradeNumberBoulder = boulder.gradeNumberSetter;
+  String? boulderID = boulder.boulderID;
+  int? gradeNumberBoulder = boulder.gradeNumberSetter;
 
   Map<String, dynamic> newData = {
     "gradeNumber": gradeNumberBoulder,
@@ -63,24 +63,27 @@ Map<String, dynamic> updateClimbedBouldersMap(
   return bouldersClimbedData;
 }
 
-
+double updatePoints({required double points, double? existingData}) {
+  if (existingData != null) {
+    return points += existingData;
+  } else {return points;}
+}
 
 Map<String, dynamic> updateBoulderSet(
-    {required CloudProfile currentProfile, required CloudBoulder newBoulder, 
-
-required double setterPoints,
+    {required CloudProfile currentProfile,
+    required CloudBoulder newBoulder,
+    required double setterPoints,
     Map<String, dynamic>? existingData}) {
-
-    String boulderID = newBoulder.boulderID;
+  String boulderID = newBoulder.boulderID;
 
   Map<String, dynamic> newData = {
-      'holdColour': newBoulder.holdColour,
-      'gradeColour': newBoulder.gradeColour,
-      'gradeNumberSetter': newBoulder.gradeNumberSetter,
-      'topOut': newBoulder.topOut,
-      'compBoulder': newBoulder.compBoulder,
-      'setDateBoulder': newBoulder.setDateBoulder,
-      "setterPoints": setterPoints,
+    'holdColour': newBoulder.holdColour,
+    'gradeColour': newBoulder.gradeColour,
+    'gradeNumberSetter': newBoulder.gradeNumberSetter,
+    'topOut': newBoulder.topOut,
+    'compBoulder': newBoulder.compBoulder,
+    'setDateBoulder': newBoulder.setDateBoulder,
+    "setterPoints": setterPoints,
   };
 
   Map<String, dynamic> setBoulder = existingData ?? {};
@@ -88,7 +91,6 @@ required double setterPoints,
 
   return setBoulder;
 }
-
 
 Map<String, dynamic> updateClimberToppedMap(
     {required CloudProfile currentProfile,

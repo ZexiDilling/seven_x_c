@@ -239,17 +239,22 @@ Future<void> showAddNewBoulder(
                           }
                           if (newBoulder != null) {
                             try {
-                              var setterProfile = await userService
+                              var setterProfiles = await userService
                                   .getUserFromDisplayName(selectedSetter)
                                   .first;
-                                  setterProfile = setterProfile.first;
+                             CloudProfile setterProfile = setterProfiles.first;
 
                               double setterPoints = calculateSetterPoints(
-                                  setterProfile , newBoulder );
+                                  setterProfile, newBoulder);
                               await userService.updateUser(
                                 currentProfile: setterProfile,
-                                setBoulders: updateBoulderSet(currentProfile: setterProfile, newBoulder: newBoulder, setterPoints: setterPoints),
-                                setterPoints: setterPoints,
+                                setBoulders: updateBoulderSet(
+                                  currentProfile: setterProfile,
+                                  newBoulder: newBoulder,
+                                  setterPoints: setterPoints,
+                                  existingData: setterProfile.setBoulders,
+                                ),
+                                setterPoints: updatePoints(points: setterPoints, existingData: setterProfile.setterPoints),
                               );
                             } catch (e) {
                               // ignore: use_build_context_synchronously
@@ -279,14 +284,12 @@ Future<void> showAddNewBoulder(
       });
 }
 
-double calculateSetterPoints(
-    setterProfile, newBoulder) {
-      
-      // Calculate points based on the conditions
+double calculateSetterPoints(setterProfile, newBoulder) {
+  // Calculate points based on the conditions
   double points = defaultSetterPoints;
   // Get the setBoulders map from the setterProfile
-      Map<String, dynamic> setBoulders = setterProfile.setBoulders ?? {};
-  
+  Map<String, dynamic> setBoulders = setterProfile.setBoulders ?? {};
+
   // Bonus points for green and yellow
   if (newBoulder.gradeColour.toLowerCase() == 'green') {
     points += 3;
@@ -296,7 +299,6 @@ double calculateSetterPoints(
 
   // If setBoulders is null or empty, return default points
   if (setBoulders.isEmpty) {
-
     return points + 5;
   }
 
@@ -325,8 +327,6 @@ double calculateSetterPoints(
 
   // Get the index of the newBoulder's gradeColour in the most created colours list
   int gradeColourIndex = mostCreatedColours.indexOf(newBoulder.gradeColour);
-
-  
 
   if (gradeColourIndex == 0) {
     // Same as most created colour
