@@ -24,6 +24,9 @@ Done - Setter Points!!!
 Done - update setter 
 Done - Update setter points for creating boulders. 
 Done - Filter boulders on other stuff, like comp, not topped, checkbox stuff
+Done - 	Set/remove setter-status from user
+Done - 	Set/remove admin-status from user
+Done - List ppl who topped a boulder 
 ------------------------------------------------------------------------------------------------------------------------
 
 Missing testing:
@@ -33,17 +36,23 @@ Missing testing:
 ToDO:
 ------------------------------------------------------------------------------------------
 
+Boulder view:
+	challenges modul for boulders
+	List ppl who have complete challenges. 
+
+Boulder changes:
+	Add "hid - grade" 
+	Make a unHide all grades button.
+		Put it under "stripping"
+	add Repeat button ? 
+	Update Max climbed Grade for user if higher than current max climbed grade
+	Update Max FLashed Grade for user if higher than current max flashed grade
 
 
 Points: 
 	Get points depending on your max grade for topping/flashing and challenges. 
 	Boulder Points!!! 
 	
-
-Admin page:
-	Set/remove setter-status from user
-	Set/remove admin-status from user
-	Set take-down days for boulders / sections. 
 
 filter:
 	filter on "soon to be taken down"
@@ -58,18 +67,6 @@ Profile view:
 	setter overview
 	make it possible to check others profile ? 
 
-
-Boulder view:
-	List ppl who topped a boulder 
-	challenges modul for boulders
-	List ppl who have complete challenges. 
-
-Boulder changes:
-	Add "hid - grade" 
-	Make a unHide all grades button. 
-	add Repeat button ? 
-	Update Max climbed Grade for user if higher than current max climbed grade
-	Update Max FLashed Grade for user if higher than current max flashed grade
 
 comp module:
 	Set-up total boulder comp
@@ -124,12 +121,12 @@ Settings:
 Clean up:
 	Remove notes 
 	remove unused code
+	Make things pretty
 
 Low priority/ not sure:
 ------------------------------------------------------------------------------------------------------------------------
 Filter:
 	filter on setter
-	
 	Filter Boulders on sections / walls 
 	Mark topped / flashed on all filte boulders
 	Mark topped / flashed on all boulders in view
@@ -150,3 +147,12 @@ Settings:
 profil:
 	Make it possible to delete non-active users ? 
 	Make it possible to re-set the different points, instead of them all at the same time
+
+Admin page:
+	Set take-down days for boulders / sections. 
+	Set up / change grading system
+		Change range for colours
+		Add colours
+	Add/remove hold Colours
+
+

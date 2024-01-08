@@ -1,2 +1,2 @@
-enum MenuAction { logout, settings, stripping }
+enum MenuAction { logout, settings, stripping, adminPanel }
 

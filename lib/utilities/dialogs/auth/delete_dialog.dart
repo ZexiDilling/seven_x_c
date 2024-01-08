@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:seven_x_c/utilities/dialogs/generic_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/auth/generic_dialog.dart';
+
 
 Future<bool> showDeleteDialog(BuildContext context) {
   return showGenericDialog(

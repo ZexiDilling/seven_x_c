@@ -6,7 +6,7 @@ import 'package:seven_x_c/services/auth/auth_exceptions.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_event.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_state.dart';
-import 'package:seven_x_c/utilities/dialogs/error_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 
 class ReisterView extends StatefulWidget {
   const ReisterView({super.key});

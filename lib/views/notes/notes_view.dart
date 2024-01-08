@@ -7,7 +7,7 @@ import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_event.dart';
 import 'package:seven_x_c/services/cloude/notes/cloud_note.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
-import 'package:seven_x_c/utilities/dialogs/logout_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/auth/logout_dialog.dart';
 import 'package:seven_x_c/views/notes/notes_list_view.dart';
 
 class NotesView extends StatefulWidget {
@@ -52,6 +52,8 @@ class _NotesViewState extends State<NotesView> {
                   case MenuAction.settings:
                     // TODO: Handle this case.
                   case MenuAction.stripping:
+                    // TODO: Handle this case.
+                  case MenuAction.adminPanel:
                     // TODO: Handle this case.
                 }
               },
