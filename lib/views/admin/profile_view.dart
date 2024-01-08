@@ -9,7 +9,8 @@ import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_event.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
-import 'package:seven_x_c/utilities/dialogs/error_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
+
 
 class ProfileSettingsView extends StatefulWidget {
   const ProfileSettingsView({super.key});

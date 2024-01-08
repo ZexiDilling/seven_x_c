@@ -11,12 +11,12 @@ import 'package:seven_x_c/services/auth/bloc/auth_event.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
+import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/auth/logout_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/stripping_boulder.dart';
-import 'package:seven_x_c/utilities/dialogs/error_dialog.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/add_new_boulder.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/show_boulder_info.dart';
-import 'package:seven_x_c/utilities/dialogs/logout_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/slides/filter_silde.dart';
 import 'package:vector_math/vector_math_64.dart' as VM;
 

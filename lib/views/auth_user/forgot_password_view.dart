@@ -3,8 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_event.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_state.dart';
-import 'package:seven_x_c/utilities/dialogs/error_dialog.dart';
-import 'package:seven_x_c/utilities/dialogs/password_reset_email_sent_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/auth/password_reset_email_sent_dialog.dart';
+
 
 class ForgotPasswordView extends StatefulWidget {
   const ForgotPasswordView({super.key});

@@ -26,6 +26,7 @@ Done - Update setter points for creating boulders.
 Done - Filter boulders on other stuff, like comp, not topped, checkbox stuff
 Done - 	Set/remove setter-status from user
 Done - 	Set/remove admin-status from user
+Done - List ppl who topped a boulder 
 ------------------------------------------------------------------------------------------------------------------------
 
 Missing testing:
@@ -36,7 +37,6 @@ ToDO:
 ------------------------------------------------------------------------------------------
 
 Boulder view:
-	List ppl who topped a boulder 
 	challenges modul for boulders
 	List ppl who have complete challenges. 
 
@@ -66,7 +66,6 @@ Profile view:
 		each grade
 	setter overview
 	make it possible to check others profile ? 
-
 
 
 comp module:
@@ -122,6 +121,7 @@ Settings:
 Clean up:
 	Remove notes 
 	remove unused code
+	Make things pretty
 
 Low priority/ not sure:
 ------------------------------------------------------------------------------------------------------------------------
