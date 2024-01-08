@@ -33,8 +33,7 @@ class GymView extends StatefulWidget {
 class _GymViewState extends State<GymView> {
   final List<CircleInfo> allBoulders = [];
   final double minZoomThreshold =
-      0; // Adjust this threshold as needed this is for changing when you can add boulders. set to zero for testing purpose
-  // TODO: Handle this case.
+     boulderSingleShow; // Adjust this threshold as needed this is for changing when you can add boulders. set to zero for testing purpose
   final TransformationController _controller = TransformationController();
   String get userId => AuthService.firebase().currentUser!.id;
 
@@ -42,6 +41,7 @@ class _GymViewState extends State<GymView> {
   bool profileLoaded = false;
   bool editing = false;
   bool filterEnabled = false;
+  double currentScale = 1.0;
 
   late final FirebaseCloudStorage _boulderService;
   late final FirebaseCloudStorage _userService;
@@ -187,6 +187,11 @@ class _GymViewState extends State<GymView> {
                     transformationController: _controller,
                     minScale: 0.5,
                     maxScale: 5.0,
+                    onInteractionEnd: (details) {
+                      setState(() {
+                        currentScale = _controller.value.getMaxScaleOnAxis();
+                      });
+                    },
                     child: Container(
                       width: double.infinity,
                       height: double.infinity,
@@ -198,7 +203,8 @@ class _GymViewState extends State<GymView> {
                         ),
                       ),
                       child: CustomPaint(
-                        painter: GymPainter(allBoulders, currentProfile!),
+                        painter: GymPainter(
+                            allBoulders, currentProfile!, currentScale),
                       ),
                     ),
                   ),
@@ -319,8 +325,8 @@ class _GymViewState extends State<GymView> {
         String? wall;
 
         for (final region in wallRegions) {
-          double regionTop = region.wallXMax;
-          double regionBottom = region.wallXMin;
+          double regionTop = region.wallYMaX;
+          double regionBottom = region.wallYMin;
 
           if (tempCenterY >= regionBottom && tempCenterY <= regionTop) {
             wall = region.wallName;

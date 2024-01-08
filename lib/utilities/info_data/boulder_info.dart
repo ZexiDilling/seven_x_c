@@ -2,16 +2,20 @@
 import 'package:flutter/material.dart';
 
 const double boulderRadius = 2.5;
+const double boulderRadiusDrawing = 15;
 const double boulderRadiusTopped = 0.80;
+const double boulderSingleShow = 2.5;
 const double boulderNewGlowRadius = 5.0;
 const double boulderUpdatedGlowRadius = boulderNewGlowRadius;
+const Color hiddenGradeColor = Colors.white;
+const Color newBoulderColour = Colors.purple;
+const Color updatedBoulderColour = Colors.yellow;
+
 const double minBoulderDistance = 10.0;
 const double defaultSetterPoints = 10;
 const double defaultBoulderPoints = 10;
 const double defaultCompBoulderPoints = 100;
-const Color hiddenGradeColor = Colors.white;
-const Color newBoulderColour = Colors.purple;
-const Color updatedBoulderColour = Colors.yellow;
+
 
 final Duration newBoulderNotice = Duration(days: 3);
 final Duration updateBoulderNotice = Duration(days: 2);
@@ -254,6 +258,8 @@ Map<String, List<String>> climbingGrades = {
 
 class WallRegion {
   final String wallID;
+  final double wallYMaX;
+  final double wallYMin;
   final double wallXMax;
   final double wallXMin;
   final String wallName;
@@ -262,6 +268,8 @@ class WallRegion {
 
   WallRegion({
     required this.wallID,
+    required this.wallYMaX,
+    required this.wallYMin,
     required this.wallXMax,
     required this.wallXMin,
     required this.wallName,
@@ -270,92 +278,115 @@ class WallRegion {
 
   });
 }
-
+const double yMax = 270;
+const double yMin = 220;
 List<WallRegion> wallRegions = [
   WallRegion(
     wallID: 'slap',
-    wallXMax: double.infinity,
-    wallXMin: 626,
+    wallYMaX: 670,
+    wallYMin: 626,
+    wallXMax: yMax,
+    wallXMin: yMin,
     wallName: 'Slap',
     section: 1,
     isSelected: false,
   ),
   WallRegion(
     wallID: 'dyno',
-    wallXMax: 626,
-    wallXMin: 561,
+    wallYMaX: 626,
+    wallYMin: 561,
+    wallXMax: yMax,
+    wallXMin: yMin,
     wallName: 'Dyno',
     section: 1,
     isSelected: false,
   ),
   WallRegion(
     wallID: 'chimney',
-    wallXMax: 561,
-    wallXMin: 556,
+    wallYMaX: 561,
+    wallYMin: 556,
+    wallXMax: yMax,
+    wallXMin: yMin,
     wallName: 'Chimney',
     section: 1,
     isSelected: false,
   ),
   WallRegion(
     wallID: 'diamond',
-    wallXMax: 556,
-    wallXMin: 490,
+    wallYMaX: 556,
+    wallYMin: 490,
+    wallXMax: yMax,
+    wallXMin: yMin,
     wallName: 'Diamond',
     section: 1,
     isSelected: false,
   ),
   WallRegion(
     wallID: 'face',
-    wallXMax: 490,
-    wallXMin: 435,
+    wallYMaX: 490,
+    wallYMin: 435,
+    wallXMax: yMax,
+    wallXMin: yMin,
     wallName: 'Face',
     section: 1,
     isSelected: false,
   ),
   WallRegion(
     wallID: 'shroom',
-    wallXMax: 435,
-    wallXMin: 385,
+    wallYMaX: 435,
+    wallYMin: 385,
+    wallXMax: yMax,
+    wallXMin: yMin,
     wallName: 'Shroom',
     section: 2,
     isSelected: false,
   ),
   WallRegion(
     wallID: 'Onyd',
-    wallXMax: 385,
-    wallXMin: 280,
+    wallYMaX: 385,
+    wallYMin: 280,
+    wallXMax: yMax,
+    wallXMin: yMin,
     wallName: 'Onyd',
     section: 2,
     isSelected: false,
   ),
   WallRegion(
     wallID: 'door',
-    wallXMax: 280,
-    wallXMin: 256,
+    wallYMaX: 280,
+    wallYMin: 256,
+    wallXMax: yMax,
+    wallXMin: yMin,
     wallName: 'Door',
     section: 2,
     isSelected: false,
   ),
   WallRegion(
     wallID: 'ARG',
-    wallXMax: 256,
-    wallXMin: 216,
+    wallYMaX: 256,
+    wallYMin: 216,
+    wallXMax: yMax,
+    wallXMin: yMin,
     wallName: 'ARG',
     section: 2,
     isSelected: false,
   ),
   WallRegion(
     wallID: 'Roof',
-    wallXMax: 216,
-    wallXMin: 138,
+    wallYMaX: 216,
+    wallYMin: 138,
+    wallXMax: yMax,
+    wallXMin: yMin,
     wallName: 'Roof',
     section: 3,
     isSelected: false,
   ),
   WallRegion(
     wallID: 'cave',
-    wallXMax: 138,
-    wallXMin: 0,
+    wallYMaX: 138,
+    wallYMin: 0,
+    wallXMax: yMax,
+    wallXMin: yMin,
     wallName: 'Cave',
     section: 3,
     isSelected: false,

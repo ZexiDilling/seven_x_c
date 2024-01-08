@@ -33,7 +33,7 @@ Done - Make it possible to hid and unhid grade for a single boulder
 Done - Make a unHide all grades button. 
 Done - Update gym-painter to colour based on new and updated boulders
 Done - On topped/flashed, make circles smaller
-
+Done - Group up and count per wall or section
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -45,9 +45,6 @@ Missing testing:
 ToDO:
 ------------------------------------------------------------------------------------------
 
-
-Map changes:
-	Group up and count per wall or section - make it toggle ? 
 
 Boulder changes:
 	Add Repeat button 
@@ -61,7 +58,6 @@ Boulder changes:
 Points: 
 	Get points depending on your max grade for topping/flashing and challenges. 
 	Boulder Points!!! 
-	
 
 filter:
 	filter on "soon to be taken down"
@@ -165,4 +161,8 @@ Admin page:
 		Add colours
 	Add/remove hold Colours
 
+Map changes:
+	 make it possible to toggle on and off the zoom effect
+	Make it an effect on the boulders, so they come from the center and jumps out to place and slides back in when zooming out again
+	update the number to fit with "on screen" instread of total based on filter ?
 
