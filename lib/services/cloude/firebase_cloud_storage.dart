@@ -190,6 +190,15 @@ class FirebaseCloudStorage {
     );
   }
 
+  Stream<Iterable<CloudProfile>> getAllUsers() {
+    final allUsers = profile
+        .where(boulderPointsFieldName, isGreaterThan: 0)
+        .snapshots()
+        .map(
+            (event) => event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
+    return allUsers;
+  }
+
   Future<void> deleteUser({required String ownerUserId}) async {
     try {
       await profile.doc(ownerUserId).delete();

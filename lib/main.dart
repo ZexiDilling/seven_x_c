@@ -11,6 +11,7 @@ import 'package:seven_x_c/views/auth_user/login_view.dart';
 import 'package:seven_x_c/views/auth_user/register_view.dart';
 import 'package:seven_x_c/views/auth_user/verify_email_view.dart';
 import 'package:seven_x_c/views/boulder/gym_view.dart';
+import 'package:seven_x_c/views/missing_views/ranking_overview.dart';
 import 'package:seven_x_c/views/notes/create_update_note_view.dart';
 // import 'package:seven_x_c/views/notes/notes_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'
@@ -35,6 +36,7 @@ void main() {
         profileSettings: (context) => const ProfileSettingsView(),
         adminPanel: (context) => const AdminPanelView(),
         gymView: (context) => const GymView(),
+        rankView: (context) => const RankView(),
       },
     ),
   );

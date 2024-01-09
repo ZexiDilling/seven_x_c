@@ -34,7 +34,7 @@ class GymView extends StatefulWidget {
 class _GymViewState extends State<GymView> {
   final List<CircleInfo> allBoulders = [];
   final double minZoomThreshold =
-     boulderSingleShow; // Adjust this threshold as needed this is for changing when you can add boulders. set to zero for testing purpose
+      boulderSingleShow; // Adjust this threshold as needed this is for changing when you can add boulders. set to zero for testing purpose
   final TransformationController _controller = TransformationController();
   String get userId => AuthService.firebase().currentUser!.id;
 
@@ -255,17 +255,19 @@ class _GymViewState extends State<GymView> {
             }
           case MenuAction.adminPanel:
             Navigator.of(context).pushNamed(adminPanel);
+          case MenuAction.rankings:
+            Navigator.of(context).pushNamed(rankView);
         }
       },
       itemBuilder: (context) {
         return [
           const PopupMenuItem(
-            value: MenuAction.settings,
-            child: Text("Settings"),
+            value: MenuAction.rankings,
+            child: Text("Rankings"),
           ),
           const PopupMenuItem(
-            value: MenuAction.logout,
-            child: Text("Log out"),
+            value: MenuAction.settings,
+            child: Text("Settings"),
           ),
           if (currentProfile!.isSetter | currentProfile!.isAdmin)
             const PopupMenuItem(
@@ -276,7 +278,11 @@ class _GymViewState extends State<GymView> {
             const PopupMenuItem(
               value: MenuAction.adminPanel,
               child: Text("Admin"),
-            )
+            ),
+          const PopupMenuItem(
+            value: MenuAction.logout,
+            child: Text("Log out"),
+          ),
         ];
       },
     );

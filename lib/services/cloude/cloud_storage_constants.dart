@@ -21,7 +21,6 @@ const updateDateBoulderFiledName = "updateDateBoulder";
 const climberToppedFieldName = "climberTopped";
 
 //profile
-
 const boulderPointsFieldName = "boulderPoints";
 const setterPointsFieldName = "setterPoints";
 const challengePointsFieldName = "challengePoints";
