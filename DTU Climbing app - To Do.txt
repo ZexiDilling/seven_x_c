@@ -44,6 +44,9 @@ Missing testing:
 
 ToDO:
 ------------------------------------------------------------------------------------------
+Map
+	Should glow around zoomed out markings for new and updated 
+
 
 
 Boulder changes:
@@ -121,6 +124,10 @@ Settings:
 	update settings to work
 	delete / hide options that are not needed
 
+Setter:
+	Make it possible to set a non-setter as a setter
+	Make an anomenus-setter
+	Make a DTU setter team setter
 
 Clean up:
 	Remove notes 
