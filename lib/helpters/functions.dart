@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
@@ -36,8 +35,9 @@ Map<String, dynamic> updateClimberBoulderSetMap(
 
 Map<String, dynamic> updateClimbedBouldersMap(
     {required CloudBoulder boulder,
-    required int attempts,
-    required bool flashed,
+    int? attempts,
+    bool? flashed,
+    int? repeats,
     bool? topped,
     String? gradeColour,
     int? gradeArrow,
@@ -51,6 +51,7 @@ Map<String, dynamic> updateClimbedBouldersMap(
     "gradeColour": gradeColour,
     "gradeArrow": gradeArrow,
     'attempts': attempts,
+    "repeats": repeats,
     "topped": topped,
     'flashed': flashed,
     "points": boulderPoints,
@@ -97,6 +98,7 @@ Map<String, dynamic> updateClimberToppedMap(
     required int attempts,
     required bool flashed,
     required bool topped,
+    int? repeats,
     int? gradeNumberVoted,
     String? gradeColourVoted,
     int? gradeArrowVoted,
@@ -109,6 +111,7 @@ Map<String, dynamic> updateClimberToppedMap(
     "displayName": displayName,
     "isAnonymous": isAnonymous,
     'attempts': attempts,
+    "repeats": repeats,
     "topped": topped,
     'flashed': flashed,
     "gradeNumber": gradeNumberVoted,

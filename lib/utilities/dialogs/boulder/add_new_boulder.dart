@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
@@ -20,6 +21,8 @@ Future<void> showAddNewBoulder(
     Stream<Iterable<CloudProfile>> settersStream) async {
   Color? holdColour;
   Color? gradeColor;
+  bool setterTeam = false;
+  bool guestSetterTeam = false;
   bool topOut = false;
   bool hiddenGrade = false;
   bool compBoulder = false;
@@ -182,15 +185,34 @@ Future<void> showAddNewBoulder(
                             decoration: const InputDecoration(
                                 labelText: 'Choose Setter'),
                           ),
+                          Row(children: [
+                            CheckboxListTile(
+                                title: const Text(dtuSetterName),
+                                value: setterTeam,
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    setterTeam = value ?? false;
+                                    guestSetterTeam = false;
+                                  });
+                                }),
+                            CheckboxListTile(
+                                title: const Text(guestSetter),
+                                value: guestSetterTeam,
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    guestSetterTeam = value ?? false;
+                                    setterTeam = false;
+                                  });
+                                })
+                          ]),
                           CheckboxListTile(
-                            title: const Text('Top Out'),
-                            value: topOut,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                topOut = value ?? false;
-                              });
-                            },
-                          ),
+                              title: const Text('Top Out'),
+                              value: topOut,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  topOut = value ?? false;
+                                });
+                              }),
                           CheckboxListTile(
                             title: const Text('Comp'),
                             value: compBoulder,
@@ -225,11 +247,13 @@ Future<void> showAddNewBoulder(
                                 difficultyLevel, gradeColorChoice!);
                           }
                           CloudBoulder? newBoulder;
-                          print("wall - $wall");
-                          print("hiddenGrade - $hiddenGrade");
                           try {
                             newBoulder = await boulderService.createNewBoulder(
-                                setter: selectedSetter,
+                                setter: setterTeam == true
+                                    ? dtuSetterName
+                                    : (guestSetterTeam == true
+                                        ? guestSetter
+                                        : selectedSetter),
                                 cordX: centerX,
                                 cordY: centerY,
                                 wall: wall,
@@ -253,32 +277,35 @@ Future<void> showAddNewBoulder(
                             }
                           }
                           if (newBoulder != null) {
-                            try {
-                              var setterProfiles = await userService
-                                  .getUserFromDisplayName(selectedSetter)
-                                  .first;
-                              CloudProfile setterProfile = setterProfiles.first;
+                            if (!setterTeam && !guestSetterTeam) {
+                              try {
+                                var setterProfiles = await userService
+                                    .getUserFromDisplayName(selectedSetter)
+                                    .first;
+                                CloudProfile setterProfile =
+                                    setterProfiles.first;
 
-                              double setterPoints = calculateSetterPoints(
-                                  setterProfile, newBoulder);
-                              await userService.updateUser(
-                                currentProfile: setterProfile,
-                                setBoulders: updateBoulderSet(
+                                double setterPoints = calculateSetterPoints(
+                                    setterProfile, newBoulder);
+                                await userService.updateUser(
                                   currentProfile: setterProfile,
-                                  newBoulder: newBoulder,
-                                  setterPoints: setterPoints,
-                                  existingData: setterProfile.setBoulders,
-                                ),
-                                setterPoints: updatePoints(
-                                    points: setterPoints,
-                                    existingData: setterProfile.setterPoints),
-                              );
-                            } catch (e) {
-                              // ignore: use_build_context_synchronously
-                              showErrorDialog(context, "$e");
+                                  setBoulders: updateBoulderSet(
+                                    currentProfile: setterProfile,
+                                    newBoulder: newBoulder,
+                                    setterPoints: setterPoints,
+                                    existingData: setterProfile.setBoulders,
+                                  ),
+                                  setterPoints: updatePoints(
+                                      points: setterPoints,
+                                      existingData: setterProfile.setterPoints),
+                                );
+                              } catch (e) {
+                                // ignore: use_build_context_synchronously
+                                showErrorDialog(context, "$e");
+                              }
+                            } else {
+                              print("FUCK!");
                             }
-                          } else {
-                            print("FUCK!");
                           }
                           // ignore: use_build_context_synchronously
                           Navigator.of(context).pop();

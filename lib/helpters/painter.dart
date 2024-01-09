@@ -1,4 +1,7 @@
+import 'dart:math' show pi;
+
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
@@ -10,18 +13,20 @@ class GymPainter extends CustomPainter {
   double currentScale;
 
   GymPainter(this.allBoulders, this.currentProfile, this.currentScale);
-
+  DateTime currentTime = DateTime.now();
   @override
   void paint(Canvas canvas, Size size) {
     Map<String, int> bouldersCountPerWall = {};
     Map<String, int> userToppedBouldersCountPerWall = {};
+    Map<String, Color> glowForMapMarkings = {};
     bool userTopped = false;
     bool userFlashed = false;
+    Color? glowColour;
     if (currentScale >= boulderSingleShow) {
       for (final CloudBoulder boulder in allBoulders) {
         DateTime setBoulderDate = boulder.setDateBoulder.toDate();
         DateTime? updatedBoulderDate = boulder.updateDateBoulder?.toDate();
-        DateTime currentTime = DateTime.now();
+
         Color? gradeColour = boulder.hiddenGrade == true
             ? hiddenGradeColor
             : getColorFromName(capitalizeFirstLetter(boulder.gradeColour));
@@ -52,6 +57,14 @@ class GymPainter extends CustomPainter {
 
         if (setBoulderDate.add(newBoulderNotice).isAfter(currentTime) &&
             (!userTopped && !userFlashed)) {
+          glowColour = newBoulderColour;
+        } else if (updatedBoulderDate != null &&
+            updatedBoulderDate.add(updateBoulderNotice).isAfter(currentTime) &&
+            (!userTopped && !userFlashed)) {
+          glowColour = updatedBoulderColour;
+        }
+
+        if (glowColour != null) {
           final Paint glowPaint = Paint()
             ..color = newBoulderColour.withOpacity(0.2)
             ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.2);
@@ -60,19 +73,6 @@ class GymPainter extends CustomPainter {
             Offset(boulder.cordX, boulder.cordY),
             boulderRadius +
                 boulderNewGlowRadius, // Adjust the radius to make the glow more visible
-            glowPaint,
-          );
-        } else if (updatedBoulderDate != null &&
-            updatedBoulderDate.add(updateBoulderNotice).isAfter(currentTime) &&
-            (!userTopped && !userFlashed)) {
-          final Paint glowPaint = Paint()
-            ..color = updatedBoulderColour.withOpacity(0.2)
-            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.2);
-
-          canvas.drawCircle(
-            Offset(boulder.cordX, boulder.cordY),
-            boulderRadius +
-                boulderUpdatedGlowRadius, // Adjust the radius to make the glow more visible
             glowPaint,
           );
         }
@@ -94,6 +94,9 @@ class GymPainter extends CustomPainter {
       // setup for show only one boulder
     } else {
       for (final CloudBoulder boulder in allBoulders) {
+        DateTime setBoulderDate = boulder.setDateBoulder.toDate();
+        DateTime? updatedBoulderDate = boulder.updateDateBoulder?.toDate();
+
         // Count boulders per WallRegion
         bouldersCountPerWall[boulder.wall] =
             (bouldersCountPerWall[boulder.wall] ?? 0) + 1;
@@ -111,25 +114,39 @@ class GymPainter extends CustomPainter {
           userToppedBouldersCountPerWall[boulder.wall] =
               (userToppedBouldersCountPerWall[boulder.wall] ?? 0) + 1;
         }
+
+        if (setBoulderDate.add(newBoulderNotice).isAfter(currentTime) &&
+            (!userTopped && !userFlashed)) {
+          glowForMapMarkings[boulder.wall] = newBoulderColour;
+        } else if (updatedBoulderDate != null &&
+            updatedBoulderDate.add(updateBoulderNotice).isAfter(currentTime) &&
+            (!userTopped && !userFlashed)) {
+          if (glowForMapMarkings[boulder.wall] == null) {
+            glowForMapMarkings[boulder.wall] = updatedBoulderColour;
+          }
+        }
       }
 
       for (final WallRegion wall in wallRegions) {
         final int bouldersCountTotal = bouldersCountPerWall[wall.wallName] ?? 0;
-        final int boulderCountMissing = bouldersCountTotal -
-            (userToppedBouldersCountPerWall[wall.wallName] ?? 0);
+        // final int boulderCountMissing = bouldersCountTotal -
+        //     (userToppedBouldersCountPerWall[wall.wallName] ?? 0);
+        final int boulderCountTopped = userToppedBouldersCountPerWall[wall.wallName] ?? 0;
         final Offset center = Offset(
           (wall.wallXMax + wall.wallXMin) / 2,
           (wall.wallYMaX + wall.wallYMin) / 2,
         );
 
+        // setup main circle
         final Paint paint = Paint()
           ..color = Colors.red // Set your desired color
           ..style = PaintingStyle.fill;
 
+        // set-up central boulder count
         final TextPainter textPainter = TextPainter(
           text: TextSpan(
             text:
-                "${boulderCountMissing.toString()} / ${bouldersCountTotal.toString()}",
+                "${boulderCountTopped.toString()} / ${bouldersCountTotal.toString()}",
             style: const TextStyle(
               color: Colors.black, // Set your desired text color
               fontSize: 10.0, // Set your desired font size
@@ -143,26 +160,57 @@ class GymPainter extends CustomPainter {
           center.dx - textPainter.width / 2,
           center.dy - textPainter.height / 2,
         );
+
+        // Draw Main circle
         canvas.drawCircle(
             center, boulderRadiusDrawing, paint); // Set the radius as needed
+
+        // Name of the wall
         textPainter.paint(canvas, textOffset);
         final TextPainter wallNamePainter = TextPainter(
           text: TextSpan(
-            text: wall.wallName,
+            text: wall.wallName == "Onyd" ? "DYNO" : wall.wallName,
             style: const TextStyle(
-              color: Colors.black, // Set your desired text color
-              fontSize: 10.0, // Set your desired font size
+              color: Colors.black,
+              fontSize: 10.0,
             ),
           ),
           textDirection: TextDirection.ltr,
         );
 
+        // Set name for the wall
         wallNamePainter.layout();
         final Offset wallNameOffset = Offset(
           center.dx + boulderRadiusDrawing + 5, // Adjust the spacing
           center.dy - wallNamePainter.height / 2,
         );
-        wallNamePainter.paint(canvas, wallNameOffset);
+        if (wall.wallName == "Onyd") {
+          canvas.save();
+          canvas.translate(wallNameOffset.dx, wallNameOffset.dy);
+          canvas.rotate(-pi); // Rotate the text by 180 degrees (pi radians)
+          wallNamePainter.paint(
+              canvas,
+              Offset(
+                  -wallNamePainter.width,
+                  -wallNamePainter.height /
+                      2)); // Adjust the placement after rotation
+          canvas.restore();
+        } else {
+          wallNamePainter.paint(canvas, wallNameOffset);
+        }
+
+        // add glow if needed
+        if (glowForMapMarkings[wall.wallName] != null) {
+          final Paint glowPaint = Paint()
+            ..color = newBoulderColour.withOpacity(0.2)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.2);
+
+          canvas.drawCircle(
+            center,
+            boulderRadiusDrawing + boulderNewGlowRadius,
+            glowPaint,
+          );
+        }
       }
     }
   }

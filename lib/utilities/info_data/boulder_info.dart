@@ -1,25 +1,6 @@
 
 import 'package:flutter/material.dart';
 
-const double boulderRadius = 2.5;
-const double boulderRadiusDrawing = 15;
-const double boulderRadiusTopped = 0.80;
-const double boulderSingleShow = 2.5;
-const double boulderNewGlowRadius = 5.0;
-const double boulderUpdatedGlowRadius = boulderNewGlowRadius;
-const Color hiddenGradeColor = Colors.white;
-const Color newBoulderColour = Colors.purple;
-const Color updatedBoulderColour = Colors.yellow;
-
-const double minBoulderDistance = 10.0;
-const double defaultSetterPoints = 10;
-const double defaultBoulderPoints = 10;
-const double defaultCompBoulderPoints = 100;
-
-
-final Duration newBoulderNotice = Duration(days: 3);
-final Duration updateBoulderNotice = Duration(days: 2);
-
 double calculateDistance(double x1, double y1, double x2, double y2) {
   return ((x2 - x1).abs() + (y2 - y1).abs());
 }

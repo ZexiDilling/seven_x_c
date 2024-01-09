@@ -95,8 +95,9 @@ class FirebaseCloudStorage {
       if (active != null) updatedData[activeFieldName] = active;
       if (hiddenGrade != null) updatedData[hiddenGradeFieldName] = hiddenGrade;
       if (compBoulder != null) updatedData[compBoulderFieldName] = compBoulder;
-      if (updateDateBoulder != null)
+      if (updateDateBoulder != null) {
         updatedData[updateDateBoulderFiledName] = updateDateBoulder;
+      }
       if (challenge != null) updatedData[challengeFieldName] = challenge;
       if (gradeNumberClimbers != null) {
         updatedData[gradingClimbersFieldName] = gradeNumberClimbers;
@@ -212,6 +213,8 @@ class FirebaseCloudStorage {
     String? email,
     String? displayName,
     String? gradingSystem,
+    int? maxFlahsedGrade,
+    int? maxToppedGrade,
   }) async {
     try {
       // Create a map to store non-null fields and their values
@@ -243,6 +246,12 @@ class FirebaseCloudStorage {
       if (displayName != null) updatedData[displayNameFieldName] = displayName;
       if (gradingSystem != null) {
         updatedData[gradingSystemFieldName] = gradingSystem;
+      }
+      if (maxFlahsedGrade != null) {
+        updatedData[maxFlashedGradeFieldName] = maxFlahsedGrade;
+      }
+      if (maxToppedGrade != null) {
+        updatedData[maxToppedGradeFieldName] = maxToppedGrade;
       }
 
       updatedData[updateDateProfileFieldName] = Timestamp.now();

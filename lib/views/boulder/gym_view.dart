@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/constants/routes.dart';
 import 'package:seven_x_c/enums/menu_action.dart';
 import 'package:seven_x_c/helpters/painter.dart';

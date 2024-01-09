@@ -34,36 +34,34 @@ Done - Make a unHide all grades button.
 Done - Update gym-painter to colour based on new and updated boulders
 Done - On topped/flashed, make circles smaller
 Done - Group up and count per wall or section
+Done - Should glow around zoomed out markings for new and updated 
+Done - ONYD should now be DYNO upside down. 
+Done - Add Repeat button 
+Done - Change "attempts" to repeat when topped is marked and update a counter somewhere to that number...
+Done - Add Repeat Tracking
 
 ------------------------------------------------------------------------------------------------------------------------
 
 Missing testing:
+Done - Update Max climbed Grade for user if higher than current max climbed grade
+Done - Update Max FLashed Grade for user if higher than current max flashed grade
+Done - Boulder Points!!! 
+			Get points depending on your max grade for topping/flashing and challenges. 
+			Get points  for repeat climbs. Less per repeat. 
+			substract boulderpoints if user have no longer topped a boulder
+Done - incase of removing mark:
+			Update Max climbed Grade back to previus if removed boulder was Max climbed Grade
+			Update Max FLashed Grade back to previus if removed boulder was Max flashed Grade
 
+Done - Make a DTU setter team setter
+Done - Make A guest Setter 
+	
 ------------------------------------------------------------------------------------------------------------------------
 
 
 ToDO:
 ------------------------------------------------------------------------------------------
-Map
-	Should glow around zoomed out markings for new and updated 
 
-
-
-Boulder changes:
-	Add Repeat button 
-	Change "attempts" to repeat when topped is marked and update a counter somewhere to that number...
-	Add Repeat Tracking
-	
-	Update Max climbed Grade for user if higher than current max climbed grade
-	Update Max FLashed Grade for user if higher than current max flashed grade
-
-
-Points: 
-	Get points depending on your max grade for topping/flashing and challenges. 
-	Boulder Points!!! 
-
-filter:
-	filter on "soon to be taken down"
 
 Setter view:
 	Setter rankings ? 
@@ -91,11 +89,6 @@ comp module:
 	Add a comp map to the user ? ?
 		How Do i want to track stuff ? 
 	
-Calender
-	Section cleaning
-	Setting
-
-
 
 Boulder view:
 	challenges modul for boulders
@@ -110,9 +103,14 @@ Challenges:
 	Make a filter for boulders with challenges
 	add a challenge map to the user?
 		How do I want to track this on the user ? 
-
 		
 Extra info:
+	Explain stuff
+		What does the central colour mean
+		what does the colour around mean
+		What are the gradings ? 
+			Make that dynamic, depending on the Grading Map
+		This needs to be a 1-pages
 	Guidelines
 	Rules
 	Posters
@@ -120,19 +118,28 @@ Extra info:
 	opening-closing times
 	boulder list bar graph ? 
 
+	Explain Point system
+		Boulder
+		Setter
+
+Calender
+	Section cleaning
+	Setting
+
+
 Settings:
-	update settings to work
+	update settings to work ?? 
 	delete / hide options that are not needed
 
 Setter:
 	Make it possible to set a non-setter as a setter
-	Make an anomenus-setter
-	Make a DTU setter team setter
+
 
 Clean up:
 	Remove notes 
 	remove unused code
 	Make things pretty
+	clean up code
 
 Low priority/ not sure:
 ------------------------------------------------------------------------------------------------------------------------
@@ -141,8 +148,18 @@ Filter:
 	Filter Boulders on sections / walls 
 	Mark topped / flashed on all filte boulders
 	Mark topped / flashed on all boulders in view
+	filter on "soon to be taken down"
+		To use this, I need the walls in firebase... to be able to set a strip date on the different sections.
 
 Hide/unHide - move under comp settings ? 
+
+boulder:
+	Update when clicking
+		on topped
+		on flashed
+		on attempts
+		on repeats
+		on grade
 
 rankings:
 	Make a list of Boulders set per semester both grading, hold colour, wall, section and setters
@@ -173,3 +190,6 @@ Map changes:
 	Make it an effect on the boulders, so they come from the center and jumps out to place and slides back in when zooming out again
 	update the number to fit with "on screen" instread of total based on filter ?
 
+setting: 
+	Keep track of DTU Setter team ?
+Keep track of Guest setters ? 

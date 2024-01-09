@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
@@ -17,8 +20,10 @@ Future<void> showBoulderInformation(
     FirebaseCloudStorage userService,
     Stream<Iterable<CloudProfile>> settersStream) async {
   int attempts = 0;
+  int repeats = 0;
   bool flashed = false;
   bool topped = false;
+  bool previusTopped = false;
   // const gradingSystem = "coloured";
   // const gradingSystem = "v_grade";
   // const gradingSystem = "french";
@@ -73,17 +78,18 @@ Future<void> showBoulderInformation(
     if (boulder.climberTopped!.containsKey(currentProfile.userID)) {
       var userClimbInfo = boulder.climberTopped![currentProfile.userID];
       attempts = userClimbInfo['attempts'] ?? 0;
+      repeats = userClimbInfo["repeats"] ?? 0;
       flashed = userClimbInfo['flashed'] ?? false;
       topped = userClimbInfo['topped'] ?? false;
+      previusTopped = topped;
       gradeValue = userClimbInfo["gradeNumber"] ?? 0;
 
       if (userClimbInfo["gradeColour"] != "" &&
           userClimbInfo["gradeColour"] != null) {
         voted = true;
       }
-      gradeColour = getColorFromName(userClimbInfo["gradeColour"] ??
-          boulder.gradeColour);
-      print("gradeColor - $gradeColour");
+      gradeColour =
+          getColorFromName(userClimbInfo["gradeColour"] ?? boulder.gradeColour);
       gradeColorChoice = gradeColorMap[gradeColour];
       selectedGrade = allGrading[gradeValue]![gradingSystem];
       // difficultyLevel = userClimbInfo["gradeArrowVoted"] ?? 0;
@@ -191,6 +197,16 @@ Future<void> showBoulderInformation(
                               child: Column(
                                 children: [
                                   Row(children: [
+                                    const Text("Topped"),
+                                    Checkbox(
+                                      value: topped,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          topped = value ?? false;
+                                        });
+                                      },
+                                    ),
+                                    const Spacer(),
                                     const Text("Flashed"),
                                     Checkbox(
                                       value: flashed,
@@ -203,43 +219,75 @@ Future<void> showBoulderInformation(
                                       },
                                     ),
                                   ]),
-                                  Row(children: [
-                                    const Text("Topped"),
-                                    Checkbox(
-                                      value: topped,
-                                      onChanged: (bool? value) {
-                                        setState(() {
-                                          topped = value ?? false;
-                                        });
-                                      },
-                                    ),
-                                  ]),
-                                  const SizedBox(height: 20),
-                                  Row(children: [
-                                    const Text('Attempts:'),
-                                    IconButton(
-                                      icon: const Icon(Icons.arrow_downward),
-                                      onPressed: () {
-                                        setState(() {
-                                          attempts = (attempts - 1)
-                                              .clamp(0, double.infinity)
-                                              .toInt();
-                                        });
-                                      },
-                                    ),
-                                    Text('$attempts'),
-                                    IconButton(
-                                      icon: const Icon(Icons.arrow_upward),
-                                      onPressed: () {
-                                        setState(() {
-                                          attempts++;
-                                          if (attempts > 1) {
-                                            flashed = false;
-                                          }
-                                        });
-                                      },
-                                    ),
-                                  ]),
+                                  const SizedBox(height: 10),
+                                  topped == true
+                                      ? Column(
+                                          children: [
+                                            Text(
+                                                "Topped in ${attempts == 0 ? '??' : attempts}"),
+                                            Row(children: [
+                                              const Text('Repeats:'),
+                                              IconButton(
+                                                icon: const Icon(
+                                                    Icons.arrow_downward),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    repeats = (repeats - 1)
+                                                        .clamp(
+                                                            0, double.infinity)
+                                                        .toInt();
+                                                  });
+                                                },
+                                              ),
+                                              Text('$repeats'),
+                                              IconButton(
+                                                icon: const Icon(
+                                                    Icons.arrow_upward),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    repeats++;
+                                                    if (repeats > 1) {
+                                                      flashed = false;
+                                                    }
+                                                  });
+                                                },
+                                              ),
+                                            ])
+                                          ],
+                                        )
+                                      : Column(
+                                          children: [
+                                            const Text(""),
+                                            Row(children: [
+                                              const Text('Attempts:'),
+                                              IconButton(
+                                                icon: const Icon(
+                                                    Icons.arrow_downward),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    attempts = (attempts - 1)
+                                                        .clamp(
+                                                            0, double.infinity)
+                                                        .toInt();
+                                                  });
+                                                },
+                                              ),
+                                              Text('$attempts'),
+                                              IconButton(
+                                                icon: const Icon(
+                                                    Icons.arrow_upward),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    attempts++;
+                                                    if (attempts > 1) {
+                                                      flashed = false;
+                                                    }
+                                                  });
+                                                },
+                                              ),
+                                            ])
+                                          ],
+                                        ),
                                 ],
                               ),
                             ),
@@ -428,23 +476,7 @@ Future<void> showBoulderInformation(
                                         },
                                       ),
                                       const Text('Grade Colour Chart'),
-                                      SizedBox(
-                                        width: 250,
-                                        height: 150,
-                                        child: BarChart(
-                                          BarChartData(
-                                            gridData:
-                                                const FlGridData(show: false),
-                                            groupsSpace: 12,
-                                            borderData:
-                                                FlBorderData(show: false),
-                                            titlesData:
-                                                const FlTitlesData(show: false),
-                                            barGroups: getGradeColourChartData(
-                                                boulder),
-                                          ),
-                                        ),
-                                      ),
+                                      barGraphColours(boulder),
                                     ],
                                   )
                                 : Column(
@@ -502,44 +534,8 @@ Future<void> showBoulderInformation(
                                                   },
                                                 )),
                                       const SizedBox(height: 20),
-                                      SizedBox(
-                                        width: 250,
-                                        height: 200,
-                                        child: BarChart(
-                                          BarChartData(
-                                            gridData:
-                                                const FlGridData(show: false),
-                                            groupsSpace: 12,
-                                            borderData:
-                                                FlBorderData(show: false),
-                                            titlesData: FlTitlesData(
-                                                show: true,
-                                                topTitles: const AxisTitles(
-                                                    sideTitles: SideTitles(
-                                                        showTitles: false)),
-                                                leftTitles: const AxisTitles(
-                                                    sideTitles: SideTitles(
-                                                        showTitles: false)),
-                                                rightTitles: const AxisTitles(
-                                                    sideTitles: SideTitles(
-                                                        showTitles: false)),
-                                                bottomTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                    showTitles: true,
-                                                    getTitlesWidget: (double
-                                                                value,
-                                                            TitleMeta meta) =>
-                                                        getBottomTitlesNumberGrade(
-                                                            value,
-                                                            meta,
-                                                            gradingSystem),
-                                                  ),
-                                                )),
-                                            barGroups: getGradeNumberChartData(
-                                                boulder, gradingSystem),
-                                          ),
-                                        ),
-                                      ),
+                                      barChartGradeNumbering(
+                                          gradingSystem, boulder),
                                     ],
                                   ),
                             const SizedBox(height: 20),
@@ -594,6 +590,7 @@ Future<void> showBoulderInformation(
                                   climberTopped: updateClimberToppedMap(
                                       currentProfile: currentProfile,
                                       attempts: attempts,
+                                      repeats: repeats,
                                       flashed: flashed,
                                       topped: topped,
                                       existingData: boulder.climberTopped,
@@ -601,20 +598,87 @@ Future<void> showBoulderInformation(
                                       gradeColourVoted: gradeColorChoice,
                                       gradeArrowVoted: difficultyLevel),
                                 );
+                                double orgBoulderPoints;
+                                int maxFlahsedGrade;
+                                int maxToppedGrade;
                                 if (topped == true) {
+                                  if (currentProfile.maxFlahsedGrade <
+                                      boulder.gradeNumberSetter) {
+                                    maxFlahsedGrade = boulder.gradeNumberSetter;
+                                  } else {
+                                    maxFlahsedGrade =
+                                        currentProfile.maxFlahsedGrade;
+                                  }
+                                  if (currentProfile.maxToppedGrade <
+                                      boulder.gradeNumberSetter) {
+                                    maxToppedGrade = boulder.gradeNumberSetter;
+                                  } else {
+                                    maxToppedGrade =
+                                        currentProfile.maxToppedGrade;
+                                  }
+                                  boulderPoints = calculateboulderPoints(
+                                      currentProfile,
+                                      boulder,
+                                      repeats,
+                                      flashed);
+                                  if (currentProfile
+                                          .climbedBoulders![boulder.boulderID]
+                                      ["topped"]) {
+                                    orgBoulderPoints = currentProfile
+                                            .climbedBoulders![boulder.boulderID]
+                                        ["boulderPoints"];
+                                  } else {
+                                    orgBoulderPoints = boulderPoints;
+                                  }
                                   userService.updateUser(
-                                      boulderPoints: boulderPoints,
+                                      boulderPoints: updatePoints(
+                                          points: boulderPoints,
+                                          existingData:
+                                              currentProfile.boulderPoints),
                                       currentProfile: currentProfile,
+                                      maxFlahsedGrade: maxFlahsedGrade,
+                                      maxToppedGrade: maxToppedGrade,
                                       climbedBoulders: updateClimbedBouldersMap(
                                           boulder: boulder,
                                           topped: topped,
-                                          attempts: attempts,
                                           flashed: flashed,
+                                          attempts: attempts,
+                                          repeats: repeats,
                                           gradeColour: gradeColorChoice,
                                           gradeArrow: difficultyLevel,
-                                          boulderPoints: boulderPoints,
+                                          boulderPoints: orgBoulderPoints,
                                           existingData:
                                               currentProfile.climbedBoulders));
+                                } else if (topped == false && previusTopped) {
+                                  // ToDo remove boulder from user and substract boulder points from the user.
+                                  if (boulder.gradeNumberSetter ==
+                                      currentProfile.maxFlahsedGrade) {
+                                    maxFlahsedGrade =
+                                        checkGrade(currentProfile, boulder.boulderID, "flashed");
+                                  } else {
+                                    maxFlahsedGrade =
+                                        currentProfile.maxFlahsedGrade;
+                                  }
+                                  if (boulder.gradeNumberSetter ==
+                                      currentProfile.maxToppedGrade) {
+                                    maxToppedGrade =
+                                        checkGrade(currentProfile, boulder.boulderID, "topped");
+                                  } else {
+                                    maxToppedGrade =
+                                        currentProfile.maxToppedGrade;
+                                  }
+                                  orgBoulderPoints = -currentProfile
+                                          .climbedBoulders![boulder.boulderID]
+                                      ["boulderPoints"];
+                                  userService.updateUser(
+                                    currentProfile: currentProfile,
+                                    boulderPoints: updatePoints(
+                                        points: orgBoulderPoints,
+                                        existingData:
+                                            currentProfile.boulderPoints),
+                                    maxFlahsedGrade: maxFlahsedGrade,
+                                    maxToppedGrade: maxToppedGrade,
+                                  );
                                 }
                                 Navigator.of(context).pop();
                               },
@@ -668,5 +732,113 @@ Future<void> showBoulderInformation(
             }
           });
     },
+  );
+}
+
+int checkGrade(CloudProfile currentProfile, String boulderID, String style) {
+  int maxValue = 0;
+  for (String boulder in currentProfile.climbedBoulders!.keys) {
+    if (boulderID != boulder) {
+      int gradeForBoulder = currentProfile.climbedBoulders![boulder][style];
+      if (maxValue < gradeForBoulder) {
+        maxValue = gradeForBoulder;
+      }
+    }
+  }
+  return maxValue;
+}
+
+double calculateboulderPoints(CloudProfile currentProfile, CloudBoulder boulder,
+    int repeats, bool flashed) {
+  double boulderPoints = defaultBoulderPoints;
+  int gradeNumber = boulder.gradeNumberSetter;
+  int maxFlahsedGrade = currentProfile.maxFlahsedGrade;
+  int maxToppedGrade = currentProfile.maxToppedGrade;
+
+  boulderPoints = boulderPoints *
+      calculateMultiplierFromGrade(
+        gradeNumber,
+        maxFlahsedGrade,
+        maxToppedGrade,
+        flashed,
+      );
+
+  // Check if the user have points from this boulder
+  if (currentProfile.climbedBoulders!.containsKey((boulder.boulderID))) {
+    if (currentProfile.climbedBoulders![boulder.boulderID]["topped"]) {
+      boulderPoints = boulderPoints *
+          (repeats > 0
+              ? repeatsMultiplier - (repeats - 1) * repeatsDecrement
+              : 0);
+    }
+  }
+
+  return boulderPoints;
+}
+
+double calculateMultiplierFromGrade(
+    int gradeNumber, int maxFlahsedGrade, int maxToppedGrade, bool flashed) {
+  double baseMultiplier = 1.0;
+  double newMultiplier;
+  if (gradeNumber > maxFlahsedGrade && flashed) {
+    newMultiplier = baseMultiplier + newFlashGradeMultiplier;
+  }
+
+  int gradeDiffer = gradeNumber - maxToppedGrade;
+
+  if (gradeDiffer < 0) {
+    newMultiplier = baseMultiplier + newToppedGradeMultiplier;
+  } else if (gradeDiffer == 0) {
+    newMultiplier = baseMultiplier;
+  } else {
+    newMultiplier = max(baseMultiplier - (decrementMultipler * gradeDiffer), 0);
+  }
+
+  return newMultiplier;
+}
+
+SizedBox barGraphColours(CloudBoulder boulder) {
+  return SizedBox(
+    width: 250,
+    height: 150,
+    child: BarChart(
+      BarChartData(
+        gridData: const FlGridData(show: false),
+        groupsSpace: 12,
+        borderData: FlBorderData(show: false),
+        titlesData: const FlTitlesData(show: false),
+        barGroups: getGradeColourChartData(boulder),
+      ),
+    ),
+  );
+}
+
+SizedBox barChartGradeNumbering(String gradingSystem, CloudBoulder boulder) {
+  return SizedBox(
+    width: 250,
+    height: 200,
+    child: BarChart(
+      BarChartData(
+        gridData: const FlGridData(show: false),
+        groupsSpace: 12,
+        borderData: FlBorderData(show: false),
+        titlesData: FlTitlesData(
+            show: true,
+            topTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (double value, TitleMeta meta) =>
+                    getBottomTitlesNumberGrade(value, meta, gradingSystem),
+              ),
+            )),
+        barGroups: getGradeNumberChartData(boulder, gradingSystem),
+      ),
+    ),
   );
 }
