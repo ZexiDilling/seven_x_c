@@ -55,16 +55,18 @@ Done - incase of removing mark:
 
 Done - Make a DTU setter team setter
 Done - Make A guest Setter 
+
+Done - ranking view Boulder Points
+Done - ranking view Boulder Amount
+Done - ranking view Setter Points
+Done - ranking view Setter Amount
+Done - Ranking view based on time
 	
 ------------------------------------------------------------------------------------------------------------------------
 
 
 ToDO:
 ------------------------------------------------------------------------------------------
-
-
-Setter view:
-	Setter rankings ? 
 
 Profile view:
 	grading progression
@@ -103,6 +105,7 @@ Challenges:
 	Make a filter for boulders with challenges
 	add a challenge map to the user?
 		How do I want to track this on the user ? 
+	Ranking View 
 		
 Extra info:
 	Explain stuff
