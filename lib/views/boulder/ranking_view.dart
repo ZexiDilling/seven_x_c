@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
@@ -242,39 +243,5 @@ class RankingTab extends StatelessWidget {
 
     // Print the result list
     return resultList;
-  }
-}
-
-enum TimePeriod { week, month, semester, year, allTime }
-
-DateTime calculateDateThreshold(TimePeriod timePeriod) {
-  DateTime currentTime = DateTime.now();
-  switch (timePeriod) {
-    case TimePeriod.week:
-      return currentTime.subtract(Duration(days: 7));
-    case TimePeriod.month:
-      return currentTime.subtract(Duration(days: 30));
-    case TimePeriod.semester:
-      // Adjust the duration as needed
-      return currentTime.subtract(Duration(days: 180));
-    case TimePeriod.year:
-      return currentTime.subtract(Duration(days: 365));
-    default:
-      return DateTime(0); // Or handle the default case accordingly
-  }
-}
-
-String getTimePeriodLabel(TimePeriod timePeriod) {
-  switch (timePeriod) {
-    case TimePeriod.week:
-      return 'Week';
-    case TimePeriod.month:
-      return 'Month';
-    case TimePeriod.semester:
-      return 'Semester';
-    case TimePeriod.year:
-      return 'Year';
-    case TimePeriod.allTime:
-      return 'All Time';
   }
 }

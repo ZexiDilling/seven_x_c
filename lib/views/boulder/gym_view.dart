@@ -257,10 +257,16 @@ class _GymViewState extends State<GymView> {
             Navigator.of(context).pushNamed(adminPanel);
           case MenuAction.rankings:
             Navigator.of(context).pushNamed(rankView);
+          case MenuAction.profile:
+            Navigator.of(context).pushNamed(profileView);
         }
       },
       itemBuilder: (context) {
         return [
+          const PopupMenuItem(
+            value: MenuAction.profile,
+            child: Text("Profile"),
+          ),
           const PopupMenuItem(
             value: MenuAction.rankings,
             child: Text("Rankings"),

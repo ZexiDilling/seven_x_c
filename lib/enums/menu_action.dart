@@ -1,2 +1,2 @@
-enum MenuAction {rankings, settings, stripping, adminPanel, logout}
+enum MenuAction {profile, rankings, settings, stripping, adminPanel, logout}
 
