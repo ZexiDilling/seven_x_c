@@ -39,6 +39,8 @@ Done - ONYD should now be DYNO upside down.
 Done - Add Repeat button 
 Done - Change "attempts" to repeat when topped is marked and update a counter somewhere to that number...
 Done - Add Repeat Tracking
+Done - update Icon
+Done - update Splash Screen
 
 ------------------------------------------------------------------------------------------------------------------------
 
