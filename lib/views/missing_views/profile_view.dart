@@ -5,10 +5,10 @@ import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
-import 'package:seven_x_c/utilities/charts/line_chart.dart';
+import 'package:seven_x_c/utilities/charts/profile_charts.dart';
 
 class ProfileView extends StatefulWidget {
-  const ProfileView({Key? key}) : super(key: key);
+  const ProfileView({super.key});
 
   @override
   State<ProfileView> createState() => _ProfileViewState();
@@ -19,6 +19,8 @@ class _ProfileViewState extends State<ProfileView> {
   TimePeriod selectedTimePeriod = TimePeriod.week;
   String get userId => AuthService.firebase().currentUser!.id;
   late bool isShowingMainData;
+
+  String chartSelection = "maxGrade";
 
   @override
   void initState() {
@@ -92,7 +94,7 @@ class _ProfileViewState extends State<ProfileView> {
 
                       // Render your UI with the updated points information
                       return SingleChildScrollView(
-                        physics: BouncingScrollPhysics(),
+                        physics: const BouncingScrollPhysics(),
                         child: Column(
                           children: [
                             ListTile(
@@ -120,6 +122,37 @@ class _ProfileViewState extends State<ProfileView> {
                                   letterSpacing: 2),
                               textAlign: TextAlign.center,
                             ),
+                            OverflowBar(
+                              alignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                TextButton(
+                                    child: const Text('Max Grade'),
+                                    onPressed: () {
+                                      chartSelection = "maxGrade";
+                                    }),
+                                TextButton(
+                                    child: const Text('Climbs'),
+                                    onPressed: () {
+                                      chartSelection = "climbs";
+                                    }),
+                                Visibility(
+                                  visible: currentProfile.isSetter,
+                                  child: TextButton(
+                                      child: const Text('Setter Data'),
+                                      onPressed: () {
+                                        chartSelection = "SetterData";
+                                      }),
+                                ),
+                                Visibility(
+                                  visible: currentProfile.isSetter,
+                                  child: TextButton(
+                                      child: const Text('Setter Pie'),
+                                      onPressed: () {
+                                        chartSelection = "SetterDataPie";
+                                      }),
+                                )
+                              ],
+                            ),
                             const SizedBox(
                               height: 37,
                             ),
@@ -129,23 +162,13 @@ class _ProfileViewState extends State<ProfileView> {
                               child: SizedBox(
                                 height: 500,
                                 child: LineChartGraph(
-                                    isShowingMainData: isShowingMainData),
+                                    chartSelection: chartSelection,
+                                    graphData: pointsData,
+                                    selectedTimePeriod: selectedTimePeriod),
                               ),
                             ),
                             const SizedBox(
                               height: 10,
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.refresh,
-                                color: Colors.white
-                                    .withOpacity(isShowingMainData ? 1.0 : 0.5),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  isShowingMainData = !isShowingMainData;
-                                });
-                              },
                             ),
                           ],
                         ),
@@ -175,7 +198,9 @@ Future<PointsData> getPoints(
   LinkedHashMap<DateTime, int> boulderClimbedMaxClimbed = LinkedHashMap();
   LinkedHashMap<DateTime, int> boulderClimbedMaxFlashed = LinkedHashMap();
   LinkedHashMap<DateTime, int> boulderSetAmount = LinkedHashMap();
-  LinkedHashMap<DateTime, dynamic> boulderSetColours = LinkedHashMap();
+  LinkedHashMap<DateTime, Map<String, int>> boulderSetColours = LinkedHashMap();
+  LinkedHashMap<String, int> boulderSetSplit = LinkedHashMap();
+
   try {
     if (selectedTimePeriod != TimePeriod.allTime) {
       if (currentProfile.climbedBoulders != null) {
@@ -219,7 +244,8 @@ Future<PointsData> getPoints(
             boulderSetAmount[entryDateWithoutTime] =
                 (boulderSetAmount[entryDateWithoutTime] ?? 0) + 1;
             String boulderGradeColour = entry.value["gradeColour"];
-
+            boulderSetSplit[boulderGradeColour] ?? 0 + 1;boulderSetSplit[boulderGradeColour] = (boulderSetSplit[boulderGradeColour] ?? 0) + 1;
+  
             if (boulderSetColours.containsKey(entryDateWithoutTime)) {
               if (boulderSetColours[entryDateWithoutTime]!
                   .containsKey(boulderGradeColour)) {
@@ -251,6 +277,7 @@ Future<PointsData> getPoints(
     print("boulderClimbedMaxFlashed - $boulderClimbedMaxFlashed");
     print("boulderSetAmount - $boulderSetAmount");
     print("boulderSetColours - $boulderSetColours");
+    print("boulderSetSplit - $boulderSetSplit");
     return PointsData(
       pointsBoulder: pointsBoulder,
       pointsSetter: pointsSetter,
@@ -263,6 +290,7 @@ Future<PointsData> getPoints(
       boulderClimbedMaxFlashed: boulderClimbedMaxFlashed,
       boulderSetAmount: boulderSetAmount,
       boulderSetColours: boulderSetColours,
+      boulderSetSplit: boulderSetSplit,
     );
   } catch (e) {
     // Handle any errors during the async operation
@@ -279,6 +307,7 @@ Future<PointsData> getPoints(
       boulderClimbedMaxFlashed: boulderClimbedMaxFlashed,
       boulderSetAmount: boulderSetAmount,
       boulderSetColours: boulderSetColours,
+      boulderSetSplit: boulderSetSplit,
     );
   }
 }
@@ -294,7 +323,8 @@ class PointsData {
   LinkedHashMap<DateTime, int> boulderClimbedMaxClimbed = LinkedHashMap();
   LinkedHashMap<DateTime, int> boulderClimbedMaxFlashed = LinkedHashMap();
   LinkedHashMap<DateTime, int> boulderSetAmount = LinkedHashMap();
-  LinkedHashMap<DateTime, dynamic> boulderSetColours = LinkedHashMap();
+  LinkedHashMap<DateTime, Map<String, int>> boulderSetColours = LinkedHashMap();
+  LinkedHashMap<String, int> boulderSetSplit = LinkedHashMap();
 
   PointsData({
     required this.pointsBoulder,
@@ -308,5 +338,6 @@ class PointsData {
     required this.boulderClimbedMaxFlashed,
     required this.boulderSetAmount,
     required this.boulderSetColours,
+    required this.boulderSetSplit,
   });
 }

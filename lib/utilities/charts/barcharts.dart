@@ -13,7 +13,6 @@ List<BarChartGroupData> getGradeColourChartData(CloudBoulder boulder) {
 
   if (boulder.climberTopped != null && boulder.climberTopped!.isNotEmpty) {
     boulder.climberTopped!.forEach((userId, climbInfo) {
-      print(climbInfo);
       if (climbInfo['gradeColour'] != "" && climbInfo['gradeColour']!= null ) {
       String gradeColour = climbInfo['gradeColour'];
       colorVotes[gradeColour] = (colorVotes[gradeColour] ?? 0) + 1;}

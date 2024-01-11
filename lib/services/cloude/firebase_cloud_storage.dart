@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
+import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/notes/cloud_note.dart';
 import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 import 'package:seven_x_c/services/cloude/cloud_storage_exceptions.dart';
@@ -10,6 +11,7 @@ class FirebaseCloudStorage {
   final notes = FirebaseFirestore.instance.collection("notes");
   final boulders = FirebaseFirestore.instance.collection("boulders");
   final profile = FirebaseFirestore.instance.collection("profile");
+  final compCollection = FirebaseFirestore.instance.collection("comp");
 
   Future<void> deleteNote({required String documentId}) async {
     try {
@@ -51,6 +53,7 @@ class FirebaseCloudStorage {
     );
   }
 
+// Boulder data
   Future<void> deleteBoulder({required String boulderID}) async {
     try {
       await boulders.doc(boulderID).delete();
@@ -190,6 +193,7 @@ class FirebaseCloudStorage {
     );
   }
 
+// User data
   Stream<Iterable<CloudProfile>> getAllUsers() {
     final allUsers = profile
         .where(boulderPointsFieldName, isGreaterThan: 0)
@@ -395,6 +399,88 @@ class FirebaseCloudStorage {
       throw CouldNotCheckDisplayNameException();
     }
   }
+
+// Comp Data
+  Future<CloudComp> createNewComp({
+    required String compName,
+    required bool activeComp,
+    required bool signUpActiveComp,
+    required Timestamp startDateComp,
+    required Timestamp endDateComp,
+    int? maxParticipants,
+    Map<String, dynamic>? bouldersComp,
+    Map<String, dynamic>? climbersComp,
+  }) async {
+    final document = await compCollection.add({
+      compNameFieldName: compName,
+      activeCompFieldName: activeComp,
+      signUpActiveCompFieldName: signUpActiveComp,
+      startDateCompFieldName: startDateComp,
+      endDateCompFieldName: endDateComp,
+      if (maxParticipants != null) maxParticipantsFieldName: maxParticipants,
+      if (bouldersComp != null) bouldersCompFieldName: bouldersComp,
+      if (climbersComp != null) climbersCompFieldName: climbersComp,
+    });
+    final fetchComp = await document.get();
+    return CloudComp(
+      compName,
+      activeComp,
+      signUpActiveComp,
+      startDateComp,
+      endDateComp,
+      maxParticipants,
+      bouldersComp,
+      climbersComp,
+      compID: fetchComp.id
+    );
+  }
+
+  Future<void> updatComp({
+    required String compID,
+    bool? activeComp,
+    bool? signUpActiveComp,
+    Timestamp? startDateComp,
+    Timestamp? endDateComp,
+    int? maxParticipants,
+    Map<String, dynamic>? bouldersComp,
+    Map<String, dynamic>? climbersComp,
+  }) async {
+    try {
+      // Create a map to store non-null fields and their values
+      final Map<String, dynamic> updatedData = {};
+
+      // Add non-null fields to the map
+      if (activeComp != null) updatedData[activeCompFieldName] = activeComp;
+      if (signUpActiveComp != null) updatedData[signUpActiveCompFieldName] = signUpActiveComp;
+      if (startDateComp != null) updatedData[startDateCompFieldName] = startDateComp;
+      if (endDateComp != null) updatedData[endDateCompFieldName] = endDateComp;
+      if (maxParticipants != null) updatedData[maxParticipantsFieldName] = maxParticipants;
+      if (bouldersComp != null) updatedData[bouldersCompFieldName] = bouldersComp;
+      if (climbersComp != null) updatedData[climbersCompFieldName] = climbersComp;
+      
+      // Update the document with the non-null fields
+      await compCollection.doc(compID).update(updatedData);
+    } catch (e) {
+      throw CouldNotUpdateComp();
+    }
+  }
+
+  Stream<Iterable<CloudComp>> getComp() {
+    final activeComp = compCollection
+        .where(activeCompFieldName, isEqualTo: true)
+        .snapshots()
+        .map((event) => event.docs.map((doc) => CloudComp.fromSnapshot(doc)));
+    return activeComp;
+  }
+
+  Future<void> deleteComp({required String compID}) async {
+    try {
+      await compCollection.doc(compID).delete();
+    } catch (e) {
+      throw CouldNotDeleteUserException();
+    }
+  }
+
 
   static final FirebaseCloudStorage _shared =
       FirebaseCloudStorage._shareIstance();

@@ -40,7 +40,12 @@ Done - Add Repeat button
 Done - Change "attempts" to repeat when topped is marked and update a counter somewhere to that number...
 Done - Add Repeat Tracking
 Done - update Icon
-Done - update Splash Screen
+Done - Profile basic view:
+Done - grading progression
+Done - Boulders climb
+Done - Setter overview
+Done - Setter pie chart
+
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -63,20 +68,14 @@ Done - ranking view Boulder Amount
 Done - ranking view Setter Points
 Done - ranking view Setter Amount
 Done - Ranking view based on time
+
+Done - update Splash Screen
 	
 ------------------------------------------------------------------------------------------------------------------------
 
 
 ToDO:
 ------------------------------------------------------------------------------------------
-
-Profile view:
-	grading progression
-	Boulders climb
-		each grade
-	setter overview
-	make it possible to check others profile ? 
-
 
 comp module:
 	Set-up total boulder comp
@@ -140,12 +139,24 @@ Settings:
 Setter:
 	Make it possible to set a non-setter as a setter
 
+boulder:
+	Update when clicking - both positive and negative. 
+		on topped
+		on flashed
+		on attempts
+		on repeats
+		on grade
+
 
 Clean up:
 	Remove notes 
 	remove unused code
 	Make things pretty
 	clean up code
+
+Profile
+	fix graph to deal with different time intervals
+	
 
 Low priority/ not sure:
 ------------------------------------------------------------------------------------------------------------------------
@@ -159,13 +170,6 @@ Filter:
 
 Hide/unHide - move under comp settings ? 
 
-boulder:
-	Update when clicking
-		on topped
-		on flashed
-		on attempts
-		on repeats
-		on grade
 
 rankings:
 	Make a list of Boulders set per semester both grading, hold colour, wall, section and setters
@@ -199,3 +203,5 @@ Map changes:
 setting: 
 	Keep track of DTU Setter team ?
 Keep track of Guest setters ? 
+
+make it possible to check others profile ? 

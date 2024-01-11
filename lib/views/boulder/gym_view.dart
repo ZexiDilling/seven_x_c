@@ -14,6 +14,7 @@ import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/logout_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/boulder/comp_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/stripping_boulder.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/add_new_boulder.dart';
@@ -43,11 +44,26 @@ class _GymViewState extends State<GymView> {
   bool editing = false;
   bool filterEnabled = false;
   double currentScale = 1.0;
+  bool compView = false;
+  String? currentCompName;
 
   late final FirebaseCloudStorage _boulderService;
   late final FirebaseCloudStorage _userService;
+  late final FirebaseCloudStorage _compService;
 
   late Stream<Iterable<CloudBoulder>> filteredBouldersStream;
+
+  void setCompView(bool value) {
+    setState(() {
+      compView = value;
+    });
+  }
+
+  void setCompName(String value) {
+    setState(() {
+      currentCompName = value;
+    });
+  }
 
   Stream<Iterable<CloudBoulder>> getFilteredBouldersStream() {
     return _boulderService.getAllBoulders().map((boulders) {
@@ -102,6 +118,7 @@ class _GymViewState extends State<GymView> {
   void initState() {
     _boulderService = FirebaseCloudStorage();
     _userService = FirebaseCloudStorage();
+    _compService = FirebaseCloudStorage();
 
     _initializeCurrentProfile();
     super.initState();
@@ -153,10 +170,14 @@ class _GymViewState extends State<GymView> {
 
             // Use the length of the boulders list to update the app bar title
             final bouldersCount = snapshot.data?.length ?? 0;
-            return Text('DTU Climbing - $bouldersCount');
+            return compView
+                ? Text(currentCompName ?? 'DTU Climbing')
+                : Text('DTU Climbing - $bouldersCount');
           },
         ),
-        backgroundColor: const Color.fromRGBO(255, 17, 0, 1),
+        backgroundColor: compView
+            ? const Color.fromARGB(255, 185, 32, 190)
+            : const Color.fromRGBO(255, 17, 0, 1),
         actions: [
           if (currentProfile!.isAdmin || currentProfile!.isSetter)
             IconButton(
@@ -259,6 +280,15 @@ class _GymViewState extends State<GymView> {
             Navigator.of(context).pushNamed(rankView);
           case MenuAction.profile:
             Navigator.of(context).pushNamed(profileView);
+          case MenuAction.comp:
+            showComp(
+              context,
+              currentProfile: currentProfile,
+              compService: _compService,
+              compView: compView,
+              setCompView: setCompView,
+              setCompName: setCompName,
+            );
         }
       },
       itemBuilder: (context) {
@@ -285,6 +315,10 @@ class _GymViewState extends State<GymView> {
               value: MenuAction.adminPanel,
               child: Text("Admin"),
             ),
+          const PopupMenuItem(
+            value: MenuAction.comp,
+            child: Text("Comp"),
+          ),
           const PopupMenuItem(
             value: MenuAction.logout,
             child: Text("Log out"),

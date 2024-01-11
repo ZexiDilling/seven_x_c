@@ -40,3 +40,13 @@ const maxFlashedGradeFieldName = "maxFlashedGrade";
 const maxToppedGradeFieldName = "maxToppedGrade";
 const createdDateProfileFieldName = "createdDateProfile";
 const updateDateProfileFieldName = "updateDateProfile";
+
+//comp
+const compNameFieldName = "compName";
+const activeCompFieldName = "activeComp";
+const signUpActiveCompFieldName = "signUpActiveComp";
+const startDateCompFieldName = "startDateComp";
+const endDateCompFieldName = "endDateComp";
+const maxParticipantsFieldName = "maxParticipants";
+const bouldersCompFieldName = "bouldersComp";
+const climbersCompFieldName = "climbersComp";
