@@ -6,6 +6,9 @@ import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 class CloudComp {
   final String compID;
   final String compName;
+  final String compStyle;
+  final String compRules;
+  final bool startedComp;
   final bool activeComp;
   final bool signUpActiveComp;
   final Timestamp startDateComp;
@@ -16,6 +19,9 @@ class CloudComp {
 
   const CloudComp(
     this.compName,
+    this.compStyle,
+    this.compRules,
+    this.startedComp,
     this.activeComp,
     this.signUpActiveComp,
     this.startDateComp,
@@ -29,6 +35,9 @@ class CloudComp {
   CloudComp.fromSnapshot(QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
       : compID = snapshot.id,
         compName = snapshot.data()[compNameFieldName] as String,
+        compStyle = snapshot.data()[compStyleFieldName] as String,
+        compRules = snapshot.data()[compRulesFieldName] as String,
+        startedComp = snapshot.data()[startedCompFieldName] as bool,
         activeComp = snapshot.data()[activeCompFieldName] as bool,
         signUpActiveComp = snapshot.data()[signUpActiveCompFieldName] as bool,
         startDateComp = snapshot.data()[startDateCompFieldName] as Timestamp,

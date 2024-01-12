@@ -11,6 +11,7 @@ class GymPainter extends CustomPainter {
   final Iterable<CloudBoulder> allBoulders;
   final CloudProfile currentProfile;
   double currentScale;
+  
 
   GymPainter(this.allBoulders, this.currentProfile, this.currentScale);
   DateTime currentTime = DateTime.now();
@@ -24,6 +25,7 @@ class GymPainter extends CustomPainter {
     Color? glowColour;
     if (currentScale >= boulderSingleShow) {
       for (final CloudBoulder boulder in allBoulders) {
+        
         DateTime setBoulderDate = boulder.setDateBoulder.toDate();
         DateTime? updatedBoulderDate = boulder.updateDateBoulder?.toDate();
 
@@ -132,6 +134,7 @@ class GymPainter extends CustomPainter {
         // final int boulderCountMissing = bouldersCountTotal -
         //     (userToppedBouldersCountPerWall[wall.wallName] ?? 0);
         final int boulderCountTopped = userToppedBouldersCountPerWall[wall.wallName] ?? 0;
+        
         final Offset center = Offset(
           (wall.wallXMax + wall.wallXMin) / 2,
           (wall.wallYMaX + wall.wallYMin) / 2,

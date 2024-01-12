@@ -43,6 +43,9 @@ const updateDateProfileFieldName = "updateDateProfile";
 
 //comp
 const compNameFieldName = "compName";
+const compStyleFieldName = "compStyle";
+const compRulesFieldName = "compRules";
+const startedCompFieldName = "startedComp";
 const activeCompFieldName = "activeComp";
 const signUpActiveCompFieldName = "signUpActiveComp";
 const startDateCompFieldName = "startDateComp";

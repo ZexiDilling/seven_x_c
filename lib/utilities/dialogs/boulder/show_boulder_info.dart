@@ -4,21 +4,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
+import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/charts/barcharts.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/generics/yes_no.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 
 Future<void> showBoulderInformation(
-    BuildContext context,
-    CloudBoulder boulder,
-    setState,
-    CloudProfile currentProfile,
-    FirebaseCloudStorage boulderService,
-    FirebaseCloudStorage userService,
-    Stream<Iterable<CloudProfile>> settersStream) async {
+  BuildContext context,
+  setState,
+  CloudBoulder boulder,
+  CloudProfile currentProfile,
+  CloudComp? currentComp,
+  bool compView,
+  FirebaseCloudStorage boulderService,
+  FirebaseCloudStorage userService,
+  FirebaseCloudStorage compService,
+  Stream<Iterable<CloudProfile>> settersStream,
+) async {
   int attempts = 0;
   int repeats = 0;
   bool flashed = false;
@@ -376,8 +383,34 @@ Future<void> showBoulderInformation(
                                         Checkbox(
                                           value: compBoulder,
                                           onChanged: (bool? value) {
-                                            setState(() {
+                                            setState(() async {
+                                              bool check = false;
                                               compBoulder = value ?? false;
+                                              if (compBoulder) {
+                                                check =
+                                                    await showConfirmationDialog(
+                                                        context,
+                                                        "Add boulder to comp? ");
+                                              }
+                                              if (check) {
+                                                if (currentComp != null) {
+                                                  compService.updatComp(
+                                                      compID:
+                                                          currentComp.compID,
+                                                      bouldersComp:
+                                                          updateBoulderCompSet(
+                                                        currentComp:
+                                                            currentComp,
+                                                        boulder: boulder,
+                                                        existingData:
+                                                            currentComp
+                                                                .bouldersComp,
+                                                      ));
+                                                } else { 
+                                                  showErrorDialog(context, "MISSING COMP!!! ");
+                                                  // todo Find a comp to add the boulder too
+                                                }
+                                              }
                                             });
                                           },
                                         ),
@@ -653,16 +686,16 @@ Future<void> showBoulderInformation(
                                   // ToDo remove boulder from user and substract boulder points from the user.
                                   if (boulder.gradeNumberSetter ==
                                       currentProfile.maxFlahsedGrade) {
-                                    maxFlahsedGrade =
-                                        checkGrade(currentProfile, boulder.boulderID, "flashed");
+                                    maxFlahsedGrade = checkGrade(currentProfile,
+                                        boulder.boulderID, "flashed");
                                   } else {
                                     maxFlahsedGrade =
                                         currentProfile.maxFlahsedGrade;
                                   }
                                   if (boulder.gradeNumberSetter ==
                                       currentProfile.maxToppedGrade) {
-                                    maxToppedGrade =
-                                        checkGrade(currentProfile, boulder.boulderID, "topped");
+                                    maxToppedGrade = checkGrade(currentProfile,
+                                        boulder.boulderID, "topped");
                                   } else {
                                     maxToppedGrade =
                                         currentProfile.maxToppedGrade;

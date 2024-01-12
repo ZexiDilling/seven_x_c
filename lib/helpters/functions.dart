@@ -1,4 +1,6 @@
+import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
+import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
 String capitalizeFirstLetter(String input) {
@@ -67,7 +69,33 @@ Map<String, dynamic> updateClimbedBouldersMap(
 double updatePoints({required double points, double? existingData}) {
   if (existingData != null) {
     return points += existingData;
-  } else {return points;}
+  } else {
+    return points;
+  }
+}
+
+Map<String, dynamic> updateBoulderCompSet({
+  required CloudComp currentComp,
+  required CloudBoulder boulder,
+  Map<String, dynamic>? existingData,
+}) {
+  String boulderID = boulder.boulderID;
+  int? sequenceNumber;
+  if (existingData != null) {
+    sequenceNumber = existingData.length + 1;
+  } else {
+    sequenceNumber = 1;
+  }
+  Map<String, dynamic> newData = {
+    "name": sequenceNumber,
+    "holdColour": boulder.holdColour,
+    "points": defaultCompBoulderPoints,
+    "tops": 0,
+    "topUsers": []
+  };
+  Map<String, dynamic> boulderComp = existingData ?? {};
+  boulderComp[boulderID] = newData;
+  return boulderComp;
 }
 
 Map<String, dynamic> updateBoulderSet(
@@ -124,8 +152,6 @@ Map<String, dynamic> updateClimberToppedMap(
 
   return climberToppedData;
 }
-
-
 
 enum TimePeriod { week, month, semester, year, allTime }
 

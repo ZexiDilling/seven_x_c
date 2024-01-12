@@ -3,29 +3,35 @@ import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
+import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/generics/yes_no.dart';
 // import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 
 Future<void> showAddNewBoulder(
-    BuildContext context,
-    FirebaseCloudStorage boulderService,
-    FirebaseCloudStorage userService,
-    double centerX,
-    double centerY,
-    String wall,
-    String gradingSystem,
-    CloudProfile currentProfile,
-    Stream<Iterable<CloudProfile>> settersStream) async {
+  BuildContext context,
+  CloudProfile currentProfile,
+  CloudComp? currentComp,
+  bool compView,
+  double centerX,
+  double centerY,
+  String wall,
+  String gradingSystem,
+  FirebaseCloudStorage boulderService,
+  FirebaseCloudStorage userService,
+  FirebaseCloudStorage compService,
+  Stream<Iterable<CloudProfile>> settersStream,
+) async {
   Color? holdColour;
   Color? gradeColor;
   bool setterTeam = false;
   bool guestSetterTeam = false;
   bool topOut = false;
-  bool hiddenGrade = false;
-  bool compBoulder = false;
+  bool hiddenGrade = compView;
+  bool compBoulder = compView;
   String selectedGrade = '';
 
   int difficultyLevel = 1;
@@ -246,6 +252,17 @@ Future<void> showAddNewBoulder(
                             gradeValue = difficultyLevelToArrow(
                                 difficultyLevel, gradeColorChoice!);
                           }
+                          if (compView && !compBoulder) {
+                            // Show a confirmation dialog
+                            bool confirmResult = await showConfirmationDialog(
+                                context, "Is this boulder a compBoulder?");
+
+                            if (confirmResult) {
+                              // If user confirms, toggle the value of compBoulder
+                              compBoulder = !compBoulder;
+                            }
+                          }
+
                           CloudBoulder? newBoulder;
                           try {
                             newBoulder = await boulderService.createNewBoulder(
@@ -276,6 +293,22 @@ Future<void> showAddNewBoulder(
                               newBoulder = null;
                             }
                           }
+                          if (currentComp != null && compView) {
+                            if (newBoulder != null) {
+                              // Check if newBoulder is not already in currentComp.bouldersComp
+                              if (!currentComp.bouldersComp!
+                                  .containsKey(newBoulder.boulderID)) {
+                                compService.updatComp(
+                                    compID: currentComp.compID,
+                                    bouldersComp: updateBoulderCompSet(
+                                        currentComp: currentComp,
+                                        boulder: newBoulder,
+                                        existingData:
+                                            currentComp.bouldersComp));
+                              }
+                            } 
+                          }
+
                           if (newBoulder != null) {
                             if (!setterTeam && !guestSetterTeam) {
                               try {

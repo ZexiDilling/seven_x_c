@@ -403,6 +403,9 @@ class FirebaseCloudStorage {
 // Comp Data
   Future<CloudComp> createNewComp({
     required String compName,
+    required String compStyle,
+    required String compRules,
+    required bool startedComp,
     required bool activeComp,
     required bool signUpActiveComp,
     required Timestamp startDateComp,
@@ -413,6 +416,9 @@ class FirebaseCloudStorage {
   }) async {
     final document = await compCollection.add({
       compNameFieldName: compName,
+      compStyleFieldName: compStyle,
+      compRulesFieldName: compRules,
+      startedCompFieldName: startedComp,
       activeCompFieldName: activeComp,
       signUpActiveCompFieldName: signUpActiveComp,
       startDateCompFieldName: startDateComp,
@@ -423,20 +429,26 @@ class FirebaseCloudStorage {
     });
     final fetchComp = await document.get();
     return CloudComp(
-      compName,
-      activeComp,
-      signUpActiveComp,
-      startDateComp,
-      endDateComp,
-      maxParticipants,
-      bouldersComp,
-      climbersComp,
-      compID: fetchComp.id
-    );
+        compName,
+        compStyle,
+        compRules,
+        startedComp,
+        activeComp,
+        signUpActiveComp,
+        startDateComp,
+        endDateComp,
+        maxParticipants,
+        bouldersComp,
+        climbersComp,
+        compID: fetchComp.id);
   }
 
   Future<void> updatComp({
     required String compID,
+    String? compName,
+    String? compStyle,
+    String? compRules,
+    bool? startedComp,
     bool? activeComp,
     bool? signUpActiveComp,
     Timestamp? startDateComp,
@@ -450,14 +462,28 @@ class FirebaseCloudStorage {
       final Map<String, dynamic> updatedData = {};
 
       // Add non-null fields to the map
+      if (compName != null) updatedData[compNameFieldName] = compName;
+      if (compStyle != null) updatedData[compStyleFieldName] = compStyle;
+      if (compRules != null) updatedData[compRulesFieldName] = compRules;
+      if (startedComp != null) updatedData[startedCompFieldName] = startedComp;
       if (activeComp != null) updatedData[activeCompFieldName] = activeComp;
-      if (signUpActiveComp != null) updatedData[signUpActiveCompFieldName] = signUpActiveComp;
-      if (startDateComp != null) updatedData[startDateCompFieldName] = startDateComp;
+      if (signUpActiveComp != null) {
+        updatedData[signUpActiveCompFieldName] = signUpActiveComp;
+      }
+      if (startDateComp != null) {
+        updatedData[startDateCompFieldName] = startDateComp;
+      }
       if (endDateComp != null) updatedData[endDateCompFieldName] = endDateComp;
-      if (maxParticipants != null) updatedData[maxParticipantsFieldName] = maxParticipants;
-      if (bouldersComp != null) updatedData[bouldersCompFieldName] = bouldersComp;
-      if (climbersComp != null) updatedData[climbersCompFieldName] = climbersComp;
-      
+      if (maxParticipants != null) {
+        updatedData[maxParticipantsFieldName] = maxParticipants;
+      }
+      if (bouldersComp != null) {
+        updatedData[bouldersCompFieldName] = bouldersComp;
+      }
+      if (climbersComp != null) {
+        updatedData[climbersCompFieldName] = climbersComp;
+      }
+
       // Update the document with the non-null fields
       await compCollection.doc(compID).update(updatedData);
     } catch (e) {
@@ -465,7 +491,30 @@ class FirebaseCloudStorage {
     }
   }
 
-  Stream<Iterable<CloudComp>> getComp() {
+  Future<CloudComp?> getComp(compName) async {
+    final querySnapshot = await compCollection
+        .where(compNameFieldName, isEqualTo: compName)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      // If there's at least one document with the specified compID
+      // Return the first document as a CloudComp instance
+      return CloudComp.fromSnapshot(querySnapshot.docs.first);
+    } else {
+      // If no document with the specified compID is found, return null
+      return null;
+    }
+  }
+
+  // Stream<Iterable<CloudComp>> getComp(compName) {
+  //   final currentComp = compCollection
+  //       .where(compNameFieldName, isEqualTo: compName)
+  //       .snapshots()
+  //       .map((event) => event.docs.map((doc) => CloudComp.fromSnapshot(doc)));
+  //   return currentComp;
+  // }
+
+  Stream<Iterable<CloudComp>> getActiveComps() {
     final activeComp = compCollection
         .where(activeCompFieldName, isEqualTo: true)
         .snapshots()
@@ -480,7 +529,6 @@ class FirebaseCloudStorage {
       throw CouldNotDeleteUserException();
     }
   }
-
 
   static final FirebaseCloudStorage _shared =
       FirebaseCloudStorage._shareIstance();

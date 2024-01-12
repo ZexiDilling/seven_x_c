@@ -1,22 +1,22 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 
-void showComp(BuildContext context,
-    {required CloudProfile? currentProfile,
-    required FirebaseCloudStorage? compService,
-    required bool compView,
-    required Function(bool) setCompView,
-    required Function(String) setCompName}) {
+void showComp(
+  BuildContext context, {
+  required CloudProfile? currentProfile,
+  required FirebaseCloudStorage? compService,
+  required bool compView,
+  required Function(bool) setCompView,
+  required Function(CloudComp) setComp,
+}) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return StreamBuilder<Object>(
-        stream: compService!.getComp(),
+        stream: compService!.getActiveComps(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             var compData = snapshot.data as Iterable<CloudComp>;
@@ -48,41 +48,51 @@ void showComp(BuildContext context,
                             final currentComp = compData.elementAt(index);
                             return GestureDetector(
                               onTap: () {
-                                setCompView(!compView);
-                                setCompName(activeComps[index]);
-                                Navigator.of(context).pop();
-
-                                // if (currentComp.climbersComp!
-                                //     .containsKey(currentProfile!.userID)) {
-                                // } else {
-                                //   if (currentComp.climbersComp!.length <
-                                //       (currentComp.maxParticipants as int)) {
-                                //     showErrorDialog(context, "Comp signup");
-                                //   } else {
-                                //     showErrorDialog(
-                                //         context, "Comp signup is full");
-                                //   }
-                                // }
-
-                                // Handle item click here
-                                print('Item clicked: ${activeComps[index]}');
+                                if (currentComp.climbersComp!
+                                    .containsKey(currentProfile.userID)) {
+                                  setCompView(!compView);
+                                  setComp(currentComp);
+                                  Navigator.of(context).pop();
+                                } else {
+                                  if (currentComp.climbersComp!.length <
+                                      (currentComp.maxParticipants as int)) {
+                                    // todo handle singup! 
+                                    setCompView(!compView);
+                                    setComp(currentComp);
+                                    
+                                    Navigator.of(context).pop();
+                                  } else {
+                                    showErrorDialog(
+                                        context, "Comp signup is full");
+                                    Navigator.of(context).pop();
+                                  }
+                                }
                               },
-                              child: Text(activeComps[index]),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    activeComps[index],
+                                    style: TextStyle(
+                                        color: currentComp.startedComp
+                                            ? Colors.black
+                                            : currentComp.signUpActiveComp
+                                                ? Colors.purple
+                                                : Colors.red),
+                                  ),
+                                  if (currentProfile!.isAdmin)
+                                    IconButton(
+                                      icon: const Icon(Icons.edit),
+                                      onPressed: () {
+                                        setCompView(!compView);
+                                        setComp(currentComp);
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                ],
+                              ),
                             );
                           },
                         ),
-                      ),
-                      Row(
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              // Handle "Sign Up" button click
-                              Navigator.of(context).pop();
-                              // Add your custom logic here
-                            },
-                            child: const Text('Sign Up'),
-                          ),
-                        ],
                       ),
                       Visibility(
                         visible: currentProfile!.isSetter,
@@ -95,14 +105,6 @@ void showComp(BuildContext context,
                                 // Add your custom logic here
                               },
                               child: const Text('Create Comp'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                // Handle "Change Comp" button click
-                                Navigator.of(context).pop();
-                                // Add your custom logic here
-                              },
-                              child: const Text('Change'),
                             ),
                           ],
                         ),

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
+import 'package:seven_x_c/constants/colours_thems.dart';
 import 'package:seven_x_c/constants/routes.dart';
 import 'package:seven_x_c/enums/menu_action.dart';
 import 'package:seven_x_c/helpters/painter.dart';
@@ -10,12 +11,15 @@ import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_event.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
+import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/logout_dialog.dart';
-import 'package:seven_x_c/utilities/dialogs/boulder/comp_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/comp/comp_rank_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/comp/comp_signup_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/stripping_boulder.dart';
+import 'package:seven_x_c/utilities/dialogs/slides/comp_slide.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/add_new_boulder.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/show_boulder_info.dart';
@@ -44,8 +48,9 @@ class _GymViewState extends State<GymView> {
   bool editing = false;
   bool filterEnabled = false;
   double currentScale = 1.0;
+  int topCounter = 0;
   bool compView = false;
-  String? currentCompName;
+  late CloudComp currentComp;
 
   late final FirebaseCloudStorage _boulderService;
   late final FirebaseCloudStorage _userService;
@@ -59,9 +64,15 @@ class _GymViewState extends State<GymView> {
     });
   }
 
-  void setCompName(String value) {
+  void setCurrentComp(CloudComp value) {
     setState(() {
-      currentCompName = value;
+      currentComp = value;
+    });
+  }
+
+  void toppedBoulderCount(int value) {
+    setState(() {
+      topCounter = value;
     });
   }
 
@@ -104,7 +115,7 @@ class _GymViewState extends State<GymView> {
         });
       }
 
-      if (compFilter) {
+      if (compFilter | compView) {
         // Filter boulders where comp is true
         boulders = boulders.where((boulder) => boulder.compBoulder == true);
       }
@@ -165,20 +176,29 @@ class _GymViewState extends State<GymView> {
 
             if (snapshot.hasError) {
               // Handle error
-              return Text('Error: ${snapshot.error}');
+              return Text('Error:  ${snapshot.error}');
             }
 
             // Use the length of the boulders list to update the app bar title
             final bouldersCount = snapshot.data?.length ?? 0;
             return compView
-                ? Text(currentCompName ?? 'DTU Climbing')
+                ? Text(currentComp.compName)
                 : Text('DTU Climbing - $bouldersCount');
+            // : Text("$compView");
           },
         ),
-        backgroundColor: compView
-            ? const Color.fromARGB(255, 185, 32, 190)
-            : const Color.fromRGBO(255, 17, 0, 1),
+        backgroundColor: compView ? compAppBarColour : dtuClimbingAppBar,
         actions: [
+          compView
+              ? IconButton(
+                  onPressed: () {
+                    showCompRankings(context,
+                        compService: _compService,
+                        currentComp: currentComp,
+                        currentProfile: currentProfile);
+                  },
+                  icon: const Icon(Icons.emoji_events))
+              : const SizedBox(),
           if (currentProfile!.isAdmin || currentProfile!.isSetter)
             IconButton(
               icon: Icon(editing ? Icons.edit : Icons.done),
@@ -188,7 +208,7 @@ class _GymViewState extends State<GymView> {
                 });
               },
             ),
-          extraMenu(context)
+          dropDownMenu(context)
         ],
       ),
       body: StreamBuilder(
@@ -239,11 +259,12 @@ class _GymViewState extends State<GymView> {
           }
         },
       ),
-      drawer: filterDrawer(context, setState, currentProfile!),
+      
+      drawer: compView ? currentProfile!.isAdmin ? compDrawer(context, currentComp, _compService) : null : filterDrawer(context, setState, currentProfile!),
     );
   }
 
-  PopupMenuButton<MenuAction> extraMenu(BuildContext context) {
+  PopupMenuButton<MenuAction> dropDownMenu(BuildContext context) {
     return PopupMenuButton<MenuAction>(
       onSelected: (value) async {
         switch (value) {
@@ -287,7 +308,7 @@ class _GymViewState extends State<GymView> {
               compService: _compService,
               compView: compView,
               setCompView: setCompView,
-              setCompName: setCompName,
+              setComp: setCurrentComp,
             );
         }
       },
@@ -380,18 +401,23 @@ class _GymViewState extends State<GymView> {
             break;
           }
         }
+
         try {
           setState(() {
             showAddNewBoulder(
-                context,
-                _boulderService,
-                _userService,
-                tempCenterX,
-                tempCenterY,
-                wall!,
-                gradingSystem,
-                currentProfile,
-                setters);
+              context,
+              currentProfile,
+              currentComp,
+              compView,
+              tempCenterX,
+              tempCenterY,
+              wall!,
+              gradingSystem,
+              _boulderService,
+              _userService,
+              _compService,
+              setters,
+            );
           });
         } catch (error) {
           // Handle the error
@@ -405,8 +431,18 @@ class _GymViewState extends State<GymView> {
           if (distance < minDistance) {
             // Tapped inside the circle, perform the desired action
             setState(() {
-              showBoulderInformation(context, boulders, setState,
-                  currentProfile, _boulderService, _userService, setters);
+              showBoulderInformation(
+                context,
+                setState,
+                boulders,
+                currentProfile,
+                currentComp,
+                compView,
+                _boulderService,
+                _userService,
+                _compService,
+                setters,
+              );
             });
 
             break;
