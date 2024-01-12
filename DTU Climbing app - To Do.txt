@@ -70,6 +70,18 @@ Done - ranking view Setter Amount
 Done - Ranking view based on time
 
 Done - update Splash Screen
+
+Comp Module:
+	Done - mark comp-boulders
+	Done - Set max participants 
+	Done - point system (only set up one)
+	Done - Rankings users - live
+	Done - Rankings boulders - live
+	Done - Make it possible to add boulders to a comp
+	Done - Make a CompView where ppl can top comp boulders
+	Done - Make it possible to start and end the comp
+	Done - Make signup and active its own thing.
+
 	
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -79,18 +91,16 @@ ToDO:
 
 comp module:
 	Set-up total boulder comp
-	done - mark comp-boulders
-	sign up for the comp
-		Set max participants 
-		Set time and day slots
-	rankings users - both live and after
-	rankings boulders - both live and after
-	generate final report
-	point system:
-		our standard
-		others
-	Add a comp map to the user ? ?
-		How Do i want to track stuff ? 
+	Sign up for the comp
+	See result after comp completion
+	see boulder after comp completion
+	Generate final report
+	One comp boulders, let the user see the name. 
+	Mark the name of the boulder on the map ? 
+	Add a comp map to the user when the comp is complete
+		Total ranking
+		Gender ranking
+	
 	
 
 Boulder view:
@@ -205,3 +215,9 @@ setting:
 Keep track of Guest setters ? 
 
 make it possible to check others profile ? 
+
+
+Comp module:
+	Add other point system
+	make it possible to make your own system. ish
+	Split one comp into multiple days / slots
