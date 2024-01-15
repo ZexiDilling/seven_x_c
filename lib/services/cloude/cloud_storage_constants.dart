@@ -51,5 +51,18 @@ const signUpActiveCompFieldName = "signUpActiveComp";
 const startDateCompFieldName = "startDateComp";
 const endDateCompFieldName = "endDateComp";
 const maxParticipantsFieldName = "maxParticipants";
+const includeZonesFieldName = "includeZones";
+const includeFinalsFieldName = "includeFinals";
+const includeSemiFinalsFieldName = "includeSemiFinals";
 const bouldersCompFieldName = "bouldersComp";
 const climbersCompFieldName = "climbersComp";
+
+//challenge
+const challengeIDFieldName = "challengeID";
+const challengeNameFieldName = "challengeName";
+const challengeCreatorFieldName = "challengeCreator";
+const challengeTypeFieldName = "challengeType";
+const challengeDescriptionFieldName = "challengeDescription";
+const challengeOwnPointsFieldName = "challengeOwnPoints";
+const challengeBouldersFieldName = "challengeBoulders";
+const challengeCounterFieldName = "challengeCounter";

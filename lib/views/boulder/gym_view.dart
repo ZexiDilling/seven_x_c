@@ -50,7 +50,7 @@ class _GymViewState extends State<GymView> {
   double currentScale = 1.0;
   int topCounter = 0;
   bool compView = false;
-  late CloudComp currentComp;
+  CloudComp? currentComp;
 
   late final FirebaseCloudStorage _boulderService;
   late final FirebaseCloudStorage _userService;
@@ -182,7 +182,7 @@ class _GymViewState extends State<GymView> {
             // Use the length of the boulders list to update the app bar title
             final bouldersCount = snapshot.data?.length ?? 0;
             return compView
-                ? Text(currentComp.compName)
+                ? Text(currentComp!.compName)
                 : Text('DTU Climbing - $bouldersCount');
             // : Text("$compView");
           },
@@ -194,7 +194,7 @@ class _GymViewState extends State<GymView> {
                   onPressed: () {
                     showCompRankings(context,
                         compService: _compService,
-                        currentComp: currentComp,
+                        currentComp: currentComp!,
                         currentProfile: currentProfile);
                   },
                   icon: const Icon(Icons.emoji_events))
@@ -259,8 +259,11 @@ class _GymViewState extends State<GymView> {
           }
         },
       ),
-      
-      drawer: compView ? currentProfile!.isAdmin ? compDrawer(context, currentComp, _compService) : null : filterDrawer(context, setState, currentProfile!),
+      drawer: compView
+          ? currentProfile!.isAdmin
+              ? compDrawer(context, currentComp!, _compService)
+              : null
+          : filterDrawer(context, setState, currentProfile!),
     );
   }
 
@@ -429,20 +432,23 @@ class _GymViewState extends State<GymView> {
           double distance = (boulders.cordX - transformedPosition.x).abs() +
               (boulders.cordY - transformedPosition.y).abs();
           if (distance < minDistance) {
+            List<String> challengesOverview = await _boulderService
+                .grabBoulderChallenges(boulderID: boulders.boulderID);
+                challengesOverview.add("create");
             // Tapped inside the circle, perform the desired action
             setState(() {
               showBoulderInformation(
-                context,
-                setState,
-                boulders,
-                currentProfile,
-                currentComp,
-                compView,
-                _boulderService,
-                _userService,
-                _compService,
-                setters,
-              );
+                  context,
+                  setState,
+                  boulders,
+                  currentProfile,
+                  currentComp,
+                  compView,
+                  _boulderService,
+                  _userService,
+                  _compService,
+                  setters,
+                  challengesOverview);
             });
 
             break;

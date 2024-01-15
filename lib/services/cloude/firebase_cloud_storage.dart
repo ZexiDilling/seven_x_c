@@ -1,5 +1,8 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
+import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/notes/cloud_note.dart';
 import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
@@ -9,9 +12,10 @@ import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 class FirebaseCloudStorage {
   // Todo Remove notes from this
   final notes = FirebaseFirestore.instance.collection("notes");
-  final boulders = FirebaseFirestore.instance.collection("boulders");
-  final profile = FirebaseFirestore.instance.collection("profile");
+  final bouldersCollection = FirebaseFirestore.instance.collection("boulders");
+  final profileCollection = FirebaseFirestore.instance.collection("profile");
   final compCollection = FirebaseFirestore.instance.collection("comp");
+  final challengeCollection = FirebaseFirestore.instance.collection("challenges");
 
   Future<void> deleteNote({required String documentId}) async {
     try {
@@ -56,7 +60,7 @@ class FirebaseCloudStorage {
 // Boulder data
   Future<void> deleteBoulder({required String boulderID}) async {
     try {
-      await boulders.doc(boulderID).delete();
+      await bouldersCollection.doc(boulderID).delete();
     } catch (e) {
       throw CouldNotDeleteBoulderException();
     }
@@ -110,14 +114,14 @@ class FirebaseCloudStorage {
       }
 
       // Update the document with the non-null fields
-      await boulders.doc(boulderID).update(updatedData);
+      await bouldersCollection.doc(boulderID).update(updatedData);
     } catch (e) {
       throw CouldNotUpdateBoulderException();
     }
   }
 
   Stream<Iterable<CloudBoulder>> getAllBoulders() {
-    final allBoulders = boulders
+    final allBoulders = bouldersCollection
         .where(activeFieldName, isEqualTo: true)
         .snapshots()
         .map(
@@ -126,7 +130,7 @@ class FirebaseCloudStorage {
   }
 
   Stream<Iterable<CloudBoulder>> getBoulder({required String boulderID}) {
-    final allBoulders = boulders
+    final allBoulders = bouldersCollection
         .where(boulderID, isEqualTo: boulderID)
         .snapshots()
         .map(
@@ -152,7 +156,7 @@ class FirebaseCloudStorage {
     Map<String, dynamic>? gradeNumberClimber,
     Map<String, dynamic>? climberTopped,
   }) async {
-    final document = await boulders.add({
+    final document = await bouldersCollection.add({
       setterFieldName: setter,
       coordinateXFieldName: cordX,
       coordinateYFieldName: cordY,
@@ -193,9 +197,22 @@ class FirebaseCloudStorage {
     );
   }
 
+Future<List<String>> grabBoulderChallenges({required String boulderID}) async {
+  final QuerySnapshot<Map<String, dynamic>> boulderSnapshots =
+      await bouldersCollection.where('boulderID', isEqualTo: boulderID).get();
+
+  // Extract challenges from non-null challenge field
+  final List<String> challenges = boulderSnapshots.docs
+      .where((doc) => doc['challenge'] != null)
+      .map((doc) => doc['challenge'] as String) // Assuming 'challenge' is a String
+      .toList();
+
+  return challenges;
+}
+
 // User data
   Stream<Iterable<CloudProfile>> getAllUsers() {
-    final allUsers = profile
+    final allUsers = profileCollection
         .where(boulderPointsFieldName, isGreaterThan: 0)
         .snapshots()
         .map(
@@ -205,7 +222,7 @@ class FirebaseCloudStorage {
 
   Future<void> deleteUser({required String ownerUserId}) async {
     try {
-      await profile.doc(ownerUserId).delete();
+      await profileCollection.doc(ownerUserId).delete();
     } catch (e) {
       throw CouldNotDeleteUserException();
     }
@@ -269,7 +286,7 @@ class FirebaseCloudStorage {
 
       updatedData[updateDateProfileFieldName] = Timestamp.now();
       // Update the document with the non-null fields
-      await profile.doc(currentProfile.profileID).update(updatedData);
+      await profileCollection.doc(currentProfile.profileID).update(updatedData);
     } catch (e) {
       throw CouldNotUpdateUserException();
     }
@@ -295,7 +312,7 @@ class FirebaseCloudStorage {
     required Timestamp createdDateProfile,
     required Timestamp updateDateProfile,
   }) async {
-    final document = await profile.add({
+    final document = await profileCollection.add({
       boulderPointsFieldName: boulderPoints,
       setterPointsFieldName: setterPoints,
       challengePointsFieldName: challengePoints,
@@ -340,7 +357,7 @@ class FirebaseCloudStorage {
   }
 
   Stream<Iterable<CloudProfile>> getSetters() {
-    final setters = profile
+    final setters = profileCollection
         .where(isSetterFieldName, isEqualTo: true)
         .snapshots()
         .map(
@@ -350,7 +367,7 @@ class FirebaseCloudStorage {
 
   Stream<Iterable<CloudProfile>> getUserFromEmail(String profileEmail) {
     try {
-      final currentProfile = profile
+      final currentProfile = profileCollection
           .where(emailFieldName, isEqualTo: profileEmail)
           .snapshots()
           .map((event) =>
@@ -364,7 +381,7 @@ class FirebaseCloudStorage {
   Stream<Iterable<CloudProfile>> getUserFromDisplayName(
       String profileDisplayName) {
     try {
-      final currentProfile = profile
+      final currentProfile = profileCollection
           .where(displayNameFieldName, isEqualTo: profileDisplayName)
           .snapshots()
           .map((event) =>
@@ -376,7 +393,7 @@ class FirebaseCloudStorage {
   }
 
   Stream<Iterable<CloudProfile>> getUser({required String userID}) {
-    final currentProfile = profile
+    final currentProfile = profileCollection
         .where(userIDFieldName, isEqualTo: userID)
         .snapshots()
         .map(
@@ -387,7 +404,7 @@ class FirebaseCloudStorage {
   Future<bool> isDisplayNameUnique(
       String displayName, String currentUserId) async {
     try {
-      final querySnapshot = await profile
+      final querySnapshot = await profileCollection
           .where(displayNameFieldName, isEqualTo: displayName)
           .where(userIDFieldName, isNotEqualTo: currentUserId)
           .get();
@@ -410,6 +427,9 @@ class FirebaseCloudStorage {
     required bool signUpActiveComp,
     required Timestamp startDateComp,
     required Timestamp endDateComp,
+    required bool includeZones,
+    required bool includeFinals,
+    required bool includeSemiFinals,
     int? maxParticipants,
     Map<String, dynamic>? bouldersComp,
     Map<String, dynamic>? climbersComp,
@@ -423,6 +443,9 @@ class FirebaseCloudStorage {
       signUpActiveCompFieldName: signUpActiveComp,
       startDateCompFieldName: startDateComp,
       endDateCompFieldName: endDateComp,
+      includeZonesFieldName: includeZones,
+      includeFinalsFieldName: includeFinals,
+      includeSemiFinalsFieldName: includeSemiFinals,
       if (maxParticipants != null) maxParticipantsFieldName: maxParticipants,
       if (bouldersComp != null) bouldersCompFieldName: bouldersComp,
       if (climbersComp != null) climbersCompFieldName: climbersComp,
@@ -438,6 +461,9 @@ class FirebaseCloudStorage {
         startDateComp,
         endDateComp,
         maxParticipants,
+        includeZones,
+        includeFinals,
+        includeSemiFinals,
         bouldersComp,
         climbersComp,
         compID: fetchComp.id);
@@ -454,6 +480,9 @@ class FirebaseCloudStorage {
     Timestamp? startDateComp,
     Timestamp? endDateComp,
     int? maxParticipants,
+    bool? includeZones,
+    bool? includeFinals,
+    bool? includeSemiFinals,
     Map<String, dynamic>? bouldersComp,
     Map<String, dynamic>? climbersComp,
   }) async {
@@ -476,6 +505,15 @@ class FirebaseCloudStorage {
       if (endDateComp != null) updatedData[endDateCompFieldName] = endDateComp;
       if (maxParticipants != null) {
         updatedData[maxParticipantsFieldName] = maxParticipants;
+      }
+      if (includeZones != null) {
+        updatedData[includeZonesFieldName] = includeZones;
+      }
+      if (includeFinals != null) {
+        updatedData[includeFinalsFieldName] = includeFinals;
+      }
+      if (includeSemiFinals != null) {
+        updatedData[includeSemiFinalsFieldName] = includeSemiFinals;
       }
       if (bouldersComp != null) {
         updatedData[bouldersCompFieldName] = bouldersComp;
@@ -506,14 +544,6 @@ class FirebaseCloudStorage {
     }
   }
 
-  // Stream<Iterable<CloudComp>> getComp(compName) {
-  //   final currentComp = compCollection
-  //       .where(compNameFieldName, isEqualTo: compName)
-  //       .snapshots()
-  //       .map((event) => event.docs.map((doc) => CloudComp.fromSnapshot(doc)));
-  //   return currentComp;
-  // }
-
   Stream<Iterable<CloudComp>> getActiveComps() {
     final activeComp = compCollection
         .where(activeCompFieldName, isEqualTo: true)
@@ -525,6 +555,95 @@ class FirebaseCloudStorage {
   Future<void> deleteComp({required String compID}) async {
     try {
       await compCollection.doc(compID).delete();
+    } catch (e) {
+      throw CouldNotDeleteUserException();
+    }
+  }
+
+  Future<CloudChallenge> createNewChallenge({
+    required String challengeName,
+    required String challengeCreator,
+    required String challengeType,
+    required String challengeDescription,
+    required double challengeOwnPoints,
+    required Array challengeBoulders,
+    required bool challengeCounter,
+  }) async {
+    final document = await compCollection.add({
+      challengeNameFieldName: challengeName,
+      challengeCreatorFieldName: challengeCreator,
+      challengeTypeFieldName: challengeType,
+      challengeDescriptionFieldName: challengeDescription,
+      challengeOwnPointsFieldName: challengeOwnPoints,
+      challengeBouldersFieldName: challengeBoulders,
+      challengeCounterFieldName: challengeCounter,
+    });
+    final fetchChallenge = await document.get();
+    return CloudChallenge(
+      challengeName,
+      challengeCreator,
+      challengeType,
+      challengeDescription,
+      challengeOwnPoints,
+      challengeBoulders,
+      challengeCounter,
+      challengeID: fetchChallenge.id,
+    );
+  }
+
+  Future<void> updateChallenge({
+    required String challengeID,
+    String? challengeName,
+    String? challengeCreator,
+    String? challengeType,
+    String? challengeDescription,
+    double? challengeOwnPoints,
+    Array? challengeBoulders,
+    bool? challengeCounter,
+  }) async {
+    try {
+      // Create a map to store non-null fields and their values
+      final Map<String, dynamic> updatedData = {};
+
+      // Add non-null fields to the map
+      if (challengeCreator != null)
+        updatedData[challengeCreatorFieldName] = challengeCreator;
+      if (challengeType != null)
+        updatedData[challengeTypeFieldName] = challengeType;
+      if (challengeDescription != null)
+        updatedData[challengeDescriptionFieldName] = challengeDescription;
+      if (challengeOwnPoints != null)
+        updatedData[challengeOwnPointsFieldName] = challengeOwnPoints;
+      if (challengeBoulders != null)
+        updatedData[challengeBouldersFieldName] = challengeBoulders;
+      if (challengeCounter != null) {
+        updatedData[challengeCounterFieldName] = challengeCounter;
+      }
+      await challengeCollection.doc(challengeID).update(updatedData);
+    } catch (e) {
+      throw CouldNotUpdateChallenge();
+    }
+  }
+
+Future<CloudChallenge?> getchallenge(challengeName) async {
+    final querySnapshot = await challengeCollection
+        .where(challengeNameFieldName, isEqualTo: challengeName)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      // If there's at least one document with the specified compID
+      // Return the first document as a CloudComp instance
+      return CloudChallenge.fromSnapshot(querySnapshot.docs.first);
+    } else {
+      // If no document with the specified compID is found, return null
+      return null;
+    }
+  }
+
+
+Future<void> deleteChallenge({required String challengeID}) async {
+    try {
+      await challengeCollection.doc(challengeID).delete();
     } catch (e) {
       throw CouldNotDeleteUserException();
     }

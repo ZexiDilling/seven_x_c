@@ -25,6 +25,7 @@ Future<void> showBoulderInformation(
   FirebaseCloudStorage userService,
   FirebaseCloudStorage compService,
   Stream<Iterable<CloudProfile>> settersStream,
+  List<String> challengesOverview
 ) async {
   int attempts = 0;
   int repeats = 0;
@@ -48,6 +49,11 @@ Future<void> showBoulderInformation(
   List<String> allGradeColorChoice = [];
   bool voted = false;
   String labelText = "Vote a Grade";
+  bool expandPanelState = false;
+
+  
+
+  Map<String, bool> expandedStates = {};
 
   bool active = boulder.active;
   bool updated = false;
@@ -406,8 +412,10 @@ Future<void> showBoulderInformation(
                                                             currentComp
                                                                 .bouldersComp,
                                                       ));
-                                                } else { 
-                                                  showErrorDialog(context, "MISSING COMP!!! ");
+                                                } else {
+                                                  // ignore: use_build_context_synchronously
+                                                  showErrorDialog(context,
+                                                      "MISSING COMP!!! ");
                                                   // todo Find a comp to add the boulder too
                                                 }
                                               }
@@ -571,6 +579,84 @@ Future<void> showBoulderInformation(
                                           gradingSystem, boulder),
                                     ],
                                   ),
+                            const SizedBox(height: 20),
+                            ExpansionPanelList(
+                              elevation: 1,
+                              expandedHeaderPadding: const EdgeInsets.all(0),
+                              children: [
+                                ExpansionPanel(
+                                  headerBuilder: (context, isExpanded) {
+                                    return const ListTile(
+                                      title: Text("Challenges"),
+                                    );
+                                  },
+                                  body: Column(
+                                    children: challengesOverview.map((challenge) {
+                                      // Use the expanded state for each challenge
+                                      bool isExpanded =
+                                          expandedStates[challenge] ?? false;
+
+                                      return ExpansionPanelList(
+                                        elevation: 1,
+                                        expandedHeaderPadding:
+                                            const EdgeInsets.all(0),
+                                        children: [
+                                          ExpansionPanel(
+                                            headerBuilder:
+                                                (context, isExpanded) {
+                                              
+                                              return ListTile(
+                                                
+                                                title: Text(challenge),
+                                              );
+                                            },
+                                            
+                                            body: Column(
+                                              
+                                              children: [
+                                                challenge !=  "create" ? Column(children: [ElevatedButton(
+                                                  onPressed: () {
+                                                    // Add your logic for the button inside the expansion panel
+                                                  },
+                                                  child: const Text("Button 1"),
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    // Add your logic for the button inside the expansion panel
+                                                  },
+                                                  child: const Text("Button 2"),
+                                                ),
+                                                // Add more buttons or other widgets as needed,)
+                                                ])
+                                                
+                                                : ElevatedButton(onPressed: () {}, child: const Text("Create your own"))
+                                              ],
+                                            ),
+                                            isExpanded: isExpanded,
+                                          ),
+                                          
+                                        ],
+                                        expansionCallback:
+                                            (panelIndex, isExpanded) {
+                                          setState(() {
+                                            expandedStates[challenge] =
+                                                isExpanded;
+                                          });
+                                        },
+                                      );
+                                    }).toList(),
+                                    
+                                  ),
+                                  isExpanded: expandPanelState,
+                                ),
+                              ],
+                              expansionCallback: (panelIndex, isExpanded) {
+                                setState(() {
+                                  expandPanelState = !expandPanelState;
+                                });
+                              },
+                            ),
+
                             const SizedBox(height: 20),
                             Row(children: [
                               SizedBox(

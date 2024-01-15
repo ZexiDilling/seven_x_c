@@ -70,18 +70,6 @@ Done - ranking view Setter Amount
 Done - Ranking view based on time
 
 Done - update Splash Screen
-
-Comp Module:
-	Done - mark comp-boulders
-	Done - Set max participants 
-	Done - point system (only set up one)
-	Done - Rankings users - live
-	Done - Rankings boulders - live
-	Done - Make it possible to add boulders to a comp
-	Done - Make a CompView where ppl can top comp boulders
-	Done - Make it possible to start and end the comp
-	Done - Make signup and active its own thing.
-
 	
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -156,6 +144,7 @@ boulder:
 		on attempts
 		on repeats
 		on grade
+	Show if a boulder is a top out. 
 
 
 Clean up:
