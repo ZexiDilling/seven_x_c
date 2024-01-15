@@ -25,3 +25,5 @@ class CouldNotCheckDisplayNameException extends CloudStorageException {}
 class CouldNotGetSetterProfile extends CloudStorageException {}
 
 class CouldNotUpdateComp extends CloudStorageException {}
+
+class CouldNotUpdateChallenge extends CloudStorageException {}

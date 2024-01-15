@@ -145,6 +145,7 @@ boulder:
 		on attempts
 		on repeats
 		on grade
+	Show if a boulder is a top out. 
 
 
 Clean up:
