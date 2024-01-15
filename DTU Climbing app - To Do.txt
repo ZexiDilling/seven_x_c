@@ -70,7 +70,6 @@ Done - ranking view Setter Amount
 Done - Ranking view based on time
 
 Done - update Splash Screen
-	
 ------------------------------------------------------------------------------------------------------------------------
 
 

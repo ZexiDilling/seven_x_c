@@ -14,6 +14,9 @@ class CloudComp {
   final Timestamp startDateComp;
   final Timestamp endDateComp;
   final int? maxParticipants;
+  final bool includeZones;
+  final bool includeFinals;
+  final bool includeSemiFinals;
   final Map<String, dynamic>? bouldersComp;
   final Map<String, dynamic>? climbersComp;
 
@@ -27,6 +30,9 @@ class CloudComp {
     this.startDateComp,
     this.endDateComp,
     this.maxParticipants,
+    this.includeZones,
+    this.includeFinals,
+    this.includeSemiFinals,
     this.bouldersComp,
     this.climbersComp, {
     required this.compID,
@@ -43,6 +49,9 @@ class CloudComp {
         startDateComp = snapshot.data()[startDateCompFieldName] as Timestamp,
         endDateComp = snapshot.data()[endDateCompFieldName] as Timestamp,
         maxParticipants = snapshot.data()[maxParticipantsFieldName] as int,
+        includeZones = snapshot.data()[includeZonesFieldName] as bool,
+        includeFinals = snapshot.data()[includeFinalsFieldName] as bool,
+        includeSemiFinals = snapshot.data()[includeSemiFinalsFieldName] as bool,
         bouldersComp =
             snapshot.data()[bouldersCompFieldName] as Map<String, dynamic>?,
         climbersComp =

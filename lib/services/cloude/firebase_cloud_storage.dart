@@ -410,6 +410,9 @@ class FirebaseCloudStorage {
     required bool signUpActiveComp,
     required Timestamp startDateComp,
     required Timestamp endDateComp,
+    required bool includeZones,
+    required bool includeFinals,
+    required bool includeSemiFinals,
     int? maxParticipants,
     Map<String, dynamic>? bouldersComp,
     Map<String, dynamic>? climbersComp,
@@ -423,6 +426,9 @@ class FirebaseCloudStorage {
       signUpActiveCompFieldName: signUpActiveComp,
       startDateCompFieldName: startDateComp,
       endDateCompFieldName: endDateComp,
+      includeZonesFieldName: includeZones,
+      includeFinalsFieldName: includeFinals,
+      includeSemiFinalsFieldName: includeSemiFinals,
       if (maxParticipants != null) maxParticipantsFieldName: maxParticipants,
       if (bouldersComp != null) bouldersCompFieldName: bouldersComp,
       if (climbersComp != null) climbersCompFieldName: climbersComp,
@@ -438,6 +444,9 @@ class FirebaseCloudStorage {
         startDateComp,
         endDateComp,
         maxParticipants,
+        includeZones,
+        includeFinals,
+        includeSemiFinals,
         bouldersComp,
         climbersComp,
         compID: fetchComp.id);
@@ -454,6 +463,9 @@ class FirebaseCloudStorage {
     Timestamp? startDateComp,
     Timestamp? endDateComp,
     int? maxParticipants,
+    bool? includeZones,
+    bool? includeFinals,
+    bool? includeSemiFinals,
     Map<String, dynamic>? bouldersComp,
     Map<String, dynamic>? climbersComp,
   }) async {
@@ -476,6 +488,15 @@ class FirebaseCloudStorage {
       if (endDateComp != null) updatedData[endDateCompFieldName] = endDateComp;
       if (maxParticipants != null) {
         updatedData[maxParticipantsFieldName] = maxParticipants;
+      }
+      if (includeZones != null) {
+        updatedData[includeZonesFieldName] = includeZones;
+      }
+      if (includeFinals != null) {
+        updatedData[includeFinalsFieldName] = includeFinals;
+      }
+      if (includeSemiFinals != null) {
+        updatedData[includeSemiFinalsFieldName] = includeSemiFinals;
       }
       if (bouldersComp != null) {
         updatedData[bouldersCompFieldName] = bouldersComp;
