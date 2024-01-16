@@ -3,6 +3,10 @@ import 'package:flutter/material.dart' show Color, Colors;
 const String dtuSetterName = "DTU Setter Team";
 const String guestSetter = "Guest Setter";
 
+  // Dropdown values
+  List<String> compRulesOptions = ['Classic', 'Rule2', 'Rule3'];
+  List<String> compStylesOptions = ['totalBoulder', 'Style2', 'Style3'];
+
 // drawing Constants
 const double boulderRadius = 2.5;
 const double boulderRadiusDrawing = 15;

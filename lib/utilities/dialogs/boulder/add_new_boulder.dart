@@ -30,6 +30,7 @@ Future<void> showAddNewBoulder(
   bool setterTeam = false;
   bool guestSetterTeam = false;
   bool topOut = false;
+  bool gotZone = false;
   bool hiddenGrade = compView;
   bool compBoulder = compView;
   String selectedGrade = '';
@@ -94,7 +95,6 @@ Future<void> showAddNewBoulder(
                                       onChanged: (Color? value) {
                                         setState(() {
                                           gradeColor = value;
-                                          // If the grade color changes, reset the selected grade
                                           gradeColorChoice =
                                               gradeColorMap[gradeColor];
                                         });
@@ -281,6 +281,7 @@ Future<void> showAddNewBoulder(
                                 active: true,
                                 hiddenGrade: hiddenGrade,
                                 compBoulder: compBoulder,
+                                gotZone: gotZone,
                                 setDateBoulder: Timestamp.now());
                           } catch (e) {
                             if (e.toString().contains(

@@ -79,6 +79,7 @@ class FirebaseCloudStorage {
     bool? active,
     bool? hiddenGrade,
     bool? compBoulder,
+    bool? gotZone,
     Timestamp? updateDateBoulder,
     Map<String, dynamic>? challenge,
     Map<String, dynamic>? gradeNumberClimbers,
@@ -102,6 +103,7 @@ class FirebaseCloudStorage {
       if (active != null) updatedData[activeFieldName] = active;
       if (hiddenGrade != null) updatedData[hiddenGradeFieldName] = hiddenGrade;
       if (compBoulder != null) updatedData[compBoulderFieldName] = compBoulder;
+      if (gotZone != null) updatedData[gotZoneFieldName] = gotZone;
       if (updateDateBoulder != null) {
         updatedData[updateDateBoulderFiledName] = updateDateBoulder;
       }
@@ -150,6 +152,7 @@ class FirebaseCloudStorage {
     required bool active,
     required bool hiddenGrade,
     required bool compBoulder,
+    required bool gotZone,
     required Timestamp setDateBoulder,
     Timestamp? updateDateBoulder,
     Map<String, dynamic>? challenge,
@@ -168,6 +171,7 @@ class FirebaseCloudStorage {
       activeFieldName: active,
       hiddenGradeFieldName: hiddenGrade,
       compBoulderFieldName: compBoulder,
+      gotZoneFieldName: gotZone,
       setDateBoulderFiledName: setDateBoulder,
       updateDateBoulderFiledName: setDateBoulder,
       if (challenge != null) challengeFieldName: challenge,
@@ -191,6 +195,7 @@ class FirebaseCloudStorage {
       active,
       hiddenGrade,
       compBoulder,
+      gotZone,
       setDateBoulder,
       setDateBoulder,
       boulderID: fetchBoulder.id,

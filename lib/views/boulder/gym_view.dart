@@ -78,6 +78,8 @@ class _GymViewState extends State<GymView> {
 
   Stream<Iterable<CloudBoulder>> getFilteredBouldersStream() {
     return _boulderService.getAllBoulders().map((boulders) {
+      if (showAllBouldersFilter) {return boulders;} else {
+
       if (selectedColors.isNotEmpty) {
         boulders = boulders.where((boulder) =>
             selectedColors.contains(boulder.gradeColour.toLowerCase()));
@@ -121,7 +123,7 @@ class _GymViewState extends State<GymView> {
       }
 
       // If no filters are applied, return the original stream
-      return boulders;
+      return boulders;}
     });
   }
 
@@ -261,7 +263,7 @@ class _GymViewState extends State<GymView> {
       ),
       drawer: compView
           ? currentProfile!.isAdmin
-              ? compDrawer(context, currentComp!, _compService)
+              ? compDrawer(context, setState, currentComp!, _compService)
               : null
           : filterDrawer(context, setState, currentProfile!),
     );

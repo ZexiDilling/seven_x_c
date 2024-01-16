@@ -45,6 +45,11 @@ Done - grading progression
 Done - Boulders climb
 Done - Setter overview
 Done - Setter pie chart
+comp-Module:
+	Done - Edit comp - rules, boulders and general stuff
+	Done - added final and semi finals. (is not used atm)
+	
+
 
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -68,8 +73,18 @@ Done - ranking view Boulder Amount
 Done - ranking view Setter Points
 Done - ranking view Setter Amount
 Done - Ranking view based on time
-
 Done - update Splash Screen
+	
+
+Comp Module:
+	Set-up total boulder comp
+	Sign up for the comp
+	
+	added Zones option to comp (is not used atm)
+	
+	
+Challenges:
+
 	
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -78,8 +93,6 @@ ToDO:
 ------------------------------------------------------------------------------------------
 
 comp module:
-	Set-up total boulder comp
-	Sign up for the comp
 	See result after comp completion
 	see boulder after comp completion
 	Generate final report
@@ -145,6 +158,7 @@ boulder:
 		on repeats
 		on grade
 	Show if a boulder is a top out. 
+	
 
 
 Clean up:
@@ -210,3 +224,5 @@ Comp module:
 	Add other point system
 	make it possible to make your own system. ish
 	Split one comp into multiple days / slots
+	add finals, and semi-finals to comp - RUles
+	add zones to comp.  - Rules 

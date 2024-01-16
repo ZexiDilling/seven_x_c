@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/utilities/dialogs/generics/info_popup.dart';
 
@@ -19,9 +20,7 @@ class _CompCreationViewState extends State<CompCreationView> {
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
 
-  // Dropdown values
-  List<String> rulesOptions = ['Classic', 'Rule2', 'Rule3'];
-  List<String> stylesOptions = ['Total Boulder Comp', 'Style2', 'Style3'];
+
 
   // Selected values for dropdowns
   String selectedRule = 'Classic';
@@ -140,7 +139,7 @@ class _CompCreationViewState extends State<CompCreationView> {
                         selectedRule = newValue!;
                       });
                     },
-                    items: rulesOptions.map((rule) {
+                    items: compRulesOptions.map((rule) {
                       return DropdownMenuItem<String>(
                         value: rule,
                         child: Text(rule),
@@ -167,7 +166,7 @@ class _CompCreationViewState extends State<CompCreationView> {
                         selectedStyle = newValue!;
                       });
                     },
-                    items: stylesOptions.map((style) {
+                    items: compStylesOptions.map((style) {
                       return DropdownMenuItem<String>(
                         value: style,
                         child: Text(style),

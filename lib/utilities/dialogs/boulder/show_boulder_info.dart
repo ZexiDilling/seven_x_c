@@ -15,18 +15,17 @@ import 'package:seven_x_c/utilities/dialogs/generics/yes_no.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 
 Future<void> showBoulderInformation(
-  BuildContext context,
-  setState,
-  CloudBoulder boulder,
-  CloudProfile currentProfile,
-  CloudComp? currentComp,
-  bool compView,
-  FirebaseCloudStorage boulderService,
-  FirebaseCloudStorage userService,
-  FirebaseCloudStorage compService,
-  Stream<Iterable<CloudProfile>> settersStream,
-  List<String> challengesOverview
-) async {
+    BuildContext context,
+    setState,
+    CloudBoulder boulder,
+    CloudProfile currentProfile,
+    CloudComp? currentComp,
+    bool compView,
+    FirebaseCloudStorage boulderService,
+    FirebaseCloudStorage userService,
+    FirebaseCloudStorage compService,
+    Stream<Iterable<CloudProfile>> settersStream,
+    List<String> challengesOverview) async {
   int attempts = 0;
   int repeats = 0;
   bool flashed = false;
@@ -50,8 +49,6 @@ Future<void> showBoulderInformation(
   bool voted = false;
   String labelText = "Vote a Grade";
   bool expandPanelState = false;
-
-  
 
   Map<String, bool> expandedStates = {};
 
@@ -412,11 +409,15 @@ Future<void> showBoulderInformation(
                                                             currentComp
                                                                 .bouldersComp,
                                                       ));
+                                                  boulderService.updatBoulder(
+                                                    boulderID:
+                                                        boulder.boulderID,
+                                                    compBoulder: compBoulder,
+                                                  );
                                                 } else {
                                                   // ignore: use_build_context_synchronously
                                                   showErrorDialog(context,
                                                       "MISSING COMP!!! ");
-                                                  // todo Find a comp to add the boulder too
                                                 }
                                               }
                                             });
@@ -591,7 +592,8 @@ Future<void> showBoulderInformation(
                                     );
                                   },
                                   body: Column(
-                                    children: challengesOverview.map((challenge) {
+                                    children:
+                                        challengesOverview.map((challenge) {
                                       // Use the expanded state for each challenge
                                       bool isExpanded =
                                           expandedStates[challenge] ?? false;
@@ -604,37 +606,38 @@ Future<void> showBoulderInformation(
                                           ExpansionPanel(
                                             headerBuilder:
                                                 (context, isExpanded) {
-                                              
                                               return ListTile(
-                                                
                                                 title: Text(challenge),
                                               );
                                             },
-                                            
                                             body: Column(
-                                              
                                               children: [
-                                                challenge !=  "create" ? Column(children: [ElevatedButton(
-                                                  onPressed: () {
-                                                    // Add your logic for the button inside the expansion panel
-                                                  },
-                                                  child: const Text("Button 1"),
-                                                ),
-                                                ElevatedButton(
-                                                  onPressed: () {
-                                                    // Add your logic for the button inside the expansion panel
-                                                  },
-                                                  child: const Text("Button 2"),
-                                                ),
-                                                // Add more buttons or other widgets as needed,)
-                                                ])
-                                                
-                                                : ElevatedButton(onPressed: () {}, child: const Text("Create your own"))
+                                                challenge != "create"
+                                                    ? Column(children: [
+                                                        ElevatedButton(
+                                                          onPressed: () {
+                                                            // Add your logic for the button inside the expansion panel
+                                                          },
+                                                          child: const Text(
+                                                              "Button 1"),
+                                                        ),
+                                                        ElevatedButton(
+                                                          onPressed: () {
+                                                            // Add your logic for the button inside the expansion panel
+                                                          },
+                                                          child: const Text(
+                                                              "Button 2"),
+                                                        ),
+                                                        // Add more buttons or other widgets as needed,)
+                                                      ])
+                                                    : ElevatedButton(
+                                                        onPressed: () {},
+                                                        child: const Text(
+                                                            "Create your own"))
                                               ],
                                             ),
                                             isExpanded: isExpanded,
                                           ),
-                                          
                                         ],
                                         expansionCallback:
                                             (panelIndex, isExpanded) {
@@ -645,7 +648,6 @@ Future<void> showBoulderInformation(
                                         },
                                       );
                                     }).toList(),
-                                    
                                   ),
                                   isExpanded: expandPanelState,
                                 ),
