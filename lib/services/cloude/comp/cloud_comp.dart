@@ -17,6 +17,7 @@ class CloudComp {
   final bool includeZones;
   final bool includeFinals;
   final bool includeSemiFinals;
+  final bool genderBased;
   final Map<String, dynamic>? bouldersComp;
   final Map<String, dynamic>? climbersComp;
 
@@ -33,6 +34,7 @@ class CloudComp {
     this.includeZones,
     this.includeFinals,
     this.includeSemiFinals,
+    this.genderBased,
     this.bouldersComp,
     this.climbersComp, {
     required this.compID,
@@ -52,6 +54,7 @@ class CloudComp {
         includeZones = snapshot.data()[includeZonesFieldName] as bool,
         includeFinals = snapshot.data()[includeFinalsFieldName] as bool,
         includeSemiFinals = snapshot.data()[includeSemiFinalsFieldName] as bool,
+        genderBased = snapshot.data()[genderBasedFieldName] as bool,
         bouldersComp =
             snapshot.data()[bouldersCompFieldName] as Map<String, dynamic>?,
         climbersComp =

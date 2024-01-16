@@ -11,8 +11,9 @@ class GymPainter extends CustomPainter {
   final Iterable<CloudBoulder> allBoulders;
   final CloudProfile currentProfile;
   double currentScale;
+  bool compView;
 
-  GymPainter(this.allBoulders, this.currentProfile, this.currentScale);
+  GymPainter(this.allBoulders, this.currentProfile, this.currentScale, this.compView);
   DateTime currentTime = DateTime.now();
   @override
   void paint(Canvas canvas, Size size) {
@@ -45,6 +46,7 @@ class GymPainter extends CustomPainter {
           userTopped = false;
         }
 
+        // Fade if user have topped the boulder
         final Paint paint = Paint()
           ..color = (userTopped
               ? gradeColour?.withOpacity(fadeEffect)
@@ -58,6 +60,24 @@ class GymPainter extends CustomPainter {
           paint,
         );
 
+        if (compView && boulder.boulderName != null) {
+          // set-up central boulder count
+        final TextPainter textPainter = TextPainter(
+          text: TextSpan(
+            text:
+                "${boulder.boulderName}}",
+            style: const TextStyle(
+              color: Colors.black, // Set your desired text color
+              fontSize: 10.0, // Set your desired font size
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        );
+
+        textPainter.layout();   
+        }
+
+        // set glowcolour depending on status of the boulder
         if (setBoulderDate.add(newBoulderNotice).isAfter(currentTime) &&
             (!userTopped && !userFlashed)) {
           glowColour = newBoulderColour;
@@ -67,6 +87,7 @@ class GymPainter extends CustomPainter {
           glowColour = updatedBoulderColour;
         }
 
+        // Give problems a glow, unless they have been topped
         if (glowColour != null && !userTopped) {
           final Paint glowPaint = Paint()
             ..color = newBoulderColour.withOpacity(0.2)
@@ -80,6 +101,8 @@ class GymPainter extends CustomPainter {
           );
         }
 
+
+        // Colour the outer ring
         final Paint outlinePaint = Paint()
           ..color =
               (userTopped ? holdColour?.withOpacity(fadeEffect) : holdColour!)!
@@ -94,7 +117,8 @@ class GymPainter extends CustomPainter {
           outlinePaint,
         );
       }
-      // setup for show only one boulder
+
+      // setup for showing counter when zoomed out
     } else {
       for (final CloudBoulder boulder in allBoulders) {
         DateTime setBoulderDate = boulder.setDateBoulder.toDate();

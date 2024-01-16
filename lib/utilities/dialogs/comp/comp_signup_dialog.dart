@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/constants/routes.dart';
+import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/comp/gender_getter.dart';
 
 void showComp(
   BuildContext context, {
@@ -47,7 +50,7 @@ void showComp(
                           itemBuilder: (BuildContext context, int index) {
                             final currentComp = compData.elementAt(index);
                             return GestureDetector(
-                              onTap: () {
+                              onTap: () async {
                                 if (currentComp.climbersComp!
                                     .containsKey(currentProfile.userID)) {
                                   setCompView(!compView);
@@ -56,10 +59,19 @@ void showComp(
                                 } else {
                                   if (currentComp.climbersComp!.length <
                                       (currentComp.maxParticipants as int)) {
-                                    // todo handle singup! 
+                                    String gender =
+                                        await showGetGender(context);
+                                    compService.updatComp(
+                                        compID: currentComp.compID,
+                                        climbersComp: updateCompClimbers(
+                                          currentComp: currentComp,
+                                          currentProfile: currentProfile,
+                                          gender: gender,
+                                          existingData:
+                                              currentComp.climbersComp,
+                                        ));
                                     setCompView(!compView);
                                     setComp(currentComp);
-                                    
                                     Navigator.of(context).pop();
                                   } else {
                                     showErrorDialog(
@@ -100,15 +112,22 @@ void showComp(
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                // Handle "Create Comp" button click
-                                Navigator.of(context).pop();
-                                // Add your custom logic here
+                                Navigator.of(context).popAndPushNamed(compcreatview);
                               },
                               child: const Text('Create Comp'),
                             ),
                           ],
                         ),
-                      )
+                      ),
+                      ElevatedButton(
+                              onPressed: () {
+                                // Handle "Old Comps" button click
+                                // ToDo fix  this one 
+                                Navigator.of(context).pop();
+                                // Add your custom logic here
+                              },
+                              child: const Text('Old Comps'),
+                            ),
                     ],
                   ),
                 )

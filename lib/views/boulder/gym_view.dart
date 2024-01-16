@@ -248,7 +248,7 @@ class _GymViewState extends State<GymView> {
                       ),
                       child: CustomPaint(
                         painter: GymPainter(
-                            allBoulders, currentProfile!, currentScale),
+                            allBoulders, currentProfile!, currentScale, compView),
                       ),
                     ),
                   ),

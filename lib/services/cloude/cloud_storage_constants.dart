@@ -17,6 +17,7 @@ const activeFieldName = "active";
 const hiddenGradeFieldName = "hiddenGrade";
 const compBoulderFieldName = "compBoulder";
 const gotZoneFieldName = "gotZone";
+const boulderNameFieldName = "boulderName";
 const setDateBoulderFiledName = "setDateBoulder";
 const updateDateBoulderFiledName = "updateDateBoulder";
 const climberToppedFieldName = "climberTopped";
@@ -55,6 +56,7 @@ const maxParticipantsFieldName = "maxParticipants";
 const includeZonesFieldName = "includeZones";
 const includeFinalsFieldName = "includeFinals";
 const includeSemiFinalsFieldName = "includeSemiFinals";
+const genderBasedFieldName = "genderBased";
 const bouldersCompFieldName = "bouldersComp";
 const climbersCompFieldName = "climbersComp";
 

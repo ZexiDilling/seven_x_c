@@ -15,7 +15,8 @@ class FirebaseCloudStorage {
   final bouldersCollection = FirebaseFirestore.instance.collection("boulders");
   final profileCollection = FirebaseFirestore.instance.collection("profile");
   final compCollection = FirebaseFirestore.instance.collection("comp");
-  final challengeCollection = FirebaseFirestore.instance.collection("challenges");
+  final challengeCollection =
+      FirebaseFirestore.instance.collection("challenges");
 
   Future<void> deleteNote({required String documentId}) async {
     try {
@@ -80,6 +81,7 @@ class FirebaseCloudStorage {
     bool? hiddenGrade,
     bool? compBoulder,
     bool? gotZone,
+    String? boulderName,
     Timestamp? updateDateBoulder,
     Map<String, dynamic>? challenge,
     Map<String, dynamic>? gradeNumberClimbers,
@@ -104,6 +106,7 @@ class FirebaseCloudStorage {
       if (hiddenGrade != null) updatedData[hiddenGradeFieldName] = hiddenGrade;
       if (compBoulder != null) updatedData[compBoulderFieldName] = compBoulder;
       if (gotZone != null) updatedData[gotZoneFieldName] = gotZone;
+      if (boulderName != null) updatedData[boulderNameFieldName] = boulderName;
       if (updateDateBoulder != null) {
         updatedData[updateDateBoulderFiledName] = updateDateBoulder;
       }
@@ -158,6 +161,7 @@ class FirebaseCloudStorage {
     Map<String, dynamic>? challenge,
     Map<String, dynamic>? gradeNumberClimber,
     Map<String, dynamic>? climberTopped,
+    String? boulderName,
   }) async {
     final document = await bouldersCollection.add({
       setterFieldName: setter,
@@ -172,6 +176,7 @@ class FirebaseCloudStorage {
       hiddenGradeFieldName: hiddenGrade,
       compBoulderFieldName: compBoulder,
       gotZoneFieldName: gotZone,
+      boulderNameFieldName: boulderName,
       setDateBoulderFiledName: setDateBoulder,
       updateDateBoulderFiledName: setDateBoulder,
       if (challenge != null) challengeFieldName: challenge,
@@ -196,24 +201,27 @@ class FirebaseCloudStorage {
       hiddenGrade,
       compBoulder,
       gotZone,
+      boulderName,
       setDateBoulder,
       setDateBoulder,
       boulderID: fetchBoulder.id,
     );
   }
 
-Future<List<String>> grabBoulderChallenges({required String boulderID}) async {
-  final QuerySnapshot<Map<String, dynamic>> boulderSnapshots =
-      await bouldersCollection.where('boulderID', isEqualTo: boulderID).get();
+  Future<List<String>> grabBoulderChallenges(
+      {required String boulderID}) async {
+    final QuerySnapshot<Map<String, dynamic>> boulderSnapshots =
+        await bouldersCollection.where('boulderID', isEqualTo: boulderID).get();
 
-  // Extract challenges from non-null challenge field
-  final List<String> challenges = boulderSnapshots.docs
-      .where((doc) => doc['challenge'] != null)
-      .map((doc) => doc['challenge'] as String) // Assuming 'challenge' is a String
-      .toList();
+    // Extract challenges from non-null challenge field
+    final List<String> challenges = boulderSnapshots.docs
+        .where((doc) => doc['challenge'] != null)
+        .map((doc) =>
+            doc['challenge'] as String) // Assuming 'challenge' is a String
+        .toList();
 
-  return challenges;
-}
+    return challenges;
+  }
 
 // User data
   Stream<Iterable<CloudProfile>> getAllUsers() {
@@ -435,6 +443,7 @@ Future<List<String>> grabBoulderChallenges({required String boulderID}) async {
     required bool includeZones,
     required bool includeFinals,
     required bool includeSemiFinals,
+    required bool genderBased,
     int? maxParticipants,
     Map<String, dynamic>? bouldersComp,
     Map<String, dynamic>? climbersComp,
@@ -451,6 +460,7 @@ Future<List<String>> grabBoulderChallenges({required String boulderID}) async {
       includeZonesFieldName: includeZones,
       includeFinalsFieldName: includeFinals,
       includeSemiFinalsFieldName: includeSemiFinals,
+      genderBasedFieldName: genderBased,
       if (maxParticipants != null) maxParticipantsFieldName: maxParticipants,
       if (bouldersComp != null) bouldersCompFieldName: bouldersComp,
       if (climbersComp != null) climbersCompFieldName: climbersComp,
@@ -469,6 +479,7 @@ Future<List<String>> grabBoulderChallenges({required String boulderID}) async {
         includeZones,
         includeFinals,
         includeSemiFinals,
+        genderBased,
         bouldersComp,
         climbersComp,
         compID: fetchComp.id);
@@ -488,6 +499,7 @@ Future<List<String>> grabBoulderChallenges({required String boulderID}) async {
     bool? includeZones,
     bool? includeFinals,
     bool? includeSemiFinals,
+    bool? genderBased,
     Map<String, dynamic>? bouldersComp,
     Map<String, dynamic>? climbersComp,
   }) async {
@@ -520,6 +532,7 @@ Future<List<String>> grabBoulderChallenges({required String boulderID}) async {
       if (includeSemiFinals != null) {
         updatedData[includeSemiFinalsFieldName] = includeSemiFinals;
       }
+      if (genderBased != null) updatedData[genderBasedFieldName] = genderBased;
       if (bouldersComp != null) {
         updatedData[bouldersCompFieldName] = bouldersComp;
       }
@@ -630,7 +643,7 @@ Future<List<String>> grabBoulderChallenges({required String boulderID}) async {
     }
   }
 
-Future<CloudChallenge?> getchallenge(challengeName) async {
+  Future<CloudChallenge?> getchallenge(challengeName) async {
     final querySnapshot = await challengeCollection
         .where(challengeNameFieldName, isEqualTo: challengeName)
         .get();
@@ -645,8 +658,7 @@ Future<CloudChallenge?> getchallenge(challengeName) async {
     }
   }
 
-
-Future<void> deleteChallenge({required String challengeID}) async {
+  Future<void> deleteChallenge({required String challengeID}) async {
     try {
       await challengeCollection.doc(challengeID).delete();
     } catch (e) {

@@ -121,6 +121,22 @@ Map<String, dynamic> updateBoulderSet(
   return setBoulder;
 }
 
+Map<String, dynamic> updateCompClimbers({required CloudComp currentComp, required CloudProfile currentProfile, required String gender, Map<String, dynamic>? existingData}) {
+  String displayName = currentProfile.displayName;
+  String userID = currentProfile.userID;
+  
+  Map<String, dynamic> newData = {
+    "displayName": displayName,
+    "gender": gender,
+    "points": 0,
+    "tops": 0,
+  };
+  Map<String, dynamic> climbersComp= existingData ?? {};
+  climbersComp[userID] = newData;
+
+  return climbersComp;
+}
+
 Map<String, dynamic> updateClimberToppedMap(
     {required CloudProfile currentProfile,
     required int attempts,

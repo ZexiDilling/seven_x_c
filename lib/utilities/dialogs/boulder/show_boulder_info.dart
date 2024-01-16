@@ -135,65 +135,68 @@ Future<void> showBoulderInformation(
                   return AlertDialog(
                     title: Row(
                       children: [
-                        Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: getColorFromName(
-                                boulder.holdColour), // Outline color
-                          ),
-                          child: Center(
-                            child: Container(
-                              width: 26,
-                              height: 26,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: boulder.hiddenGrade == true
-                                    ? hiddenGradeColor
-                                    : getColorFromName(capitalizeFirstLetter(
-                                        boulder.gradeColour)), // Inside color
-                              ),
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 0.0),
-                                  child: Text(
-                                    gradingShow!,
-                                    style: TextStyle(
-                                      color: Colors
-                                          .white, // You can adjust the text color as needed
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: (gradingShow.length > 3 ||
-                                              gradingShow.contains('/'))
-                                          ? 10 // Adjust the font size as needed
-                                          : 15,
+                        const SizedBox(width: 10),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width - 150,
+                          child: Card(
+                            child: ListTile(
+                              leading: Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: getColorFromName(
+                                      boulder.holdColour), // Outline color
+                                ),
+                                child: Center(
+                                  child: Container(
+                                    width: 26,
+                                    height: 26,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: boulder.hiddenGrade == true
+                                          ? hiddenGradeColor
+                                          : getColorFromName(
+                                              capitalizeFirstLetter(boulder
+                                                  .gradeColour)), // Inside color
+                                    ),
+                                    child: Center(
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 0.0),
+                                        child: Text(
+                                          gradingShow!,
+                                          style: TextStyle(
+                                            color: Colors
+                                                .white, // You can adjust the text color as needed
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: (gradingShow.length > 3 ||
+                                                    gradingShow.contains('/'))
+                                                ? 10 // Adjust the font size as needed
+                                                : 15,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
+                              title: Text("Setter ${boulder.setter}",
+                                  style: TextStyle(
+                                    fontSize: (boulder.setter.length > 10)
+                                        ? 20.0
+                                        : 15.0,
+                                    // Adjust the font size as needed
+                                    
+                                  )),
+                              subtitle: Text(boulder.boulderName ?? ""),
+                              trailing: topOut
+                                  ? const Icon(Icons.arrow_upward,
+                                      size: 25.0, color: Colors.green)
+                                  : const Text(""),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        Text("Setter - ${boulder.setter}"),
-                        if (currentProfile.isAdmin || currentProfile.isSetter)
-                          IconButton(
-                            icon: Icon(editing ? Icons.edit : Icons.done),
-                            onPressed: () {
-                              labelText =
-                                  editing ? "Vote a Grade" : "Choose a Grade";
-                              gradeColour =
-                                  getColorFromName(boulder.gradeColour);
-                              gradeColorChoice = gradeColorMap[gradeColour];
-                              gradeValue = boulder.gradeNumberSetter;
-                              difficultyLevel = getdifficultyFromArrow(
-                                  getArrowFromNumberAndColor(
-                                      gradeValue!, boulder.gradeColour));
-                              setState(() {
-                                editing = !editing;
-                              });
-                            },
-                          ),
                       ],
                     ),
                     content: SizedBox(
@@ -202,6 +205,35 @@ Future<void> showBoulderInformation(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Row(
+                              children: [
+                                Visibility(
+                                  visible: currentProfile.isAdmin ||
+                                      currentProfile.isSetter,
+                                  child: IconButton(
+                                    icon:
+                                        Icon(editing ? Icons.edit : Icons.done),
+                                    onPressed: () {
+                                      labelText = editing
+                                          ? "Vote a Grade"
+                                          : "Choose a Grade";
+                                      gradeColour =
+                                          getColorFromName(boulder.gradeColour);
+                                      gradeColorChoice =
+                                          gradeColorMap[gradeColour];
+                                      gradeValue = boulder.gradeNumberSetter;
+                                      difficultyLevel = getdifficultyFromArrow(
+                                          getArrowFromNumberAndColor(
+                                              gradeValue!,
+                                              boulder.gradeColour));
+                                      setState(() {
+                                        editing = !editing;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
                             Visibility(
                               visible: !editing,
                               child: Column(

@@ -45,10 +45,11 @@ Done - grading progression
 Done - Boulders climb
 Done - Setter overview
 Done - Setter pie chart
+Done - added names to boulders
 comp-Module:
 	Done - Edit comp - rules, boulders and general stuff
 	Done - added final and semi finals. (is not used atm)
-	
+
 
 
 
@@ -74,13 +75,17 @@ Done - ranking view Setter Points
 Done - ranking view Setter Amount
 Done - Ranking view based on time
 Done - update Splash Screen
+
+Boulders:
+	Done - Show if a boulder is a top out. 
+	Done - show name of boulder if there is one 
 	
 
 Comp Module:
 	Set-up total boulder comp
 	Sign up for the comp
-	
 	added Zones option to comp (is not used atm)
+	Mark the name of the boulder on the map 
 	
 	
 Challenges:
@@ -97,11 +102,17 @@ comp module:
 	see boulder after comp completion
 	Generate final report
 	One comp boulders, let the user see the name. 
-	Mark the name of the boulder on the map ? 
 	Add a comp map to the user when the comp is complete
 		Total ranking
 		Gender ranking
 	
+boulder:
+	Update when clicking - both positive and negative. 
+		on topped
+		on flashed
+		on attempts
+		on repeats
+		on grade
 	
 
 Boulder view:
@@ -150,15 +161,7 @@ Settings:
 Setter:
 	Make it possible to set a non-setter as a setter
 
-boulder:
-	Update when clicking - both positive and negative. 
-		on topped
-		on flashed
-		on attempts
-		on repeats
-		on grade
-	Show if a boulder is a top out. 
-	
+
 
 
 Clean up:
