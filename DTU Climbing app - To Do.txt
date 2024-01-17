@@ -86,7 +86,11 @@ Comp Module:
 	Sign up for the comp
 	added Zones option to comp (is not used atm)
 	Mark the name of the boulder on the map 
-	
+	Add a comp map to the user when the comp is complete
+	Total ranking
+	Gender ranking
+	See result after comp completion
+	see boulder after comp completion
 	
 Challenges:
 
@@ -97,14 +101,11 @@ Challenges:
 ToDO:
 ------------------------------------------------------------------------------------------
 
+FIX CREATE BOULDERS!!!!!!!!!!!!
+
 comp module:
-	See result after comp completion
-	see boulder after comp completion
-	Generate final report
-	One comp boulders, let the user see the name. 
-	Add a comp map to the user when the comp is complete
-		Total ranking
-		Gender ranking
+	Randome person picker button for prices to random ppl. 
+
 	
 boulder:
 	Update when clicking - both positive and negative. 

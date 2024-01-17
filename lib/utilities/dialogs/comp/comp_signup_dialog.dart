@@ -106,28 +106,33 @@ void showComp(
                           },
                         ),
                       ),
-                      Visibility(
-                        visible: currentProfile!.isSetter,
-                        child: Row(
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).popAndPushNamed(compcreatview);
-                              },
-                              child: const Text('Create Comp'),
+                      Row(
+                        children: [
+                          Visibility(
+                            visible: currentProfile!.isSetter,
+                            child: Row(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .popAndPushNamed(compCreatView);
+                                  },
+                                  child: const Text('Create Comp'),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                      ElevatedButton(
-                              onPressed: () {
-                                // Handle "Old Comps" button click
-                                // ToDo fix  this one 
-                                Navigator.of(context).pop();
-                                // Add your custom logic here
-                              },
-                              child: const Text('Old Comps'),
-                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              // Handle "Old Comps" button click
+                              
+                              Navigator.of(context).popAndPushNamed(compResultView);
+                              // Add your custom logic here
+                            },
+                            child: const Text('Old Comps'),
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 )

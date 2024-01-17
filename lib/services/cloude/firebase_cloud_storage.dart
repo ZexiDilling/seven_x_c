@@ -252,7 +252,7 @@ class FirebaseCloudStorage {
     Map<String, dynamic>? climbedBoulders,
     Map<String, dynamic>? setBoulders,
     Map<String, dynamic>? challengeProfile,
-    Map<String, dynamic>? comp,
+    Map<String, dynamic>? compProfile,
     String? email,
     String? displayName,
     String? gradingSystem,
@@ -284,7 +284,7 @@ class FirebaseCloudStorage {
       if (challengeProfile != null) {
         updatedData[challengeProfileFieldName] = challengeProfile;
       }
-      if (comp != null) updatedData[compBoulderFieldName] = comp;
+      if (compProfile != null) updatedData[compProfileFieldName] = compProfile;
       if (email != null) updatedData[emailFieldName] = email;
       if (displayName != null) updatedData[displayNameFieldName] = displayName;
       if (gradingSystem != null) {
@@ -447,6 +447,7 @@ class FirebaseCloudStorage {
     int? maxParticipants,
     Map<String, dynamic>? bouldersComp,
     Map<String, dynamic>? climbersComp,
+    Map<String, dynamic>? compResults,
   }) async {
     final document = await compCollection.add({
       compNameFieldName: compName,
@@ -464,6 +465,7 @@ class FirebaseCloudStorage {
       if (maxParticipants != null) maxParticipantsFieldName: maxParticipants,
       if (bouldersComp != null) bouldersCompFieldName: bouldersComp,
       if (climbersComp != null) climbersCompFieldName: climbersComp,
+      if (compResults != null) compResultsFieldName: compResults,
     });
     final fetchComp = await document.get();
     return CloudComp(
@@ -482,6 +484,7 @@ class FirebaseCloudStorage {
         genderBased,
         bouldersComp,
         climbersComp,
+        compResults,
         compID: fetchComp.id);
   }
 
@@ -502,6 +505,7 @@ class FirebaseCloudStorage {
     bool? genderBased,
     Map<String, dynamic>? bouldersComp,
     Map<String, dynamic>? climbersComp,
+    Map<String, dynamic>? compResults,
   }) async {
     try {
       // Create a map to store non-null fields and their values
@@ -539,6 +543,9 @@ class FirebaseCloudStorage {
       if (climbersComp != null) {
         updatedData[climbersCompFieldName] = climbersComp;
       }
+      if (compResults != null) {
+        updatedData[compResultsFieldName] = compResults;
+      }
 
       // Update the document with the non-null fields
       await compCollection.doc(compID).update(updatedData);
@@ -561,6 +568,14 @@ class FirebaseCloudStorage {
       return null;
     }
   }
+
+  Stream<Iterable<CloudComp>> getAllComps() {
+    final activeComp = compCollection
+        .snapshots()
+        .map((event) => event.docs.map((doc) => CloudComp.fromSnapshot(doc)));
+    return activeComp;
+  }
+
 
   Stream<Iterable<CloudComp>> getActiveComps() {
     final activeComp = compCollection

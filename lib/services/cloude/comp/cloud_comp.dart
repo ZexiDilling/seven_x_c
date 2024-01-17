@@ -20,6 +20,7 @@ class CloudComp {
   final bool genderBased;
   final Map<String, dynamic>? bouldersComp;
   final Map<String, dynamic>? climbersComp;
+  final Map<String, dynamic>? compResults;
 
   const CloudComp(
     this.compName,
@@ -36,7 +37,8 @@ class CloudComp {
     this.includeSemiFinals,
     this.genderBased,
     this.bouldersComp,
-    this.climbersComp, {
+    this.climbersComp,
+    this.compResults, {
     required this.compID,
   });
 
@@ -58,5 +60,7 @@ class CloudComp {
         bouldersComp =
             snapshot.data()[bouldersCompFieldName] as Map<String, dynamic>?,
         climbersComp =
-            snapshot.data()[climbersCompFieldName] as Map<String, dynamic>?;
+            snapshot.data()[climbersCompFieldName] as Map<String, dynamic>?,
+        compResults =
+            snapshot.data()[compResultsFieldName] as Map<String, dynamic>?;
 }

@@ -12,10 +12,10 @@ import 'package:seven_x_c/views/auth_user/register_view.dart';
 import 'package:seven_x_c/views/auth_user/verify_email_view.dart';
 import 'package:seven_x_c/views/boulder/gym_view.dart';
 import 'package:seven_x_c/views/boulder/ranking_view.dart';
+import 'package:seven_x_c/views/comp/comp_result_view.dart';
 import 'package:seven_x_c/views/comp/comp_setup_view.dart';
 import 'package:seven_x_c/views/missing_views/profile_view.dart';
 import 'package:seven_x_c/views/notes/create_update_note_view.dart';
-// import 'package:seven_x_c/views/notes/notes_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'
     show BlocConsumer, BlocProvider, ReadContext;
 import 'package:seven_x_c/views/admin/profile_view.dart';
@@ -40,7 +40,8 @@ void main() {
         gymView: (context) => const GymView(),
         rankView: (context) => const RankView(),
         profileView: (context) => const ProfileView(),
-        compcreatview: (context) => const CompCreationView(),
+        compCreatView: (context) => const CompCreationView(),
+        compResultView: (context) => const CompResultsView(),
       },
     ),
   );

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
@@ -74,8 +73,6 @@ class _CompCreationViewState extends State<CompCreationView> {
                 ],
               ),
               const SizedBox(height: 16),
-
-              // Start Date and End Date Text Fields
               buildDatePickerRow(
                 context: context,
                 selectedDate: selectedStartDate,

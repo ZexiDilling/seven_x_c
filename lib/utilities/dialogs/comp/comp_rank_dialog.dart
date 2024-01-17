@@ -5,10 +5,13 @@ import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 
-void showCompRankings(BuildContext context,
-    {required FirebaseCloudStorage? compService,
-    required CloudComp currentComp,
-    required CloudProfile? currentProfile}) {
+void showCompRankings(
+  BuildContext context, {
+  required FirebaseCloudStorage? compService,
+  required CloudComp currentComp,
+  required CloudProfile? currentProfile,
+  required Function(bool) setCompView,
+}) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -70,14 +73,21 @@ void showCompRankings(BuildContext context,
                         ],
                       ),
                     ),
-                    ElevatedButton(onPressed: () {showErrorDialog(context, "INFO!");}, child: const Text("Info")),
-                    currentProfile!.isAdmin
-                        ? ElevatedButton(
+                    Row(
+                      children: [
+                        ElevatedButton(
                             onPressed: () {
-                              // compService.updatComp(compID: compID)
+                              showErrorDialog(context, "INFO!");
                             },
-                            child: const Text("End Comp"))
-                        : const SizedBox()
+                            child: const Text("Info")),
+                        ElevatedButton(
+                            onPressed: () {
+                              setCompView(false);
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("Exit comp"))
+                      ],
+                    )
                   ],
                 );
               },

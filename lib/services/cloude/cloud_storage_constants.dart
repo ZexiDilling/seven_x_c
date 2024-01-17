@@ -32,7 +32,7 @@ const isAnonymousFieldName = "isAnonymous";
 const climbedBouldersFieldName = "climbedBoulders";
 const setBouldersFieldName = "setBoulders";
 const challengeProfileFieldName = "challengeProfile";
-const compFieldName = "comp";
+const compProfileFieldName = "compProfile";
 const profileIDFieldName = "profileID";
 const emailFieldName = "email";
 const displayNameFieldName = "displayName";
@@ -59,6 +59,7 @@ const includeSemiFinalsFieldName = "includeSemiFinals";
 const genderBasedFieldName = "genderBased";
 const bouldersCompFieldName = "bouldersComp";
 const climbersCompFieldName = "climbersComp";
+const compResultsFieldName = "climbersResults";
 
 //challenge
 const challengeIDFieldName = "challengeID";

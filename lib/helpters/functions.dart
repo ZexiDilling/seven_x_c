@@ -121,17 +121,55 @@ Map<String, dynamic> updateBoulderSet(
   return setBoulder;
 }
 
-Map<String, dynamic> updateCompClimbers({required CloudComp currentComp, required CloudProfile currentProfile, required String gender, Map<String, dynamic>? existingData}) {
+Map<String, dynamic> updateCompProfile({
+  required CloudComp currentComp,
+  required CloudProfile currentProfile,
+  required Map<String, dynamic> ranking,
+  Map<String, dynamic>? existingData,
+}) {
+  String displayName = currentProfile.displayName;
+  String userId = currentProfile.userID;
+  String compName = currentComp.compName;
+  String gender = currentComp.climbersComp![userId]["gender"];
+  int rankingTotal = ranking["total"]![userId]["rank"];
+  int rankingMale = ranking["male"]?[userId]?["rank"] ?? 0;
+  int rankingFemale = ranking["female"]?[userId]?["rank"] ?? 0;
+  double points = ranking["total"]![userId]["points"];
+  int tops = ranking["total"]![userId]["tops"];
+
+
+  // Create a new climber data
+  Map<String, dynamic> newData = {
+    "displayName": displayName,
+    "gender": gender,
+    "points": points,
+    "tops": tops,
+    "rankingTotal": rankingTotal,
+    "rankingMale": rankingMale,
+    "rankingFemale": rankingFemale,
+  };
+
+  Map<String, dynamic> climbersComp = existingData ?? {};
+  climbersComp[compName] = newData;
+
+  return climbersComp;
+}
+
+Map<String, dynamic> updateCompClimbers(
+    {required CloudComp currentComp,
+    required CloudProfile currentProfile,
+    required String gender,
+    Map<String, dynamic>? existingData}) {
   String displayName = currentProfile.displayName;
   String userID = currentProfile.userID;
-  
+
   Map<String, dynamic> newData = {
     "displayName": displayName,
     "gender": gender,
     "points": 0,
     "tops": 0,
   };
-  Map<String, dynamic> climbersComp= existingData ?? {};
+  Map<String, dynamic> climbersComp = existingData ?? {};
   climbersComp[userID] = newData;
 
   return climbersComp;

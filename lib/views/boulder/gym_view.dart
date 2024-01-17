@@ -197,7 +197,7 @@ class _GymViewState extends State<GymView> {
                     showCompRankings(context,
                         compService: _compService,
                         currentComp: currentComp!,
-                        currentProfile: currentProfile);
+                        currentProfile: currentProfile, setCompView: setCompView);
                   },
                   icon: const Icon(Icons.emoji_events))
               : const SizedBox(),
@@ -263,7 +263,7 @@ class _GymViewState extends State<GymView> {
       ),
       drawer: compView
           ? currentProfile!.isAdmin
-              ? compDrawer(context, setState, currentComp!, _compService)
+              ? compDrawer(context, setState, currentComp!, _compService, _userService)
               : null
           : filterDrawer(context, setState, currentProfile!),
     );
