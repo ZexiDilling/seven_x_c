@@ -104,6 +104,8 @@ ToDO:
 FIX CREATE BOULDERS!!!!!!!!!!!!
 
 comp module:
+	When A user tops a boulder, add it to the comp map. 
+		Upadte the points based on the rule and style set
 	Randome person picker button for prices to random ppl. 
 
 	
