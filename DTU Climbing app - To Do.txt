@@ -79,6 +79,11 @@ Done - update Splash Screen
 Boulders:
 	Done - Show if a boulder is a top out. 
 	Done - show name of boulder if there is one 
+	Done - Update when clicking - both positive and negative. 
+		Done - on topped
+		Done - on flashed
+		Done - on repeats
+		Done - on grade
 	
 
 Comp Module:
@@ -91,6 +96,8 @@ Comp Module:
 	Gender ranking
 	See result after comp completion
 	see boulder after comp completion
+	When A user tops a boulder, add it to the comp map. 
+		Upadte the points based on the rule and style set
 	
 Challenges:
 
@@ -104,20 +111,9 @@ ToDO:
 FIX CREATE BOULDERS!!!!!!!!!!!!
 
 comp module:
-	When A user tops a boulder, add it to the comp map. 
-		Upadte the points based on the rule and style set
 	Randome person picker button for prices to random ppl. 
 
 	
-boulder:
-	Update when clicking - both positive and negative. 
-		on topped
-		on flashed
-		on attempts
-		on repeats
-		on grade
-	
-
 Boulder view:
 	challenges modul for boulders
 	
@@ -163,9 +159,6 @@ Settings:
 
 Setter:
 	Make it possible to set a non-setter as a setter
-
-
-
 
 Clean up:
 	Remove notes 
@@ -228,6 +221,9 @@ make it possible to check others profile ?
 
 Comp module:
 	Add other point system
+		add points for flash for setup the comp
+		substract points per attempts
+		base points on highest climed boulder.
 	make it possible to make your own system. ish
 	Split one comp into multiple days / slots
 	add finals, and semi-finals to comp - RUles

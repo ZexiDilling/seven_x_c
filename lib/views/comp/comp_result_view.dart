@@ -120,9 +120,16 @@ class _CompResultsViewState extends State<CompResultsView>
         children: [
           for (var entry in sortedEntries)
             ListTile(
+              leading: CircleAvatar(
+              backgroundColor: Colors.blue, // Change color as needed
+              child: Text(
+                entry.value['rank'].toString(),
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
               title: Text(entry.key), // Assuming entry.key is the display name
               subtitle: Text(
-                  'Rank: ${entry.value['rank']}, Points: ${entry.value['points']}, Tops: ${entry.value['tops']}'),
+                  'Points: ${entry.value['points']}, Tops: ${entry.value['tops']}'),
             ),
         ],
       );
@@ -149,7 +156,6 @@ class _CompResultsViewState extends State<CompResultsView>
 
   Future<Widget> _buildBoulderInfoTabContent() async {
     final boulders = selectedComp?.bouldersComp;
-    print(boulders);
 
     if (boulders!.isNotEmpty) {
       

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
+import 'package:seven_x_c/helpters/comp/comp_calculations.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
@@ -149,36 +150,8 @@ Future<void> showBoulderInformation(
                                       boulder.holdColour), // Outline color
                                 ),
                                 child: Center(
-                                  child: Container(
-                                    width: 26,
-                                    height: 26,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: boulder.hiddenGrade == true
-                                          ? hiddenGradeColor
-                                          : getColorFromName(
-                                              capitalizeFirstLetter(boulder
-                                                  .gradeColour)), // Inside color
-                                    ),
-                                    child: Center(
-                                      child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 0.0),
-                                        child: Text(
-                                          gradingShow!,
-                                          style: TextStyle(
-                                            color: Colors
-                                                .white, // You can adjust the text color as needed
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: (gradingShow.length > 3 ||
-                                                    gradingShow.contains('/'))
-                                                ? 10 // Adjust the font size as needed
-                                                : 15,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                  child:
+                                      gradingCirleDrawing(boulder, gradingShow),
                                 ),
                               ),
                               title: Text("Setter ${boulder.setter}",
@@ -186,8 +159,6 @@ Future<void> showBoulderInformation(
                                     fontSize: (boulder.setter.length > 10)
                                         ? 20.0
                                         : 15.0,
-                                    // Adjust the font size as needed
-                                    
                                   )),
                               subtitle: Text(boulder.boulderName ?? ""),
                               trailing: topOut
@@ -245,6 +216,45 @@ Future<void> showBoulderInformation(
                                       onChanged: (bool? value) {
                                         setState(() {
                                           topped = value ?? false;
+
+                                          if (compView) {
+                                            updateCompCalculations(compService, currentComp!, boulder, currentProfile, flashed, attempts);
+                                          }
+
+                                          if (topped) {
+                                            boulderService.updatBoulder(
+                                                boulderID: boulder.boulderID,
+                                                climberTopped:
+                                                    updateClimberToppedMap(
+                                                        currentProfile:
+                                                            currentProfile,
+                                                        attempts: attempts,
+                                                        repeats: repeats,
+                                                        flashed: flashed,
+                                                        topped: topped,
+                                                        existingData: boulder
+                                                            .climberTopped));
+                                            updateUserTopped(
+                                                userService,
+                                                currentProfile,
+                                                boulder,
+                                                flashed,
+                                                topped,
+                                                attempts,
+                                                repeats);
+                                          } else {
+                                            flashed = false;
+                                            boulderService.updatBoulder(
+                                                boulderID: boulder.boulderID,
+                                                climberTopped:
+                                                    removeClimberToppedentry(
+                                                        currentProfile:
+                                                            currentProfile,
+                                                        existingData: boulder
+                                                            .climberTopped));
+                                            updateUserUndoTop(userService,
+                                                currentProfile, boulder);
+                                          }
                                         });
                                       },
                                     ),
@@ -257,6 +267,52 @@ Future<void> showBoulderInformation(
                                           flashed = value ?? false;
                                           topped = value ?? false;
                                           attempts = 1;
+                                          if (compView) {
+                                            updateCompCalculations(compService, currentComp!, boulder, currentProfile, flashed, attempts);
+                                          }
+                                          if (flashed) {
+                                            boulderService.updatBoulder(
+                                                boulderID: boulder.boulderID,
+                                                climberTopped:
+                                                    updateClimberToppedMap(
+                                                        currentProfile:
+                                                            currentProfile,
+                                                        attempts: attempts,
+                                                        repeats: repeats,
+                                                        flashed: flashed,
+                                                        topped: topped,
+                                                        existingData: boulder
+                                                            .climberTopped));
+                                            updateUserTopped(
+                                                userService,
+                                                currentProfile,
+                                                boulder,
+                                                flashed,
+                                                topped,
+                                                attempts,
+                                                repeats);
+                                          } else {
+                                            boulderService.updatBoulder(
+                                                boulderID: boulder.boulderID,
+                                                climberTopped:
+                                                    updateClimberToppedMap(
+                                                        currentProfile:
+                                                            currentProfile,
+                                                        attempts: attempts,
+                                                        repeats: repeats,
+                                                        flashed: flashed,
+                                                        topped: topped,
+                                                        existingData: boulder
+                                                            .climberTopped));
+                                            updateUserRemovedFlashed(
+                                                userService,
+                                                currentProfile,
+                                                boulder,
+                                                flashed,
+                                                topped,
+                                                attempts,
+                                                repeats);
+                                          }
                                         });
                                       },
                                     ),
@@ -278,6 +334,11 @@ Future<void> showBoulderInformation(
                                                         .clamp(
                                                             0, double.infinity)
                                                         .toInt();
+                                                    updateUserReapet(
+                                                        userService,
+                                                        currentProfile,
+                                                        boulder,
+                                                        repeats);
                                                   });
                                                 },
                                               ),
@@ -288,9 +349,11 @@ Future<void> showBoulderInformation(
                                                 onPressed: () {
                                                   setState(() {
                                                     repeats++;
-                                                    if (repeats > 1) {
-                                                      flashed = false;
-                                                    }
+                                                    updateUserReapet(
+                                                        userService,
+                                                        currentProfile,
+                                                        boulder,
+                                                        repeats);
                                                   });
                                                 },
                                               ),
@@ -333,6 +396,7 @@ Future<void> showBoulderInformation(
                                 ],
                               ),
                             ),
+                            // Edeting the boulder
                             Visibility(
                                 visible: editing,
                                 child: Column(
@@ -522,7 +586,15 @@ Future<void> showBoulderInformation(
                                               gradeColour = value;
                                               gradeColorChoice =
                                                   gradeColorMap[gradeColour];
-                                              voted = true;
+
+                                              updateUsersVotedForGrade(
+                                                  boulderService,
+                                                  boulder,
+                                                  currentProfile,
+                                                  gradingSystem,
+                                                  gradeValue,
+                                                  difficultyLevel,
+                                                  gradeColorChoice);
                                             });
                                           },
                                           items: gradeColorMap.entries.map(
@@ -546,6 +618,14 @@ Future<void> showBoulderInformation(
                                         onChanged: (double value) {
                                           setState(() {
                                             difficultyLevel = value.toInt();
+                                            updateUsersVotedForGrade(
+                                                boulderService,
+                                                boulder,
+                                                currentProfile,
+                                                gradingSystem,
+                                                gradeValue,
+                                                difficultyLevel,
+                                                gradeColorChoice);
                                           });
                                         },
                                       ),
@@ -570,15 +650,21 @@ Future<void> showBoulderInformation(
                                               allGradeColorChoice =
                                                   mapNumberToColors(
                                                       gradeValue!);
-                                              if (allGradeColorChoice.length ==
-                                                  1) {
-                                                gradeColorChoice =
-                                                    allGradeColorChoice[0];
-                                              }
+
+                                              gradeColorChoice =
+                                                  allGradeColorChoice[0];
+
                                               gradeColors = allGradeColorChoice
                                                   .join(', ');
+                                              updateUsersVotedForGrade(
+                                                  boulderService,
+                                                  boulder,
+                                                  currentProfile,
+                                                  gradingSystem,
+                                                  gradeValue,
+                                                  difficultyLevel,
+                                                  gradeColorChoice);
                                             });
-                                            voted = true;
                                           },
                                           items: climbingGrades[gradingSystem]!
                                               .map<DropdownMenuItem<String>>(
@@ -604,6 +690,14 @@ Future<void> showBoulderInformation(
                                                   onChanged: (value) {
                                                     setState(() {
                                                       gradeColorChoice = value;
+                                                      updateUsersVotedForGrade(
+                                                          boulderService,
+                                                          boulder,
+                                                          currentProfile,
+                                                          gradingSystem,
+                                                          gradeValue,
+                                                          difficultyLevel,
+                                                          gradeColorChoice);
                                                     });
                                                   },
                                                 )),
@@ -613,111 +707,12 @@ Future<void> showBoulderInformation(
                                     ],
                                   ),
                             const SizedBox(height: 20),
-                            ExpansionPanelList(
-                              elevation: 1,
-                              expandedHeaderPadding: const EdgeInsets.all(0),
-                              children: [
-                                ExpansionPanel(
-                                  headerBuilder: (context, isExpanded) {
-                                    return const ListTile(
-                                      title: Text("Challenges"),
-                                    );
-                                  },
-                                  body: Column(
-                                    children:
-                                        challengesOverview.map((challenge) {
-                                      // Use the expanded state for each challenge
-                                      bool isExpanded =
-                                          expandedStates[challenge] ?? false;
-
-                                      return ExpansionPanelList(
-                                        elevation: 1,
-                                        expandedHeaderPadding:
-                                            const EdgeInsets.all(0),
-                                        children: [
-                                          ExpansionPanel(
-                                            headerBuilder:
-                                                (context, isExpanded) {
-                                              return ListTile(
-                                                title: Text(challenge),
-                                              );
-                                            },
-                                            body: Column(
-                                              children: [
-                                                challenge != "create"
-                                                    ? Column(children: [
-                                                        ElevatedButton(
-                                                          onPressed: () {
-                                                            // Add your logic for the button inside the expansion panel
-                                                          },
-                                                          child: const Text(
-                                                              "Button 1"),
-                                                        ),
-                                                        ElevatedButton(
-                                                          onPressed: () {
-                                                            // Add your logic for the button inside the expansion panel
-                                                          },
-                                                          child: const Text(
-                                                              "Button 2"),
-                                                        ),
-                                                        // Add more buttons or other widgets as needed,)
-                                                      ])
-                                                    : ElevatedButton(
-                                                        onPressed: () {},
-                                                        child: const Text(
-                                                            "Create your own"))
-                                              ],
-                                            ),
-                                            isExpanded: isExpanded,
-                                          ),
-                                        ],
-                                        expansionCallback:
-                                            (panelIndex, isExpanded) {
-                                          setState(() {
-                                            expandedStates[challenge] =
-                                                isExpanded;
-                                          });
-                                        },
-                                      );
-                                    }).toList(),
-                                  ),
-                                  isExpanded: expandPanelState,
-                                ),
-                              ],
-                              expansionCallback: (panelIndex, isExpanded) {
-                                setState(() {
-                                  expandPanelState = !expandPanelState;
-                                });
-                              },
-                            ),
+                            challengePanel(challengesOverview, expandedStates,
+                                setState, expandPanelState),
 
                             const SizedBox(height: 20),
                             Row(children: [
-                              SizedBox(
-                                width: 200,
-                                height: 200,
-                                child: ListView.builder(
-                                  itemCount: toppersList.length,
-                                  itemBuilder: (context, index) {
-                                    // Access climber information from the map
-                                    String name = toppersList[index]['name'];
-                                    bool flashed =
-                                        toppersList[index]['flashed'];
-
-                                    return Card(
-                                      child: ListTile(
-                                        title: Row(
-                                          children: [
-                                            Text(name),
-                                            const SizedBox(width: 10),
-                                            Text(flashed ? "F" : "T"),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
+                              climberTopList(toppersList),
                             ]),
                           ],
                         ),
@@ -803,7 +798,6 @@ Future<void> showBoulderInformation(
                                           existingData:
                                               currentProfile.climbedBoulders));
                                 } else if (topped == false && previusTopped) {
-                                  // ToDo remove boulder from user and substract boulder points from the user.
                                   if (boulder.gradeNumberSetter ==
                                       currentProfile.maxFlahsedGrade) {
                                     maxFlahsedGrade = checkGrade(currentProfile,
@@ -888,6 +882,73 @@ Future<void> showBoulderInformation(
   );
 }
 
+void updateUsersVotedForGrade(
+    FirebaseCloudStorage boulderService,
+    CloudBoulder boulder,
+    CloudProfile currentProfile,
+    String gradingSystem,
+    int? gradeValue,
+    int? difficultyLevel,
+    String? gradeColorChoice) {
+  if (gradingSystem == "coloured") {
+    gradeValue = difficultyLevelToArrow(difficultyLevel!, gradeColorChoice!);
+  } else {
+    String arrow = getArrowFromNumberAndColor(gradeValue!, gradeColorChoice!);
+    difficultyLevel = getdifficultyFromArrow(arrow);
+  }
+  boulderService.updatBoulder(
+    boulderID: boulder.boulderID,
+    climberTopped: updateClimberToppedMap(
+        currentProfile: currentProfile,
+        existingData: boulder.climberTopped,
+        gradeNumberVoted: gradeValue,
+        gradeColourVoted: gradeColorChoice,
+        gradeArrowVoted: difficultyLevel),
+  );
+}
+
+void updateUserReapet(FirebaseCloudStorage userService,
+    CloudProfile currentProfile, CloudBoulder boulder, int newRepeats) {
+  int currentRepeats =
+      currentProfile.climbedBoulders![boulder.boulderID]["newRepeats"];
+  double orgBoulderPoints =
+      currentProfile.climbedBoulders![boulder.boulderID]["boulderPoints"];
+  double orgRepeatPoints =
+      currentProfile.climbedBoulders![boulder.boulderID]["boulderPoints"] ?? 0;
+  double repeatPoints;
+
+  if (newRepeats > currentRepeats) {
+    repeatPoints = calculateRepeatPoints(
+        currentProfile, boulder, newRepeats, orgBoulderPoints);
+  } else {
+    repeatPoints = -calculateRepeatPoints(
+        currentProfile, boulder, newRepeats, orgBoulderPoints);
+  }
+
+  double newRepeatPoints = orgRepeatPoints + repeatPoints;
+
+  userService.updateUser(
+      boulderPoints: updatePoints(
+          points: repeatPoints, existingData: currentProfile.boulderPoints),
+      currentProfile: currentProfile,
+      climbedBoulders: updateClimbedBouldersMap(
+          boulder: boulder,
+          repeats: newRepeats,
+          repeatPoints: newRepeatPoints,
+          existingData: currentProfile.climbedBoulders));
+}
+
+double calculateRepeatPoints(CloudProfile currentProfile, CloudBoulder boulder,
+    int repeats, double orgBoulderPoints) {
+  double repeatPoints = orgBoulderPoints *
+      (repeats > 0 ? repeatsMultiplier - (repeats - 1) * repeatsDecrement : 0);
+  if (repeatPoints > 0) {
+    return repeatPoints;
+  } else {
+    return 0.0;
+  }
+}
+
 int checkGrade(CloudProfile currentProfile, String boulderID, String style) {
   int maxValue = 0;
   for (String boulder in currentProfile.climbedBoulders!.keys) {
@@ -899,6 +960,27 @@ int checkGrade(CloudProfile currentProfile, String boulderID, String style) {
     }
   }
   return maxValue;
+}
+
+double calculateMultiplierFromGrade(
+    int gradeNumber, int maxFlahsedGrade, int maxToppedGrade, bool flashed) {
+  double baseMultiplier = 1.0;
+  double newMultiplier;
+  if (gradeNumber > maxFlahsedGrade && flashed) {
+    newMultiplier = baseMultiplier + newFlashGradeMultiplier;
+  }
+
+  int gradeDiffer = gradeNumber - maxToppedGrade;
+
+  if (gradeDiffer < 0) {
+    newMultiplier = baseMultiplier + newToppedGradeMultiplier;
+  } else if (gradeDiffer == 0) {
+    newMultiplier = baseMultiplier;
+  } else {
+    newMultiplier = max(baseMultiplier - (decrementMultipler * gradeDiffer), 0);
+  }
+
+  return newMultiplier;
 }
 
 double calculateboulderPoints(CloudProfile currentProfile, CloudBoulder boulder,
@@ -929,25 +1011,256 @@ double calculateboulderPoints(CloudProfile currentProfile, CloudBoulder boulder,
   return boulderPoints;
 }
 
-double calculateMultiplierFromGrade(
-    int gradeNumber, int maxFlahsedGrade, int maxToppedGrade, bool flashed) {
-  double baseMultiplier = 1.0;
-  double newMultiplier;
-  if (gradeNumber > maxFlahsedGrade && flashed) {
-    newMultiplier = baseMultiplier + newFlashGradeMultiplier;
-  }
-
-  int gradeDiffer = gradeNumber - maxToppedGrade;
-
-  if (gradeDiffer < 0) {
-    newMultiplier = baseMultiplier + newToppedGradeMultiplier;
-  } else if (gradeDiffer == 0) {
-    newMultiplier = baseMultiplier;
+void updateUserRemovedFlashed(
+    FirebaseCloudStorage userService,
+    CloudProfile currentProfile,
+    CloudBoulder boulder,
+    bool flashed,
+    bool topped,
+    int attempts,
+    int repeats) {
+  int maxFlahsedGrade;
+  double pointsForTop;
+  double pointsForFlash;
+  double orgBoulderPoints;
+  double boulderPoints;
+  if (boulder.gradeNumberSetter == currentProfile.maxFlahsedGrade) {
+    maxFlahsedGrade = checkGrade(currentProfile, boulder.boulderID, "flashed");
   } else {
-    newMultiplier = max(baseMultiplier - (decrementMultipler * gradeDiffer), 0);
+    maxFlahsedGrade = currentProfile.maxFlahsedGrade;
   }
+  pointsForFlash =
+      -currentProfile.climbedBoulders![boulder.boulderID]["boulderPoints"];
 
-  return newMultiplier;
+  pointsForTop =
+      calculateboulderPoints(currentProfile, boulder, repeats, flashed);
+
+  boulderPoints = pointsForTop - pointsForFlash;
+  orgBoulderPoints = pointsForTop;
+
+  userService.updateUser(
+      boulderPoints: updatePoints(
+          points: boulderPoints, existingData: currentProfile.boulderPoints),
+      currentProfile: currentProfile,
+      maxFlahsedGrade: maxFlahsedGrade,
+      climbedBoulders: updateClimbedBouldersMap(
+          boulder: boulder,
+          topped: topped,
+          flashed: flashed,
+          attempts: attempts,
+          repeats: repeats,
+          boulderPoints: orgBoulderPoints,
+          existingData: currentProfile.climbedBoulders));
+}
+
+void updateUserUndoTop(
+  FirebaseCloudStorage userService,
+  CloudProfile currentProfile,
+  CloudBoulder boulder,
+) {
+  int maxFlahsedGrade;
+  int maxToppedGrade;
+  double orgBoulderPoints;
+  if (boulder.gradeNumberSetter == currentProfile.maxFlahsedGrade) {
+    maxFlahsedGrade = checkGrade(currentProfile, boulder.boulderID, "flashed");
+  } else {
+    maxFlahsedGrade = currentProfile.maxFlahsedGrade;
+  }
+  if (boulder.gradeNumberSetter == currentProfile.maxToppedGrade) {
+    maxToppedGrade = checkGrade(currentProfile, boulder.boulderID, "topped");
+  } else {
+    maxToppedGrade = currentProfile.maxToppedGrade;
+  }
+  orgBoulderPoints = -(currentProfile.climbedBoulders![boulder.boulderID]
+              ["boulderPoints"] ??
+          0) -
+      (currentProfile.climbedBoulders![boulder.boulderID]["repeatPoints"] ?? 0);
+
+  userService.updateUser(
+      currentProfile: currentProfile,
+      boulderPoints: updatePoints(
+          points: orgBoulderPoints, existingData: currentProfile.boulderPoints),
+      maxFlahsedGrade: maxFlahsedGrade,
+      maxToppedGrade: maxToppedGrade,
+      climbedBoulders: removeClimbedBouldersMap(
+          boulder: boulder, existingData: currentProfile.climbedBoulders));
+}
+
+void updateUserTopped(
+    FirebaseCloudStorage userService,
+    CloudProfile currentProfile,
+    CloudBoulder boulder,
+    bool flashed,
+    bool topped,
+    int attempts,
+    int repeats) {
+  double orgBoulderPoints;
+  double boulderPoints;
+  int maxFlahsedGrade;
+  int maxToppedGrade;
+
+  if (currentProfile.maxFlahsedGrade < boulder.gradeNumberSetter) {
+    maxFlahsedGrade = boulder.gradeNumberSetter;
+  } else {
+    maxFlahsedGrade = currentProfile.maxFlahsedGrade;
+  }
+  if (currentProfile.maxToppedGrade < boulder.gradeNumberSetter) {
+    maxToppedGrade = boulder.gradeNumberSetter;
+  } else {
+    maxToppedGrade = currentProfile.maxToppedGrade;
+  }
+  boulderPoints =
+      calculateboulderPoints(currentProfile, boulder, repeats, flashed);
+  if (currentProfile.climbedBoulders![boulder.boulderID]["topped"]) {
+    orgBoulderPoints =
+        currentProfile.climbedBoulders![boulder.boulderID]["boulderPoints"];
+  } else {
+    orgBoulderPoints = boulderPoints;
+  }
+  userService.updateUser(
+      boulderPoints: updatePoints(
+          points: boulderPoints, existingData: currentProfile.boulderPoints),
+      currentProfile: currentProfile,
+      maxFlahsedGrade: maxFlahsedGrade,
+      maxToppedGrade: maxToppedGrade,
+      climbedBoulders: updateClimbedBouldersMap(
+          boulder: boulder,
+          topped: topped,
+          flashed: flashed,
+          attempts: attempts,
+          repeats: repeats,
+          boulderPoints: orgBoulderPoints,
+          existingData: currentProfile.climbedBoulders));
+}
+
+ExpansionPanelList challengePanel(
+    List<String> challengesOverview,
+    Map<String, bool> expandedStates,
+    StateSetter setState,
+    bool expandPanelState) {
+  return ExpansionPanelList(
+    elevation: 1,
+    expandedHeaderPadding: const EdgeInsets.all(0),
+    children: [
+      ExpansionPanel(
+        headerBuilder: (context, isExpanded) {
+          return const ListTile(
+            title: Text("Challenges"),
+          );
+        },
+        body: Column(
+          children: challengesOverview.map((challenge) {
+            // Use the expanded state for each challenge
+            bool isExpanded = expandedStates[challenge] ?? false;
+
+            return ExpansionPanelList(
+              elevation: 1,
+              expandedHeaderPadding: const EdgeInsets.all(0),
+              children: [
+                ExpansionPanel(
+                  headerBuilder: (context, isExpanded) {
+                    return ListTile(
+                      title: Text(challenge),
+                    );
+                  },
+                  body: Column(
+                    children: [
+                      challenge != "create"
+                          ? Column(children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Add your logic for the button inside the expansion panel
+                                },
+                                child: const Text("Button 1"),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Add your logic for the button inside the expansion panel
+                                },
+                                child: const Text("Button 2"),
+                              ),
+                              // Add more buttons or other widgets as needed,)
+                            ])
+                          : ElevatedButton(
+                              onPressed: () {},
+                              child: const Text("Create your own"))
+                    ],
+                  ),
+                  isExpanded: isExpanded,
+                ),
+              ],
+              expansionCallback: (panelIndex, isExpanded) {
+                setState(() {
+                  expandedStates[challenge] = isExpanded;
+                });
+              },
+            );
+          }).toList(),
+        ),
+        isExpanded: expandPanelState,
+      ),
+    ],
+    expansionCallback: (panelIndex, isExpanded) {
+      setState(() {
+        expandPanelState = !expandPanelState;
+      });
+    },
+  );
+}
+
+SizedBox climberTopList(List<Map<String, dynamic>> toppersList) {
+  return SizedBox(
+    width: 200,
+    height: 200,
+    child: ListView.builder(
+      itemCount: toppersList.length,
+      itemBuilder: (context, index) {
+        // Access climber information from the map
+        String name = toppersList[index]['name'];
+        bool flashed = toppersList[index]['flashed'];
+
+        return Card(
+          child: ListTile(
+            title: Row(
+              children: [
+                Text(name),
+                const SizedBox(width: 10),
+                Text(flashed ? "F" : "T"),
+              ],
+            ),
+          ),
+        );
+      },
+    ),
+  );
+}
+
+Container gradingCirleDrawing(CloudBoulder boulder, String? gradingShow) {
+  return Container(
+    width: 26,
+    height: 26,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: boulder.hiddenGrade == true
+          ? hiddenGradeColor
+          : getColorFromName(capitalizeFirstLetter(boulder.gradeColour)),
+    ),
+    child: Center(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 0.0),
+        child: Text(
+          gradingShow!,
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: (gradingShow.length > 3 || gradingShow.contains('/'))
+                ? 10 // Font size for the text in the grading cirle. Changes size depending on text length
+                : 15,
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 SizedBox barGraphColours(CloudBoulder boulder) {

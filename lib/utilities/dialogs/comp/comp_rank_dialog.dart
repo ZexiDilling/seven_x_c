@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:seven_x_c/helpters/comp/comp_calculations.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
@@ -12,6 +13,8 @@ void showCompRankings(
   required CloudProfile? currentProfile,
   required Function(bool) setCompView,
 }) {
+  Map<String, dynamic> rankings = compRanking(currentComp);
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -32,6 +35,16 @@ void showCompRankings(
                           ),
                           Row(
                             children: [
+                              Expanded(
+                                child: IconButton(
+                                  icon: const Icon(Icons.list_alt),
+                                  onPressed: () {
+                                    context
+                                        .read<RankingBloc>()
+                                        .setRankingShow(RankingShow.total);
+                                  },
+                                ),
+                              ),
                               Expanded(
                                 child: IconButton(
                                   icon: const Icon(Icons.female),
@@ -66,10 +79,12 @@ void showCompRankings(
                           ),
                           if (state == RankingShow.boulders)
                             rankBoulders(currentComp),
+                          if (state == RankingShow.total)
+                            rankingList(rankings, "total"),
                           if (state == RankingShow.male)
-                            rankingList(currentComp, "male"),
+                            rankingList(rankings, "male"),
                           if (state == RankingShow.female)
-                            rankingList(currentComp, "female"),
+                            rankingList(rankings, "female"),
                         ],
                       ),
                     ),
@@ -117,42 +132,37 @@ SizedBox rankBoulders(CloudComp compData) {
   );
 }
 
-SizedBox rankingList(CloudComp compData, String gender) {
+SizedBox rankingList(Map<String, dynamic> rankings, String gender) {
+  List<String> sortedUserIds = sortRanking(rankings[gender]);
+
   return SizedBox(
     height: 500,
     width: 400,
     child: ListView.builder(
-      itemCount: compData.climbersComp!.values
-          .where((climberData) => climberData['gender'] == gender)
-          .length,
+      itemCount: sortedUserIds.length,
       itemBuilder: (context, index) {
-        final filteredClimbers = compData.climbersComp!.values
-            .where((climberData) => climberData['gender'] == gender)
-            .toList();
-
-        filteredClimbers.sort((a, b) {
-          final pointsComparison = b['points'].compareTo(a['points']);
-          if (pointsComparison != 0) {
-            return pointsComparison;
-          } else {
-            return b['tops'].compareTo(a['tops']);
-          }
-        });
-
-        final climberData = filteredClimbers[index];
-        final climberId = compData.climbersComp!.keys
-            .firstWhere((key) => compData.climbersComp![key] == climberData);
+        String climberId = sortedUserIds[index];
+        Map<String, dynamic> climberData = rankings[gender][climberId];
 
         return ListTile(
-          title: Text(
-              "Male Climber $climberId - Points: ${climberData['points']}, Tops: ${climberData['tops']}"),
+          leading: CircleAvatar(
+            backgroundColor: Colors.blue,
+            child: Text(
+              (index + 1).toString(),
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+          title: Text("Climber ID: $climberId"),
+          subtitle: Text(
+            "Points: ${climberData['points']}, Tops: ${climberData['tops']}",
+          ),
         );
       },
     ),
   );
 }
 
-enum RankingShow { boulders, male, female }
+enum RankingShow { boulders, male, female, total }
 
 class RankingBloc extends Cubit<RankingShow> {
   RankingBloc() : super(RankingShow.boulders);

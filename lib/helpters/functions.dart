@@ -1,4 +1,4 @@
-import 'package:seven_x_c/constants/boulder_const.dart';
+import 'package:seven_x_c/constants/comp_const.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
@@ -35,6 +35,15 @@ Map<String, dynamic> updateClimberBoulderSetMap(
   return bouldersClimbedData;
 }
 
+Map<String, dynamic> removeClimbedBouldersMap(
+    {required CloudBoulder boulder,
+    required Map<String, dynamic>? existingData}) {
+  String? boulderID = boulder.boulderID;
+  Map<String, dynamic> bouldersClimbedData = existingData ?? {};
+  bouldersClimbedData.remove(boulderID.toString());
+  return bouldersClimbedData;
+}
+
 Map<String, dynamic> updateClimbedBouldersMap(
     {required CloudBoulder boulder,
     int? attempts,
@@ -44,19 +53,19 @@ Map<String, dynamic> updateClimbedBouldersMap(
     String? gradeColour,
     int? gradeArrow,
     double? boulderPoints,
+    double? repeatPoints,
     Map<String, dynamic>? existingData}) {
   String? boulderID = boulder.boulderID;
   int? gradeNumberBoulder = boulder.gradeNumberSetter;
 
   Map<String, dynamic> newData = {
     "gradeNumber": gradeNumberBoulder,
-    "gradeColour": gradeColour,
-    "gradeArrow": gradeArrow,
     'attempts': attempts,
     "repeats": repeats,
     "topped": topped,
     'flashed': flashed,
     "points": boulderPoints,
+    "repeatPoints": repeatPoints,
     "date": DateTime.now()
   };
 
@@ -137,7 +146,6 @@ Map<String, dynamic> updateCompProfile({
   double points = ranking["total"]![userId]["points"];
   int tops = ranking["total"]![userId]["tops"];
 
-
   // Create a new climber data
   Map<String, dynamic> newData = {
     "displayName": displayName,
@@ -166,8 +174,6 @@ Map<String, dynamic> updateCompClimbers(
   Map<String, dynamic> newData = {
     "displayName": displayName,
     "gender": gender,
-    "points": 0,
-    "tops": 0,
   };
   Map<String, dynamic> climbersComp = existingData ?? {};
   climbersComp[userID] = newData;
@@ -175,11 +181,20 @@ Map<String, dynamic> updateCompClimbers(
   return climbersComp;
 }
 
+Map<String, dynamic> removeClimberToppedentry(
+    {required CloudProfile currentProfile,
+    required Map<String, dynamic>? existingData}) {
+  String userID = currentProfile.userID;
+  Map<String, dynamic> climberToppedData = existingData ?? {};
+  climberToppedData.remove(userID);
+  return climberToppedData;
+}
+
 Map<String, dynamic> updateClimberToppedMap(
     {required CloudProfile currentProfile,
-    required int attempts,
-    required bool flashed,
-    required bool topped,
+    int? attempts,
+    bool? flashed,
+    bool? topped,
     int? repeats,
     int? gradeNumberVoted,
     String? gradeColourVoted,
@@ -239,4 +254,33 @@ String getTimePeriodLabel(TimePeriod timePeriod) {
     case TimePeriod.allTime:
       return 'All Time';
   }
+}
+
+Map<String, dynamic> updateCompBoulderMap(
+    {required CloudProfile currentProfile,
+    required CloudBoulder boulder,
+    required CloudComp currentComp,
+    Map<String, dynamic>? existingData}) {
+  String boulderName = boulder.boulderName!;
+  String displayName = currentProfile.displayName;
+  List climberToped = currentComp.bouldersComp![boulderName];
+
+  if (climberToped.contains(displayName)) {
+    climberToped.remove(displayName);
+  } else {
+    climberToped.add(displayName);
+  }
+
+  int tops = climberToped.length;
+  double points = defaultCompBoulderPoints / tops;
+
+  Map<String, dynamic> newData = {
+    "points": points,
+    "tops": tops,
+  };
+
+  Map<String, dynamic> climbersComp = existingData ?? {};
+  climbersComp[boulderName] = newData;
+
+  return climbersComp;
 }
