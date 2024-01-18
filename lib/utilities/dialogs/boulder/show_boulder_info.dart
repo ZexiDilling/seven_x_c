@@ -3,8 +3,12 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
+import 'package:seven_x_c/constants/challenge_const.dart';
+import 'package:seven_x_c/helpters/challenges/challenge_create.dart';
 import 'package:seven_x_c/helpters/comp/comp_calculations.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
+import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
+import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
@@ -12,6 +16,7 @@ import 'package:seven_x_c/utilities/charts/barcharts.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/generics/info_popup.dart';
 import 'package:seven_x_c/utilities/dialogs/generics/yes_no.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 
@@ -25,6 +30,7 @@ Future<void> showBoulderInformation(
     FirebaseCloudStorage boulderService,
     FirebaseCloudStorage userService,
     FirebaseCloudStorage compService,
+    FirebaseCloudStorage challengeService,
     Stream<Iterable<CloudProfile>> settersStream,
     List<String> challengesOverview) async {
   int attempts = 0;
@@ -218,7 +224,13 @@ Future<void> showBoulderInformation(
                                           topped = value ?? false;
 
                                           if (compView) {
-                                            updateCompCalculations(compService, currentComp!, boulder, currentProfile, flashed, attempts);
+                                            updateCompCalculations(
+                                                compService,
+                                                currentComp!,
+                                                boulder,
+                                                currentProfile,
+                                                flashed,
+                                                attempts);
                                           }
 
                                           if (topped) {
@@ -268,7 +280,13 @@ Future<void> showBoulderInformation(
                                           topped = value ?? false;
                                           attempts = 1;
                                           if (compView) {
-                                            updateCompCalculations(compService, currentComp!, boulder, currentProfile, flashed, attempts);
+                                            updateCompCalculations(
+                                                compService,
+                                                currentComp!,
+                                                boulder,
+                                                currentProfile,
+                                                flashed,
+                                                attempts);
                                           }
                                           if (flashed) {
                                             boulderService.updatBoulder(
@@ -707,8 +725,229 @@ Future<void> showBoulderInformation(
                                     ],
                                   ),
                             const SizedBox(height: 20),
-                            challengePanel(challengesOverview, expandedStates,
-                                setState, expandPanelState),
+                            ExpansionPanelList(
+                              elevation: 1,
+                              expandedHeaderPadding: const EdgeInsets.all(0),
+                              children: [
+                                ExpansionPanel(
+                                  headerBuilder: (context, isExpanded) {
+                                    return ListTile(
+                                      title: Text(
+                                          "Challenges - ${challengesOverview.length - 1}"),
+                                    );
+                                  },
+                                  body: Column(
+                                    children:
+                                        challengesOverview.map((challenge) {
+                                      // Use the expanded state for each challenge
+                                      bool isExpanded =
+                                          expandedStates[challenge] ?? false;
+                                      Map<String, dynamic> challengeMap =
+                                          boulder.boulderChallenges![challenge];
+                                      bool challengeCompleted =
+                                          (challengeMap["completed"]
+                                                  as List<String>)
+                                              .contains(currentProfile.userID);
+
+                                      return ExpansionPanelList(
+                                        elevation: 1,
+                                        expandedHeaderPadding:
+                                            const EdgeInsets.all(0),
+                                        children: [
+                                          ExpansionPanel(
+                                            headerBuilder:
+                                                (context, isExpanded) {
+                                              return ListTile(
+                                                  title: challenge != "create"
+                                                      ? Text(boulder
+                                                              .boulderChallenges![
+                                                          challenge]["name"])
+                                                      : Text(challenge),
+                                                  tileColor: challengeCompleted
+                                                      ? Colors.green
+                                                      : Colors.amber);
+                                            },
+                                            body: Column(
+                                              children: [
+                                                challenge != "create"
+                                                    ? Column(children: [
+                                                        Visibility(
+                                                            visible: boulder
+                                                                        .boulderChallenges![
+                                                                    challenge]
+                                                                ["gotCounter"],
+                                                            child: Row(
+                                                                children: [
+                                                                  const Text(
+                                                                      'Count:'),
+                                                                  IconButton(
+                                                                    icon: const Icon(
+                                                                        Icons
+                                                                            .arrow_downward),
+                                                                    onPressed:
+                                                                        () {
+                                                                      setState(
+                                                                          () {
+                                                                        challengeMap[
+                                                                            "runningCount"] = (challengeMap["runningCount"] -
+                                                                                1)
+                                                                            .clamp(0,
+                                                                                double.infinity)
+                                                                            .toInt();
+                                                                        userService.updateUser(
+                                                                            currentProfile:
+                                                                                currentProfile,
+                                                                            challengePoints:
+                                                                                updatePoints(points: -challengeMap["points"], existingData: currentProfile.challengePoints));
+                                                                        challengeService.updateChallenge(
+                                                                            challengeID:
+                                                                                challenge,
+                                                                            challengeCounter:
+                                                                                challengeMap["runningCount"]);
+                                                                      });
+                                                                    },
+                                                                  ),
+                                                                  Text(
+                                                                      '${challengeMap["runningCount"]}'),
+                                                                  IconButton(
+                                                                    icon: const Icon(
+                                                                        Icons
+                                                                            .arrow_upward),
+                                                                    onPressed:
+                                                                        () {
+                                                                      setState(
+                                                                          () {
+                                                                        if (challengeMap["runningCount"] <
+                                                                            maxChallangeCounter) {
+                                                                          challengeMap[
+                                                                              "runningCount"]++;
+                                                                          challengeService.updateChallenge(
+                                                                              challengeID: challenge,
+                                                                              challengeCounter: challengeMap["runningCount"]);
+                                                                          userService.updateUser(
+                                                                              currentProfile: currentProfile,
+                                                                              challengePoints: updatePoints(
+                                                                                points: challengeMap["points"],
+                                                                                existingData: currentProfile.challengePoints,
+                                                                              ));
+                                                                        }
+                                                                      });
+                                                                    },
+                                                                  ),
+                                                                ])),
+                                                        Row(
+                                                          children: [
+                                                            Visibility(
+                                                              visible:
+                                                                  !challengeMap[
+                                                                      "gotCounter"],
+                                                              child:
+                                                                  ElevatedButton(
+                                                                onPressed:
+                                                                    () async {
+                                                                  CloudChallenge?
+                                                                      currentChallenge =
+                                                                      await challengeService
+                                                                          .getchallenge(
+                                                                              challengeMap["name"]);
+                                                                  if (challengeCompleted) {
+                                                                    boulderService.updatBoulder(
+                                                                        boulderID:
+                                                                            boulder
+                                                                                .boulderID,
+                                                                        boulderChallenges: updateBoulderChallengeMap(
+                                                                            currentChallenge:
+                                                                                currentChallenge!,
+                                                                            completed:
+                                                                                true,
+                                                                            removeUser:
+                                                                                true,
+                                                                            currentProfile:
+                                                                                currentProfile));
+
+                                                                    userService.updateUser(
+                                                                        currentProfile:
+                                                                            currentProfile,
+                                                                        challengePoints: updatePoints(
+                                                                            points:
+                                                                                -challengeMap["points"],
+                                                                            existingData: currentProfile.challengePoints));
+                                                                  } else {
+                                                                    boulderService.updatBoulder(
+                                                                        boulderID:
+                                                                            boulder
+                                                                                .boulderID,
+                                                                        boulderChallenges: updateBoulderChallengeMap(
+                                                                            currentChallenge:
+                                                                                currentChallenge!,
+                                                                            completed:
+                                                                                true,
+                                                                            currentProfile:
+                                                                                currentProfile));
+                                                                    userService.updateUser(
+                                                                        currentProfile:
+                                                                            currentProfile,
+                                                                        challengePoints: updatePoints(
+                                                                            points:
+                                                                                challengeMap["points"],
+                                                                            existingData: currentProfile.challengePoints));
+                                                                  }
+                                                                },
+                                                                child: Text(
+                                                                    challengeCompleted
+                                                                        ? "Un-Done"
+                                                                        : "Done"),
+                                                              ),
+                                                            ),
+                                                            ElevatedButton(
+                                                              onPressed: () {
+                                                                showInformationPopup(
+                                                                    context,
+                                                                    challengeMap[
+                                                                        "description"]);
+                                                              },
+                                                              child: const Text(
+                                                                  "Info"),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ])
+                                                    : ElevatedButton(
+                                                        onPressed: () {
+                                                          createChallengeDialog(
+                                                              context,
+                                                              setState,
+                                                              challengeService,
+                                                              boulderService,
+                                                              boulder,
+                                                              currentProfile);
+                                                        },
+                                                        child: const Text(
+                                                            "Create your own"))
+                                              ],
+                                            ),
+                                            isExpanded: isExpanded,
+                                          ),
+                                        ],
+                                        expansionCallback:
+                                            (panelIndex, isExpanded) {
+                                          setState(() {
+                                            expandedStates[challenge] =
+                                                isExpanded;
+                                          });
+                                        },
+                                      );
+                                    }).toList(),
+                                  ),
+                                  isExpanded: expandPanelState,
+                                ),
+                              ],
+                              expansionCallback: (panelIndex, isExpanded) {
+                                setState(() {
+                                  expandPanelState = !expandPanelState;
+                                });
+                              },
+                            ),
 
                             const SizedBox(height: 20),
                             Row(children: [
@@ -1131,81 +1370,6 @@ void updateUserTopped(
           repeats: repeats,
           boulderPoints: orgBoulderPoints,
           existingData: currentProfile.climbedBoulders));
-}
-
-ExpansionPanelList challengePanel(
-    List<String> challengesOverview,
-    Map<String, bool> expandedStates,
-    StateSetter setState,
-    bool expandPanelState) {
-  return ExpansionPanelList(
-    elevation: 1,
-    expandedHeaderPadding: const EdgeInsets.all(0),
-    children: [
-      ExpansionPanel(
-        headerBuilder: (context, isExpanded) {
-          return const ListTile(
-            title: Text("Challenges"),
-          );
-        },
-        body: Column(
-          children: challengesOverview.map((challenge) {
-            // Use the expanded state for each challenge
-            bool isExpanded = expandedStates[challenge] ?? false;
-
-            return ExpansionPanelList(
-              elevation: 1,
-              expandedHeaderPadding: const EdgeInsets.all(0),
-              children: [
-                ExpansionPanel(
-                  headerBuilder: (context, isExpanded) {
-                    return ListTile(
-                      title: Text(challenge),
-                    );
-                  },
-                  body: Column(
-                    children: [
-                      challenge != "create"
-                          ? Column(children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Add your logic for the button inside the expansion panel
-                                },
-                                child: const Text("Button 1"),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  // Add your logic for the button inside the expansion panel
-                                },
-                                child: const Text("Button 2"),
-                              ),
-                              // Add more buttons or other widgets as needed,)
-                            ])
-                          : ElevatedButton(
-                              onPressed: () {},
-                              child: const Text("Create your own"))
-                    ],
-                  ),
-                  isExpanded: isExpanded,
-                ),
-              ],
-              expansionCallback: (panelIndex, isExpanded) {
-                setState(() {
-                  expandedStates[challenge] = isExpanded;
-                });
-              },
-            );
-          }).toList(),
-        ),
-        isExpanded: expandPanelState,
-      ),
-    ],
-    expansionCallback: (panelIndex, isExpanded) {
-      setState(() {
-        expandPanelState = !expandPanelState;
-      });
-    },
-  );
 }
 
 SizedBox climberTopList(List<Map<String, dynamic>> toppersList) {

@@ -27,3 +27,5 @@ class CouldNotGetSetterProfile extends CloudStorageException {}
 class CouldNotUpdateComp extends CloudStorageException {}
 
 class CouldNotUpdateChallenge extends CloudStorageException {}
+
+class NoChallenges extends CloudStorageException {}

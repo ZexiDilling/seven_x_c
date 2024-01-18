@@ -98,22 +98,7 @@ Comp Module:
 	see boulder after comp completion
 	When A user tops a boulder, add it to the comp map. 
 		Upadte the points based on the rule and style set
-	
-Challenges:
 
-	
-------------------------------------------------------------------------------------------------------------------------
-
-
-ToDO:
-------------------------------------------------------------------------------------------
-
-FIX CREATE BOULDERS!!!!!!!!!!!!
-
-comp module:
-	Randome person picker button for prices to random ppl. 
-
-	
 Boulder view:
 	challenges modul for boulders
 	
@@ -127,8 +112,17 @@ Challenges:
 	Make a filter for boulders with challenges
 	add a challenge map to the user?
 		How do I want to track this on the user ? 
-	Ranking View 
-	List ppl who have complete challenges. 
+	
+------------------------------------------------------------------------------------------------------------------------
+
+
+ToDO:
+------------------------------------------------------------------------------------------
+
+FIX CREATE BOULDERS!!!!!!!!!!!!
+
+comp module:
+	Randome person picker button for prices to random ppl. 
 		
 Extra info:
 	Explain stuff
@@ -218,6 +212,7 @@ Keep track of Guest setters ?
 
 make it possible to check others profile ? 
 
+Ranking View  for everything ? 
 
 Comp module:
 	Add other point system
@@ -228,3 +223,8 @@ Comp module:
 	Split one comp into multiple days / slots
 	add finals, and semi-finals to comp - RUles
 	add zones to comp.  - Rules 
+
+Challenge module:
+	List ppl who have complete challenges. 
+	update challenge counter to see completed/total
+	update colour on completed challenges.

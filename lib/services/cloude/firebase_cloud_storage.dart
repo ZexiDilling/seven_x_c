@@ -83,7 +83,7 @@ class FirebaseCloudStorage {
     bool? gotZone,
     String? boulderName,
     Timestamp? updateDateBoulder,
-    Map<String, dynamic>? challenge,
+    Map<String, dynamic>? boulderChallenges,
     Map<String, dynamic>? gradeNumberClimbers,
     Map<String, dynamic>? climberTopped,
   }) async {
@@ -110,7 +110,8 @@ class FirebaseCloudStorage {
       if (updateDateBoulder != null) {
         updatedData[updateDateBoulderFiledName] = updateDateBoulder;
       }
-      if (challenge != null) updatedData[challengeFieldName] = challenge;
+      if (boulderChallenges != null)
+        updatedData[boulderChallengesFieldName] = boulderChallenges;
       if (gradeNumberClimbers != null) {
         updatedData[gradingClimbersFieldName] = gradeNumberClimbers;
       }
@@ -158,7 +159,7 @@ class FirebaseCloudStorage {
     required bool gotZone,
     required Timestamp setDateBoulder,
     Timestamp? updateDateBoulder,
-    Map<String, dynamic>? challenge,
+    Map<String, dynamic>? boulderChallenges,
     Map<String, dynamic>? gradeNumberClimber,
     Map<String, dynamic>? climberTopped,
     String? boulderName,
@@ -179,14 +180,15 @@ class FirebaseCloudStorage {
       boulderNameFieldName: boulderName,
       setDateBoulderFiledName: setDateBoulder,
       updateDateBoulderFiledName: setDateBoulder,
-      if (challenge != null) challengeFieldName: challenge,
+      if (boulderChallenges != null)
+        boulderChallengesFieldName: boulderChallenges,
       if (gradeNumberClimber != null)
         gradingClimbersFieldName: gradeNumberClimber,
       if (climberTopped != null) climberToppedFieldName: climberTopped
     });
     final fetchBoulder = await document.get();
     return CloudBoulder(
-      challenge,
+      boulderChallenges,
       gradeNumberClimber,
       climberTopped,
       setter,
@@ -208,19 +210,24 @@ class FirebaseCloudStorage {
     );
   }
 
-  Future<List<String>> grabBoulderChallenges(
-      {required String boulderID}) async {
+  Future<List<String>> grabBoulderChallenges({
+    required String boulderID,
+  }) async {
     final QuerySnapshot<Map<String, dynamic>> boulderSnapshots =
-        await bouldersCollection.where('boulderID', isEqualTo: boulderID).get();
-
+        await bouldersCollection
+            .where(FieldPath.documentId, isEqualTo: boulderID)
+            .get();
+    try {
     // Extract challenges from non-null challenge field
     final List<String> challenges = boulderSnapshots.docs
-        .where((doc) => doc['challenge'] != null)
-        .map((doc) =>
-            doc['challenge'] as String) // Assuming 'challenge' is a String
+        .where((doc) => doc['boulderChallenges'] != null)
+        .map((doc) => (doc['boulderChallenges'] as Map<String, dynamic>).keys.toList())
+        .expand((keys) => keys) // flatten the list of lists into a single list
         .toList();
-
-    return challenges;
+    return challenges;} catch (e) {
+      return <String>[];
+      
+    }
   }
 
 // User data
@@ -576,7 +583,6 @@ class FirebaseCloudStorage {
     return activeComp;
   }
 
-
   Stream<Iterable<CloudComp>> getActiveComps() {
     final activeComp = compCollection
         .where(activeCompFieldName, isEqualTo: true)
@@ -599,10 +605,12 @@ class FirebaseCloudStorage {
     required String challengeType,
     required String challengeDescription,
     required double challengeOwnPoints,
-    required Array challengeBoulders,
+    required List challengeBoulders,
     required bool challengeCounter,
+    required int challengeCounterRunning,
+    required int challengeDifficulty,
   }) async {
-    final document = await compCollection.add({
+    final document = await challengeCollection.add({
       challengeNameFieldName: challengeName,
       challengeCreatorFieldName: challengeCreator,
       challengeTypeFieldName: challengeType,
@@ -610,6 +618,8 @@ class FirebaseCloudStorage {
       challengeOwnPointsFieldName: challengeOwnPoints,
       challengeBouldersFieldName: challengeBoulders,
       challengeCounterFieldName: challengeCounter,
+      challengeCounterRunningFieldName: challengeCounterRunning,
+      challengeDifficultyFieldName: challengeDifficulty,
     });
     final fetchChallenge = await document.get();
     return CloudChallenge(
@@ -620,6 +630,8 @@ class FirebaseCloudStorage {
       challengeOwnPoints,
       challengeBoulders,
       challengeCounter,
+      challengeDifficulty,
+      challengeCounterRunning,
       challengeID: fetchChallenge.id,
     );
   }
@@ -631,26 +643,37 @@ class FirebaseCloudStorage {
     String? challengeType,
     String? challengeDescription,
     double? challengeOwnPoints,
-    Array? challengeBoulders,
+    List? challengeBoulders,
     bool? challengeCounter,
+    int? challengeCounterRunning,
+    int? challengeDifficulty,
   }) async {
     try {
       // Create a map to store non-null fields and their values
       final Map<String, dynamic> updatedData = {};
 
       // Add non-null fields to the map
-      if (challengeCreator != null)
+      if (challengeCreator != null) {
         updatedData[challengeCreatorFieldName] = challengeCreator;
-      if (challengeType != null)
+      }
+      if (challengeType != null) {
         updatedData[challengeTypeFieldName] = challengeType;
-      if (challengeDescription != null)
+      }
+      if (challengeDescription != null) {
         updatedData[challengeDescriptionFieldName] = challengeDescription;
-      if (challengeOwnPoints != null)
+      }
+      if (challengeOwnPoints != null) {
         updatedData[challengeOwnPointsFieldName] = challengeOwnPoints;
-      if (challengeBoulders != null)
+      }
+      if (challengeBoulders != null) {
         updatedData[challengeBouldersFieldName] = challengeBoulders;
+      }
       if (challengeCounter != null) {
         updatedData[challengeCounterFieldName] = challengeCounter;
+      }
+      if (challengeCounterRunning != null) updatedData[challengeCounterRunningFieldName] = challengeCounterRunning;
+      if (challengeDifficulty != null) {
+        updatedData[challengeDifficultyFieldName] = challengeDifficulty;
       }
       await challengeCollection.doc(challengeID).update(updatedData);
     } catch (e) {

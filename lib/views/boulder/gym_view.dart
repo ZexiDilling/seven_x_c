@@ -55,6 +55,7 @@ class _GymViewState extends State<GymView> {
   late final FirebaseCloudStorage _boulderService;
   late final FirebaseCloudStorage _userService;
   late final FirebaseCloudStorage _compService;
+  late final FirebaseCloudStorage _challengeService;
 
   late Stream<Iterable<CloudBoulder>> filteredBouldersStream;
 
@@ -132,6 +133,7 @@ class _GymViewState extends State<GymView> {
     _boulderService = FirebaseCloudStorage();
     _userService = FirebaseCloudStorage();
     _compService = FirebaseCloudStorage();
+    _challengeService = FirebaseCloudStorage();
 
     _initializeCurrentProfile();
     super.initState();
@@ -449,6 +451,7 @@ class _GymViewState extends State<GymView> {
                   _boulderService,
                   _userService,
                   _compService,
+                  _challengeService,
                   setters,
                   challengesOverview);
             });

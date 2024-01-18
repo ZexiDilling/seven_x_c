@@ -3,8 +3,6 @@ import 'package:flutter/material.dart' show Color, Colors;
 const String dtuSetterName = "DTU Setter Team";
 const String guestSetter = "Guest Setter";
 
-
-
 // drawing Constants
 const double boulderRadius = 2.5;
 const double boulderRadiusDrawing = 15;
@@ -21,7 +19,6 @@ const double minBoulderDistance = 10.0;
 // Points
 const double defaultSetterPoints = 10;
 const double defaultBoulderPoints = 10;
-
 const double newFlashGradeMultiplier = 0.25;
 const double newToppedGradeMultiplier = 0.5;
 const double decrementMultipler = 0.2;

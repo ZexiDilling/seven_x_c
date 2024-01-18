@@ -1,5 +1,6 @@
 import 'package:seven_x_c/constants/comp_const.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
+import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
@@ -283,4 +284,40 @@ Map<String, dynamic> updateCompBoulderMap(
   climbersComp[boulderName] = newData;
 
   return climbersComp;
+}
+
+Map<String, dynamic> updateBoulderChallengeMap(
+    {required CloudChallenge currentChallenge,
+    required bool completed,
+    CloudProfile? currentProfile,
+    bool? removeUser,
+    Map<String, dynamic>? existingData}) {
+  String challengeID = currentChallenge.challengeID;
+  List completedList;
+
+  if (completed) {
+    if (removeUser!) {
+      completedList = existingData!["completed"].remove(currentProfile);
+    } else {
+      completedList = existingData!["completed"].add(currentProfile);
+    }
+  } else {
+    completedList = [];
+  }
+
+  Map<String, dynamic> newData = {
+    "name": currentChallenge.challengeName,
+    "difficulty": currentChallenge.challengeDifficulty,
+    "description": currentChallenge.challengeDescription,
+    "type": currentChallenge.challengeType,
+    "gotCounter": currentChallenge.challengeCounter,
+    "runningCount": currentChallenge.challengeCounterRunning,
+    "points": currentChallenge.challengeOwnPoints,
+    "completed": completedList,
+  };
+
+  Map<String, dynamic> boulderChallenges = existingData ?? {};
+  boulderChallenges[challengeID] = newData;
+
+  return boulderChallenges;
 }
