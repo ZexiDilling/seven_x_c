@@ -25,12 +25,12 @@ Map<String, dynamic> getCompClimbersRanking(CloudComp currentComp) {
     List climberTopped = boulderData["Top"] ?? [];
     double boulderPoints = boulderData["points"]?.toDouble() ?? 0.0;
     // Loop through climbers who topped the current boulder
-    climberTopped.forEach((userId) {
+    for (var userId in climberTopped) {
       compClimbers[userId] ??= {"tops": 0, "points": 0.0};
   
       compClimbers[userId]["tops"]++;
       compClimbers[userId]["points"] += boulderPoints;
-    });
+    }
   });
   return compClimbers;
 }
@@ -70,7 +70,7 @@ Map<String, dynamic> compRanking(CloudComp currentComp) {
   int rankMale = 1;
   int rankFemale = 1;
   // Update ranking based on sorted user IDs
-  sortedUserIds.forEach((userId) {
+  for (var userId in sortedUserIds) {
     String gender = currentComp.climbersComp![userId]["gender"].toLowerCase();
     double points = compClimbers[userId]["points"].toDouble() ?? 0.0;
     int tops = compClimbers[userId]["tops"] ?? 0;
@@ -98,7 +98,7 @@ Map<String, dynamic> compRanking(CloudComp currentComp) {
       };
       rankFemale++;
     }
-  });
+  }
 
   return ranking;
 }

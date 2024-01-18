@@ -6,9 +6,10 @@ import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
 class RankView extends StatefulWidget {
-  const RankView({Key? key}) : super(key: key);
+  const RankView({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _RankViewState createState() => _RankViewState();
 }
 
@@ -220,8 +221,6 @@ class RankingTab extends StatelessWidget {
 
       return mapSorter(filteredRankings);
     } catch (e) {
-      // Handle any errors during the async operation
-      print('Error fetching rankings: $e');
       return [];
     }
   }

@@ -50,7 +50,9 @@ comp-Module:
 	Done - Edit comp - rules, boulders and general stuff
 	Done - added final and semi finals. (is not used atm)
 
-
+Clean up:
+	Done - Remove notes 
+	Done - remove unused code
 
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -124,6 +126,9 @@ FIX CREATE BOULDERS!!!!!!!!!!!!
 comp module:
 	Randome person picker button for prices to random ppl. 
 		
+Challenges:
+	make it possible to add old challenges to boulders. 
+
 Extra info:
 	Explain stuff
 		What does the central colour mean
@@ -155,8 +160,7 @@ Setter:
 	Make it possible to set a non-setter as a setter
 
 Clean up:
-	Remove notes 
-	remove unused code
+
 	Make things pretty
 	clean up code
 

@@ -15,7 +15,6 @@ import 'package:seven_x_c/views/boulder/ranking_view.dart';
 import 'package:seven_x_c/views/comp/comp_result_view.dart';
 import 'package:seven_x_c/views/comp/comp_setup_view.dart';
 import 'package:seven_x_c/views/missing_views/profile_view.dart';
-import 'package:seven_x_c/views/notes/create_update_note_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'
     show BlocConsumer, BlocProvider, ReadContext;
 import 'package:seven_x_c/views/admin/profile_view.dart';
@@ -34,7 +33,6 @@ void main() {
         child: const HomePage(),
       ),
       routes: {
-        createOrUpdateNote: (context) => const CreateUpdateNoteView(),
         profileSettings: (context) => const ProfileSettingsView(),
         adminPanel: (context) => const AdminPanelView(),
         gymView: (context) => const GymView(),
@@ -81,5 +79,3 @@ class HomePage extends StatelessWidget {
     });
   }
 }
-
-

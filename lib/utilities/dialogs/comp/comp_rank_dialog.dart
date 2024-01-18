@@ -125,7 +125,7 @@ SizedBox rankBoulders(CloudComp compData) {
         final boulderData = compData.bouldersComp![boulderId];
         return ListTile(
           title: Text(
-              "${boulderId} ${boulderData["holdColour"]} - ${boulderData["points"]}"),
+              "$boulderId ${boulderData["holdColour"]} - ${boulderData["points"]}"),
         );
       },
     ),

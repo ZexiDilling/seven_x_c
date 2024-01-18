@@ -270,14 +270,7 @@ Future<PointsData> getPoints(
       pointsChallenges = currentProfile.challengePoints;
       amountBoulder = currentProfile.climbedBoulders!.length;
       amountSetter = currentProfile.setBoulders!.length;
-// amountChallenges = currentProfile.challenges!.length;
     }
-    print("boulderClimbedAmount - $boulderClimbedAmount");
-    print("boulderClimbedMaxClimbed - $boulderClimbedMaxClimbed");
-    print("boulderClimbedMaxFlashed - $boulderClimbedMaxFlashed");
-    print("boulderSetAmount - $boulderSetAmount");
-    print("boulderSetColours - $boulderSetColours");
-    print("boulderSetSplit - $boulderSetSplit");
     return PointsData(
       pointsBoulder: pointsBoulder,
       pointsSetter: pointsSetter,
@@ -293,8 +286,6 @@ Future<PointsData> getPoints(
       boulderSetSplit: boulderSetSplit,
     );
   } catch (e) {
-    // Handle any errors during the async operation
-    print('Error fetching rankings: $e');
     return PointsData(
       pointsBoulder: 0,
       pointsSetter: 0,

@@ -319,8 +319,6 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
         showErrorDialog(context, "Nick Name is already");
       }
     } catch (e) {
-      print(e);
-      // Handle the error, e.g., display an error message
       showErrorDialog(context, "Failed to save or update profile");
     }
   }

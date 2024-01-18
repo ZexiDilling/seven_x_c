@@ -1,62 +1,17 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
-import 'package:seven_x_c/services/cloude/notes/cloud_note.dart';
 import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 import 'package:seven_x_c/services/cloude/cloud_storage_exceptions.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
 class FirebaseCloudStorage {
-  // Todo Remove notes from this
-  final notes = FirebaseFirestore.instance.collection("notes");
   final bouldersCollection = FirebaseFirestore.instance.collection("boulders");
   final profileCollection = FirebaseFirestore.instance.collection("profile");
   final compCollection = FirebaseFirestore.instance.collection("comp");
   final challengeCollection =
       FirebaseFirestore.instance.collection("challenges");
-
-  Future<void> deleteNote({required String documentId}) async {
-    try {
-      await notes.doc(documentId).delete();
-    } catch (e) {
-      throw CouldNotDeleteNoteException();
-    }
-  }
-
-  Future<void> updateNote({
-    required String documentId,
-    required String text,
-  }) async {
-    try {
-      await notes.doc(documentId).update({textFieldName: text});
-    } catch (e) {
-      throw CouldNotUpdateNoteException();
-    }
-  }
-
-  Stream<Iterable<CloudNote>> allNotes({required String ownerUserId}) {
-    final allNotes = notes
-        .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
-        .snapshots()
-        .map((event) => event.docs.map((doc) => CloudNote.fromSnapshot(doc)));
-    return allNotes;
-  }
-
-  Future<CloudNote> createNewNote({required String ownerUserId}) async {
-    final document = await notes.add({
-      ownerUserIdFieldName: ownerUserId,
-      textFieldName: "",
-    });
-    final fetchNote = await document.get();
-    return CloudNote(
-      documentId: fetchNote.id,
-      ownerUserId: ownerUserId,
-      text: "",
-    );
-  }
 
 // Boulder data
   Future<void> deleteBoulder({required String boulderID}) async {
@@ -110,8 +65,9 @@ class FirebaseCloudStorage {
       if (updateDateBoulder != null) {
         updatedData[updateDateBoulderFiledName] = updateDateBoulder;
       }
-      if (boulderChallenges != null)
+      if (boulderChallenges != null) {
         updatedData[boulderChallengesFieldName] = boulderChallenges;
+      }
       if (gradeNumberClimbers != null) {
         updatedData[gradingClimbersFieldName] = gradeNumberClimbers;
       }
@@ -431,8 +387,6 @@ class FirebaseCloudStorage {
 
       return querySnapshot.docs.isEmpty;
     } catch (e) {
-      // Handle any errors that might occur during the process
-      print('Error checking displayName uniqueness: $e');
       throw CouldNotCheckDisplayNameException();
     }
   }

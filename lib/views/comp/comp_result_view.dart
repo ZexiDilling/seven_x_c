@@ -6,6 +6,7 @@ class CompResultsView extends StatefulWidget {
   const CompResultsView({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CompResultsViewState createState() => _CompResultsViewState();
 }
 
@@ -54,7 +55,7 @@ class _CompResultsViewState extends State<CompResultsView>
         ),
         bottom: TabBar(
           isScrollable: true,
-          physics: BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           controller: _tabController,
           tabs: const [
             Tab(text: 'Total Ranking'),
@@ -99,7 +100,6 @@ class _CompResultsViewState extends State<CompResultsView>
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          print('Error: ${snapshot.error}');
           return const Center(child: Text('Error loading data.'));
         } else {
           return snapshot.data ?? const SizedBox.shrink();
@@ -145,7 +145,6 @@ class _CompResultsViewState extends State<CompResultsView>
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          print('Error: ${snapshot.error}');
           return const Center(child: Text('Error loading data.'));
         } else {
           return snapshot.data ?? const SizedBox.shrink();

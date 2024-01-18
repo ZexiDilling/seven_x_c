@@ -175,10 +175,10 @@ Drawer compDrawer(
                         activeComp: false,
                         endDateComp: Timestamp.now(),
                         compResults: rankings);
-                    // updateClimbers(
-                    //     currentComp: currentComp,
-                    //     userService: userService,
-                    //     compRanking: rankings);
+                    updateClimbers(
+                        currentComp: currentComp,
+                        userService: userService,
+                        compRanking: rankings);
                   },
                   child: const Text('End Comp'),
                 ),

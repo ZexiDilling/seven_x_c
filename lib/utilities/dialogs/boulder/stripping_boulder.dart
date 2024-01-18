@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
@@ -51,7 +53,6 @@ Future<void> stripping(
 
                           for (CloudBoulder boulder in boulders) {
                             if (boulder.hiddenGrade == true) {
-                              print(boulder);
                               await boulderService.updatBoulder(
                                   boulderID: boulder.boulderID,
                                   hiddenGrade: false);

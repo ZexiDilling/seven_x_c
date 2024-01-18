@@ -229,14 +229,14 @@ DateTime calculateDateThreshold(TimePeriod timePeriod) {
   DateTime currentTime = DateTime.now();
   switch (timePeriod) {
     case TimePeriod.week:
-      return currentTime.subtract(Duration(days: 7));
+      return currentTime.subtract(const Duration(days: 7));
     case TimePeriod.month:
-      return currentTime.subtract(Duration(days: 30));
+      return currentTime.subtract(const Duration(days: 30));
     case TimePeriod.semester:
       // Adjust the duration as needed
-      return currentTime.subtract(Duration(days: 180));
+      return currentTime.subtract(const Duration(days: 180));
     case TimePeriod.year:
-      return currentTime.subtract(Duration(days: 365));
+      return currentTime.subtract(const Duration(days: 365));
     default:
       return DateTime(0); // Or handle the default case accordingly
   }

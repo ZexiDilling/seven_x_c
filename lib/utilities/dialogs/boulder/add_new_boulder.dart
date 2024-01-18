@@ -8,7 +8,6 @@ import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/generics/yes_no.dart';
-// import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 
 Future<void> showAddNewBoulder(
@@ -191,26 +190,24 @@ Future<void> showAddNewBoulder(
                             decoration: const InputDecoration(
                                 labelText: 'Choose Setter'),
                           ),
-                          Row(children: [
-                            CheckboxListTile(
-                                title: const Text(dtuSetterName),
-                                value: setterTeam,
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    setterTeam = value ?? false;
-                                    guestSetterTeam = false;
-                                  });
-                                }),
-                            CheckboxListTile(
-                                title: const Text(guestSetter),
-                                value: guestSetterTeam,
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    guestSetterTeam = value ?? false;
-                                    setterTeam = false;
-                                  });
-                                })
-                          ]),
+                          CheckboxListTile(
+                              title: const Text(dtuSetterName),
+                              value: setterTeam,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  setterTeam = value ?? false;
+                                  guestSetterTeam = false;
+                                });
+                              }),
+                          CheckboxListTile(
+                              title: const Text(guestSetter),
+                              value: guestSetterTeam,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  guestSetterTeam = value ?? false;
+                                  setterTeam = false;
+                                });
+                              }),
                           CheckboxListTile(
                               title: const Text('Top Out'),
                               value: topOut,
@@ -237,10 +234,6 @@ Future<void> showAddNewBoulder(
                                 hiddenGrade = value ?? false;
                               });
                             },
-                          ),
-                          ElevatedButton(
-                            onPressed: () {},
-                            child: const Text('Add Chanllenges'),
                           ),
                         ],
                       ),
@@ -307,7 +300,7 @@ Future<void> showAddNewBoulder(
                                         existingData:
                                             currentComp.bouldersComp));
                               }
-                            } 
+                            }
                           }
 
                           if (newBoulder != null) {
@@ -337,8 +330,6 @@ Future<void> showAddNewBoulder(
                                 // ignore: use_build_context_synchronously
                                 showErrorDialog(context, "$e");
                               }
-                            } else {
-                              print("FUCK!");
                             }
                           }
                           // ignore: use_build_context_synchronously

@@ -251,11 +251,11 @@ Widget buildDatePickerRow({
           decoration: InputDecoration(
             hintText: hintText,
             labelText: hintText,
-            suffixIcon: Icon(Icons.calendar_today),
+            suffixIcon: const Icon(Icons.calendar_today),
           ),
         ),
       ),
-      SizedBox(width: 16),
+      const SizedBox(width: 16),
       ElevatedButton(
         onPressed: () {
           showDatePicker(

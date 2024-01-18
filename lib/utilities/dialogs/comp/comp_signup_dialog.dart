@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/routes.dart';
 import 'package:seven_x_c/helpters/functions.dart';
