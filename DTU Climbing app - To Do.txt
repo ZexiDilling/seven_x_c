@@ -114,15 +114,15 @@ Challenges:
 	Make a filter for boulders with challenges
 	add a challenge map to the user?
 		How do I want to track this on the user ? 
+
+Setter:
+	Done - Make it possible to set a non-setter as a setter
 	
 ------------------------------------------------------------------------------------------------------------------------
 
 
 ToDO:
 ------------------------------------------------------------------------------------------
-
-FIX CREATE BOULDERS!!!!!!!!!!!!
-
 comp module:
 	Randome person picker button for prices to random ppl. 
 		
@@ -150,17 +150,13 @@ Extra info:
 Calender
 	Section cleaning
 	Setting
-
+	used for filter on "taking down soon" 
 
 Settings:
 	update settings to work ?? 
 	delete / hide options that are not needed
 
-Setter:
-	Make it possible to set a non-setter as a setter
-
 Clean up:
-
 	Make things pretty
 	clean up code
 

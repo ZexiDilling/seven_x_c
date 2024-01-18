@@ -36,7 +36,6 @@ Future<void> showBoulderInformation(
   int repeats = 0;
   bool flashed = false;
   bool topped = false;
-  bool previusTopped = false;
   // const gradingSystem = "coloured";
   // const gradingSystem = "v_grade";
   // const gradingSystem = "french";
@@ -50,9 +49,7 @@ Future<void> showBoulderInformation(
   Color? gradeColour;
   int? gradeValue = 0;
   Color? holdColour = getColorFromName(boulder.holdColour);
-  double boulderPoints = 0.0;
   List<String> allGradeColorChoice = [];
-  bool voted = false;
   String labelText = "Vote a Grade";
   bool expandPanelState = false;
 
@@ -97,13 +94,10 @@ Future<void> showBoulderInformation(
       repeats = userClimbInfo["repeats"] ?? 0;
       flashed = userClimbInfo['flashed'] ?? false;
       topped = userClimbInfo['topped'] ?? false;
-      previusTopped = topped;
       gradeValue = userClimbInfo["gradeNumber"] ?? 0;
 
       if (userClimbInfo["gradeColour"] != "" &&
-          userClimbInfo["gradeColour"] != null) {
-        voted = true;
-      }
+          userClimbInfo["gradeColour"] != null) {}
       gradeColour =
           getColorFromName(userClimbInfo["gradeColour"] ?? boulder.gradeColour);
       gradeColorChoice = gradeColorMap[gradeColour];
@@ -136,6 +130,11 @@ Future<void> showBoulderInformation(
                   : [];
 
               String selectedSetter = setters.isNotEmpty ? boulder.setter : '';
+
+              if (!setters.contains(selectedSetter)) {
+                selectedSetter = setters.first;
+              }
+
               return StatefulBuilder(
                 builder: (BuildContext context, StateSetter setState) {
                   return AlertDialog(
@@ -231,7 +230,6 @@ Future<void> showBoulderInformation(
                                                 flashed,
                                                 attempts);
                                           }
-
                                           if (topped) {
                                             boulderService.updatBoulder(
                                                 boulderID: boulder.boulderID,
@@ -258,9 +256,13 @@ Future<void> showBoulderInformation(
                                             boulderService.updatBoulder(
                                                 boulderID: boulder.boulderID,
                                                 climberTopped:
-                                                    removeClimberToppedentry(
+                                                    updateClimberToppedMap(
                                                         currentProfile:
                                                             currentProfile,
+                                                        attempts: 0,
+                                                        flashed: flashed,
+                                                        topped: topped,
+                                                        repeats: 0,
                                                         existingData: boulder
                                                             .climberTopped));
                                             updateUserUndoTop(userService,
@@ -741,12 +743,16 @@ Future<void> showBoulderInformation(
                                       // Use the expanded state for each challenge
                                       bool isExpanded =
                                           expandedStates[challenge] ?? false;
-                                      Map<String, dynamic> challengeMap =
-                                          boulder.boulderChallenges![challenge];
-                                      bool challengeCompleted =
-                                          (challengeMap["completed"]
-                                                  as List<String>)
-                                              .contains(currentProfile.userID);
+                                      Map<String, dynamic>? challengeMap =
+                                          boulder.boulderChallenges?[challenge];
+                                      bool challengeCompleted;
+                                      if (challengeMap == null) {
+                                        challengeCompleted = false;
+                                      } else {
+                                        challengeCompleted = (challengeMap![
+                                                "completed"] as List<String>)
+                                            .contains(currentProfile.userID);
+                                      }
 
                                       return ExpansionPanelList(
                                         elevation: 1,
@@ -771,10 +777,9 @@ Future<void> showBoulderInformation(
                                                 challenge != "create"
                                                     ? Column(children: [
                                                         Visibility(
-                                                            visible: boulder
-                                                                        .boulderChallenges![
-                                                                    challenge]
-                                                                ["gotCounter"],
+                                                            visible:
+                                                                challengeMap![
+                                                                    "gotCounter"],
                                                             child: Row(
                                                                 children: [
                                                                   const Text(
@@ -788,7 +793,7 @@ Future<void> showBoulderInformation(
                                                                       setState(
                                                                           () {
                                                                         challengeMap[
-                                                                            "runningCount"] = (challengeMap["runningCount"] -
+                                                                            "runningCount"] = (challengeMap!["runningCount"] -
                                                                                 1)
                                                                             .clamp(0,
                                                                                 double.infinity)
@@ -797,7 +802,7 @@ Future<void> showBoulderInformation(
                                                                             currentProfile:
                                                                                 currentProfile,
                                                                             challengePoints:
-                                                                                updatePoints(points: -challengeMap["points"], existingData: currentProfile.challengePoints));
+                                                                                updatePoints(points: -challengeMap!["points"], existingData: currentProfile.challengePoints));
                                                                         challengeService.updateChallenge(
                                                                             challengeID:
                                                                                 challenge,
@@ -807,7 +812,7 @@ Future<void> showBoulderInformation(
                                                                     },
                                                                   ),
                                                                   Text(
-                                                                      '${challengeMap["runningCount"]}'),
+                                                                      '${challengeMap!["runningCount"]}'),
                                                                   IconButton(
                                                                     icon: const Icon(
                                                                         Icons
@@ -957,159 +962,30 @@ Future<void> showBoulderInformation(
                       ),
                     ),
                     actions: [
-                      Row(
-                        children: [
-                          Visibility(
-                            visible: !editing,
-                            child: ElevatedButton(
+                      Visibility(
+                          visible: editing,
+                          child: ElevatedButton(
                               onPressed: () {
-                                if (voted) {
-                                  if (gradingSystem == "coloured") {
-                                    gradeValue = difficultyLevelToArrow(
-                                        difficultyLevel, gradeColorChoice!);
-                                  }
+                                if (gradingSystem == "coloured") {
+                                  gradeValue = difficultyLevelToArrow(
+                                      difficultyLevel, gradeColorChoice!);
                                 } else {
                                   gradeValue = null;
                                 }
                                 boulderService.updatBoulder(
                                   boulderID: boulder.boulderID,
-                                  climberTopped: updateClimberToppedMap(
-                                      currentProfile: currentProfile,
-                                      attempts: attempts,
-                                      repeats: repeats,
-                                      flashed: flashed,
-                                      topped: topped,
-                                      existingData: boulder.climberTopped,
-                                      gradeNumberVoted: gradeValue,
-                                      gradeColourVoted: gradeColorChoice,
-                                      gradeArrowVoted: difficultyLevel),
+                                  updateDateBoulder: Timestamp.now(),
+                                  topOut: topOut,
+                                  hiddenGrade: hiddenGrade,
+                                  setter: selectedSetter,
+                                  holdColour: holdColorMap[holdColour],
+                                  gradeColour: gradeColorChoice,
+                                  gradeNumberSetter: gradeValue,
+                                  compBoulder: compBoulder,
                                 );
-                                double orgBoulderPoints;
-                                int maxFlahsedGrade;
-                                int maxToppedGrade;
-                                if (topped == true) {
-                                  if (currentProfile.maxFlahsedGrade <
-                                      boulder.gradeNumberSetter) {
-                                    maxFlahsedGrade = boulder.gradeNumberSetter;
-                                  } else {
-                                    maxFlahsedGrade =
-                                        currentProfile.maxFlahsedGrade;
-                                  }
-                                  if (currentProfile.maxToppedGrade <
-                                      boulder.gradeNumberSetter) {
-                                    maxToppedGrade = boulder.gradeNumberSetter;
-                                  } else {
-                                    maxToppedGrade =
-                                        currentProfile.maxToppedGrade;
-                                  }
-                                  boulderPoints = calculateboulderPoints(
-                                      currentProfile,
-                                      boulder,
-                                      repeats,
-                                      flashed);
-                                  if (currentProfile
-                                          .climbedBoulders![boulder.boulderID]
-                                      ["topped"]) {
-                                    orgBoulderPoints = currentProfile
-                                            .climbedBoulders![boulder.boulderID]
-                                        ["boulderPoints"];
-                                  } else {
-                                    orgBoulderPoints = boulderPoints;
-                                  }
-                                  userService.updateUser(
-                                      boulderPoints: updatePoints(
-                                          points: boulderPoints,
-                                          existingData:
-                                              currentProfile.boulderPoints),
-                                      currentProfile: currentProfile,
-                                      maxFlahsedGrade: maxFlahsedGrade,
-                                      maxToppedGrade: maxToppedGrade,
-                                      climbedBoulders: updateClimbedBouldersMap(
-                                          boulder: boulder,
-                                          topped: topped,
-                                          flashed: flashed,
-                                          attempts: attempts,
-                                          repeats: repeats,
-                                          gradeColour: gradeColorChoice,
-                                          gradeArrow: difficultyLevel,
-                                          boulderPoints: orgBoulderPoints,
-                                          existingData:
-                                              currentProfile.climbedBoulders));
-                                } else if (topped == false && previusTopped) {
-                                  if (boulder.gradeNumberSetter ==
-                                      currentProfile.maxFlahsedGrade) {
-                                    maxFlahsedGrade = checkGrade(currentProfile,
-                                        boulder.boulderID, "flashed");
-                                  } else {
-                                    maxFlahsedGrade =
-                                        currentProfile.maxFlahsedGrade;
-                                  }
-                                  if (boulder.gradeNumberSetter ==
-                                      currentProfile.maxToppedGrade) {
-                                    maxToppedGrade = checkGrade(currentProfile,
-                                        boulder.boulderID, "topped");
-                                  } else {
-                                    maxToppedGrade =
-                                        currentProfile.maxToppedGrade;
-                                  }
-                                  orgBoulderPoints = -currentProfile
-                                          .climbedBoulders![boulder.boulderID]
-                                      ["boulderPoints"];
-                                  userService.updateUser(
-                                    currentProfile: currentProfile,
-                                    boulderPoints: updatePoints(
-                                        points: orgBoulderPoints,
-                                        existingData:
-                                            currentProfile.boulderPoints),
-                                    maxFlahsedGrade: maxFlahsedGrade,
-                                    maxToppedGrade: maxToppedGrade,
-                                  );
-                                }
                                 Navigator.of(context).pop();
                               },
-                              child: const Text('OK'),
-                            ),
-                          ),
-                          Visibility(
-                              visible: editing,
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    if (gradingSystem == "coloured") {
-                                      gradeValue = difficultyLevelToArrow(
-                                          difficultyLevel, gradeColorChoice!);
-                                    } else {
-                                      gradeValue = null;
-                                    }
-                                    boulderService.updatBoulder(
-                                      boulderID: boulder.boulderID,
-                                      updateDateBoulder: Timestamp.now(),
-                                      topOut: topOut,
-                                      hiddenGrade: hiddenGrade,
-                                      setter: selectedSetter,
-                                      holdColour: holdColorMap[holdColour],
-                                      gradeColour: gradeColorChoice,
-                                      gradeNumberSetter: gradeValue,
-                                      compBoulder: compBoulder,
-                                    );
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text("Apply"))),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Cancel'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              // Info button pressed
-                              // You can add logic to display additional information
-                              // For example, show a Snackbar or navigate to another screen
-                            },
-                            child: const Text('Info'),
-                          ),
-                        ],
-                      )
+                              child: const Text("Apply")))
                     ],
                   );
                 },
@@ -1120,7 +996,7 @@ Future<void> showBoulderInformation(
   );
 }
 
-void updateUsersVotedForGrade(
+Map<String, dynamic>? updateUsersVotedForGrade(
     FirebaseCloudStorage boulderService,
     CloudBoulder boulder,
     CloudProfile currentProfile,
@@ -1134,15 +1010,16 @@ void updateUsersVotedForGrade(
     String arrow = getArrowFromNumberAndColor(gradeValue!, gradeColorChoice!);
     difficultyLevel = getdifficultyFromArrow(arrow);
   }
-  boulderService.updatBoulder(
-    boulderID: boulder.boulderID,
-    climberTopped: updateClimberToppedMap(
-        currentProfile: currentProfile,
-        existingData: boulder.climberTopped,
-        gradeNumberVoted: gradeValue,
-        gradeColourVoted: gradeColorChoice,
-        gradeArrowVoted: difficultyLevel),
+  boulder.climberTopped = updateClimberToppedMap(
+    currentProfile: currentProfile,
+    gradeNumberVoted: gradeValue,
+    gradeColourVoted: gradeColorChoice,
+    gradeArrowVoted: difficultyLevel,
+    existingData: boulder.climberTopped,
   );
+  boulderService.updatBoulder(
+      boulderID: boulder.boulderID, climberTopped: boulder.climberTopped);
+  return boulder.climberTopped;
 }
 
 void updateUserReapet(FirebaseCloudStorage userService,
@@ -1309,10 +1186,15 @@ void updateUserUndoTop(
   } else {
     maxToppedGrade = currentProfile.maxToppedGrade;
   }
-  orgBoulderPoints = -(currentProfile.climbedBoulders![boulder.boulderID]
-              ["boulderPoints"] ??
-          0) -
-      (currentProfile.climbedBoulders![boulder.boulderID]["repeatPoints"] ?? 0);
+  if (currentProfile.climbedBoulders![boulder.boulderID] != null) {
+    orgBoulderPoints = -(currentProfile.climbedBoulders![boulder.boulderID]
+                ["boulderPoints"] ??
+            0) -
+        (currentProfile.climbedBoulders![boulder.boulderID]["repeatPoints"] ??
+            0);
+  } else {
+    orgBoulderPoints = defaultBoulderPoints;
+  }
 
   userService.updateUser(
       currentProfile: currentProfile,
@@ -1349,12 +1231,18 @@ void updateUserTopped(
   }
   boulderPoints =
       calculateboulderPoints(currentProfile, boulder, repeats, flashed);
-  if (currentProfile.climbedBoulders![boulder.boulderID]["topped"]) {
-    orgBoulderPoints =
-        currentProfile.climbedBoulders![boulder.boulderID]["boulderPoints"];
-  } else {
-    orgBoulderPoints = boulderPoints;
-  }
+
+  orgBoulderPoints = currentProfile.climbedBoulders?[boulder.boulderID]
+                  ?.containsKey('topped') ==
+              true &&
+          currentProfile.climbedBoulders![boulder.boulderID]!['topped'] ==
+              true &&
+          currentProfile.climbedBoulders![boulder.boulderID]
+                  ?['boulderPoints'] !=
+              null
+      ? currentProfile.climbedBoulders![boulder.boulderID]!['boulderPoints']
+      : boulderPoints;
+
   userService.updateUser(
       boulderPoints: updatePoints(
           points: boulderPoints, existingData: currentProfile.boulderPoints),

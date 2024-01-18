@@ -204,6 +204,15 @@ Map<String, dynamic> updateClimberToppedMap(
   String displayName = currentProfile.displayName;
   bool isAnonymous = currentProfile.isAnonymous;
   String userID = currentProfile.userID;
+  if (existingData != null && existingData.isNotEmpty)  {
+  attempts ??= existingData[userID]['attempts'];
+  repeats ??= existingData[userID]["repeats"];
+  topped ??= existingData[userID]["topped"];
+  flashed ??= existingData[userID]['flashed'];
+  gradeNumberVoted ??= existingData[userID]["gradeNumber"];
+  gradeColourVoted ??= existingData[userID]["gradeColour"];
+  gradeArrowVoted ??= existingData[userID]["gradeArrow"];} else {existingData = {}; }
+
 
   Map<String, dynamic> newData = {
     "displayName": displayName,
@@ -217,10 +226,8 @@ Map<String, dynamic> updateClimberToppedMap(
     "gradeArrow": gradeArrowVoted,
   };
 
-  Map<String, dynamic> climberToppedData = existingData ?? {};
-  climberToppedData[userID] = newData;
-
-  return climberToppedData;
+  existingData[userID] = newData;
+  return existingData;
 }
 
 enum TimePeriod { week, month, semester, year, allTime }

@@ -18,7 +18,7 @@ class CloudBoulder {
   final String? boulderName;
   final Map<String, dynamic>? boulderChallenges;
   final Map<String, dynamic>? gradeNumberClimbers;
-  final Map<String, dynamic>? climberTopped;
+  Map<String, dynamic>? climberTopped;
   final Timestamp setDateBoulder;
   final Timestamp? updateDateBoulder;
 
