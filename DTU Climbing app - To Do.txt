@@ -98,8 +98,10 @@ Comp Module:
 	Gender ranking
 	See result after comp completion
 	see boulder after comp completion
+	make it impossible to mark boulders as top for the comp, when the comp is ended
 	When A user tops a boulder, add it to the comp map. 
 		Upadte the points based on the rule and style set
+	Randome person picker button for prices to random ppl. 
 
 Boulder view:
 	challenges modul for boulders
@@ -123,8 +125,7 @@ Setter:
 
 ToDO:
 ------------------------------------------------------------------------------------------
-comp module:
-	Randome person picker button for prices to random ppl. 
+
 		
 Challenges:
 	make it possible to add old challenges to boulders. 

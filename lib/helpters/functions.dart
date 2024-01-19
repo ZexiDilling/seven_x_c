@@ -204,15 +204,17 @@ Map<String, dynamic> updateClimberToppedMap(
   String displayName = currentProfile.displayName;
   bool isAnonymous = currentProfile.isAnonymous;
   String userID = currentProfile.userID;
-  if (existingData != null && existingData.isNotEmpty)  {
-  attempts ??= existingData[userID]['attempts'];
-  repeats ??= existingData[userID]["repeats"];
-  topped ??= existingData[userID]["topped"];
-  flashed ??= existingData[userID]['flashed'];
-  gradeNumberVoted ??= existingData[userID]["gradeNumber"];
-  gradeColourVoted ??= existingData[userID]["gradeColour"];
-  gradeArrowVoted ??= existingData[userID]["gradeArrow"];} else {existingData = {}; }
-
+  if (existingData != null && existingData.isNotEmpty) {
+    attempts ??= existingData[userID]['attempts'];
+    repeats ??= existingData[userID]["repeats"];
+    topped ??= existingData[userID]["topped"];
+    flashed ??= existingData[userID]['flashed'];
+    gradeNumberVoted ??= existingData[userID]["gradeNumber"];
+    gradeColourVoted ??= existingData[userID]["gradeColour"];
+    gradeArrowVoted ??= existingData[userID]["gradeArrow"];
+  } else {
+    existingData = {};
+  }
 
   Map<String, dynamic> newData = {
     "displayName": displayName,
@@ -328,3 +330,12 @@ Map<String, dynamic> updateBoulderChallengeMap(
 
   return boulderChallenges;
 }
+
+List updateListOfRandomWinners(
+    {required CloudComp currentComp,
+    required String userDisplayName,
+    List? existingData}) {
+      List randomWinners = existingData ?? [];
+      randomWinners.add(userDisplayName);
+      return randomWinners;
+    }

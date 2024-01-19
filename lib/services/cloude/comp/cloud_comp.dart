@@ -21,6 +21,7 @@ class CloudComp {
   final Map<String, dynamic>? bouldersComp;
   final Map<String, dynamic>? climbersComp;
   final Map<String, dynamic>? compResults;
+  final List? randomWinners;
 
   const CloudComp(
     this.compName,
@@ -38,7 +39,7 @@ class CloudComp {
     this.genderBased,
     this.bouldersComp,
     this.climbersComp,
-    this.compResults, {
+    this.compResults, this.randomWinners, {
     required this.compID,
   });
 
@@ -62,5 +63,6 @@ class CloudComp {
         climbersComp =
             snapshot.data()[climbersCompFieldName] as Map<String, dynamic>?,
         compResults =
-            snapshot.data()[compResultsFieldName] as Map<String, dynamic>?;
+            snapshot.data()[compResultsFieldName] as Map<String, dynamic>?,
+            randomWinners = snapshot.data()[randomWinnersFieldName] as List?;
 }

@@ -409,6 +409,7 @@ class FirebaseCloudStorage {
     Map<String, dynamic>? bouldersComp,
     Map<String, dynamic>? climbersComp,
     Map<String, dynamic>? compResults,
+    List? randomWinners,
   }) async {
     final document = await compCollection.add({
       compNameFieldName: compName,
@@ -427,6 +428,7 @@ class FirebaseCloudStorage {
       if (bouldersComp != null) bouldersCompFieldName: bouldersComp,
       if (climbersComp != null) climbersCompFieldName: climbersComp,
       if (compResults != null) compResultsFieldName: compResults,
+      if (randomWinners != null) randomWinnersFieldName: randomWinners
     });
     final fetchComp = await document.get();
     return CloudComp(
@@ -445,7 +447,7 @@ class FirebaseCloudStorage {
         genderBased,
         bouldersComp,
         climbersComp,
-        compResults,
+        compResults, randomWinners,
         compID: fetchComp.id);
   }
 
@@ -467,6 +469,7 @@ class FirebaseCloudStorage {
     Map<String, dynamic>? bouldersComp,
     Map<String, dynamic>? climbersComp,
     Map<String, dynamic>? compResults,
+    List? randomWinners,
   }) async {
     try {
       // Create a map to store non-null fields and their values
@@ -507,6 +510,7 @@ class FirebaseCloudStorage {
       if (compResults != null) {
         updatedData[compResultsFieldName] = compResults;
       }
+      if (randomWinners != null) {updatedData[randomWinnersFieldName] = randomWinners;}
 
       // Update the document with the non-null fields
       await compCollection.doc(compID).update(updatedData);

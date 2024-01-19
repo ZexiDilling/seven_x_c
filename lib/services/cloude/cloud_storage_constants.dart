@@ -60,6 +60,7 @@ const genderBasedFieldName = "genderBased";
 const bouldersCompFieldName = "bouldersComp";
 const climbersCompFieldName = "climbersComp";
 const compResultsFieldName = "climbersResults";
+const randomWinnersFieldName = "randomWinners";
 
 //challenge
 const challengeIDFieldName = "challengeID";

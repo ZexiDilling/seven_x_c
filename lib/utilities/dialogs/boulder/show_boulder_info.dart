@@ -222,13 +222,18 @@ Future<void> showBoulderInformation(
                                           topped = value ?? false;
 
                                           if (compView) {
-                                            updateCompCalculations(
-                                                compService,
-                                                currentComp!,
-                                                boulder,
-                                                currentProfile,
-                                                flashed,
-                                                attempts);
+                                            if (currentComp!.activeComp) {
+                                              updateCompCalculations(
+                                                  compService,
+                                                  currentComp,
+                                                  boulder,
+                                                  currentProfile,
+                                                  flashed,
+                                                  attempts);
+                                            } else {
+                                              showErrorDialog(context,
+                                                  "Comp have beel closed");
+                                            }
                                           }
                                           if (topped) {
                                             boulderService.updatBoulder(
@@ -281,13 +286,18 @@ Future<void> showBoulderInformation(
                                           topped = value ?? false;
                                           attempts = 1;
                                           if (compView) {
-                                            updateCompCalculations(
-                                                compService,
-                                                currentComp!,
-                                                boulder,
-                                                currentProfile,
-                                                flashed,
-                                                attempts);
+                                            if (currentComp!.activeComp) {
+                                              updateCompCalculations(
+                                                  compService,
+                                                  currentComp,
+                                                  boulder,
+                                                  currentProfile,
+                                                  flashed,
+                                                  attempts);
+                                            } else {
+                                              showErrorDialog(context,
+                                                  "Comp have beel closed");
+                                            }
                                           }
                                           if (flashed) {
                                             boulderService.updatBoulder(
@@ -749,7 +759,7 @@ Future<void> showBoulderInformation(
                                       if (challengeMap == null) {
                                         challengeCompleted = false;
                                       } else {
-                                        challengeCompleted = (challengeMap![
+                                        challengeCompleted = (challengeMap[
                                                 "completed"] as List<String>)
                                             .contains(currentProfile.userID);
                                       }
@@ -793,7 +803,7 @@ Future<void> showBoulderInformation(
                                                                       setState(
                                                                           () {
                                                                         challengeMap[
-                                                                            "runningCount"] = (challengeMap!["runningCount"] -
+                                                                            "runningCount"] = (challengeMap["runningCount"] -
                                                                                 1)
                                                                             .clamp(0,
                                                                                 double.infinity)
@@ -802,7 +812,7 @@ Future<void> showBoulderInformation(
                                                                             currentProfile:
                                                                                 currentProfile,
                                                                             challengePoints:
-                                                                                updatePoints(points: -challengeMap!["points"], existingData: currentProfile.challengePoints));
+                                                                                updatePoints(points: -challengeMap["points"], existingData: currentProfile.challengePoints));
                                                                         challengeService.updateChallenge(
                                                                             challengeID:
                                                                                 challenge,
@@ -812,7 +822,7 @@ Future<void> showBoulderInformation(
                                                                     },
                                                                   ),
                                                                   Text(
-                                                                      '${challengeMap!["runningCount"]}'),
+                                                                      '${challengeMap["runningCount"]}'),
                                                                   IconButton(
                                                                     icon: const Icon(
                                                                         Icons

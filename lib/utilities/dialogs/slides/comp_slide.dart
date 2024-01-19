@@ -1,3 +1,5 @@
+import 'dart:math' show Random;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/comp_const.dart';
@@ -6,6 +8,7 @@ import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
+import 'package:seven_x_c/utilities/dialogs/comp/random_getter.dart';
 
 bool showAllBouldersFilter = false;
 
@@ -44,6 +47,7 @@ Drawer compDrawer(
                 controller: TextEditingController(text: currentComp.compName),
                 decoration: const InputDecoration(labelText: 'Comp Name'),
                 onChanged: (value) {},
+                enabled: !currentComp.activeComp,
               ),
             ),
             ListTile(
@@ -52,11 +56,13 @@ Drawer compDrawer(
                   const Text('Show All Boulders'),
                   Checkbox(
                     value: showAllBouldersFilter,
-                    onChanged: (value) {
-                      setState(() {
-                        showAllBouldersFilter = !showAllBouldersFilter;
-                      });
-                    },
+                    onChanged: currentComp.activeComp
+                        ? null
+                        : (value) {
+                            setState(() {
+                              showAllBouldersFilter = !showAllBouldersFilter;
+                            });
+                          },
                   ),
                 ],
               ),
@@ -67,9 +73,11 @@ Drawer compDrawer(
                   const Text('Sign Up Active'),
                   Checkbox(
                     value: signUp,
-                    onChanged: (value) {
-                      signUp = !signUp;
-                    },
+                    onChanged: currentComp.activeComp
+                        ? null
+                        : (value) {
+                            signUp = !signUp;
+                          },
                   ),
                 ],
               ),
@@ -87,16 +95,19 @@ Drawer compDrawer(
                     maxPP = currentComp.maxParticipants!;
                   }
                 },
+                enabled: !currentComp.activeComp,
               ),
             ),
             ListTile(
               title: DropdownButton<String>(
                 value: selectedRule,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedRule = newValue!;
-                  });
-                },
+                onChanged: currentComp.activeComp
+                    ? null
+                    : (String? newValue) {
+                        setState(() {
+                          selectedRule = newValue!;
+                        });
+                      },
                 items: compRulesOptions
                     .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
@@ -109,11 +120,13 @@ Drawer compDrawer(
             ListTile(
               title: DropdownButton<String>(
                 value: selectedStyle,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedStyle = newValue!;
-                  });
-                },
+                onChanged: currentComp.activeComp
+                    ? null
+                    : (String? newValue) {
+                        setState(() {
+                          selectedStyle = newValue!;
+                        });
+                      },
                 items: compStylesOptions
                     .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
@@ -127,20 +140,24 @@ Drawer compDrawer(
               children: [
                 Checkbox(
                   value: includeFinals,
-                  onChanged: (value) {
-                    setState(() {
-                      includeFinals = value!;
-                    });
-                  },
+                  onChanged: currentComp.activeComp
+                      ? null
+                      : (value) {
+                          setState(() {
+                            includeFinals = value!;
+                          });
+                        },
                 ),
                 const Text('Finals?'),
                 Checkbox(
                   value: includeSemiFinals,
-                  onChanged: (value) {
-                    setState(() {
-                      includeSemiFinals = value!;
-                    });
-                  },
+                  onChanged: currentComp.activeComp
+                      ? null
+                      : (value) {
+                          setState(() {
+                            includeSemiFinals = value!;
+                          });
+                        },
                 ),
                 const Text('Semi Finals?'),
               ],
@@ -148,20 +165,39 @@ Drawer compDrawer(
             ListTile(
               title: ElevatedButton(
                 onPressed: () {
-                  compService.updatComp(
-                      compID: currentComp.compID,
-                      signUpActiveComp: signUp,
-                      maxParticipants: maxPP);
+                  currentComp.activeComp
+                      ? null
+                      : compService.updatComp(
+                          compID: currentComp.compID,
+                          signUpActiveComp: signUp,
+                          maxParticipants: maxPP);
                 },
                 child: const Text('Apply Changes'),
+              ),
+            ),
+            ListTile(
+              title: ElevatedButton(
+                onPressed: ()  {
+                  List climbers = [];
+                  if (currentComp.climbersComp != null &&
+                      currentComp.climbersComp!.isNotEmpty) {
+                    climbers =
+                        currentComp.climbersComp!.values.toList();
+
+                  }
+                  showRadomGetter(context, climbers: climbers);
+                },
+                child: const Text('Random Picker'),
               ),
             ),
             Row(
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    compService.updatComp(
-                        compID: currentComp.compID, startedComp: true);
+                    currentComp.activeComp
+                        ? null
+                        : compService.updatComp(
+                            compID: currentComp.compID, startedComp: true);
                   },
                   child: const Text('Start Comp'),
                 ),
