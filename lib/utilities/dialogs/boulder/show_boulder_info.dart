@@ -1074,7 +1074,6 @@ void updateUserReapet(FirebaseCloudStorage userService,
   }
 
   double newRepeatPoints = orgRepeatPoints + repeatPoints;
-  print("Do we get here ? ");
   userService.updateUser(
       boulderPoints: updatePoints(
           points: repeatPoints, existingData: currentProfile.boulderPoints),
@@ -1176,9 +1175,6 @@ void updateUserRemovedFlashed(
   } else {
     maxFlahsedGrade = currentProfile.maxFlahsedGrade;
   }
-  print(boulder.boulderID);
-  print(currentProfile.climbedBoulders![boulder.boulderID]);
-  print(currentProfile.climbedBoulders![boulder.boulderID]["boulderPoints"]);
   pointsForFlash =
       -currentProfile.climbedBoulders![boulder.boulderID]["boulderPoints"];
 
@@ -1278,8 +1274,6 @@ void updateUserTopped(
       ? currentProfile.climbedBoulders![boulder.boulderID]!['boulderPoints']
       : boulderPoints;
 
-print(boulderPoints);
-print("er are here ");
   userService.updateUser(
       boulderPoints: updatePoints(
           points: boulderPoints, existingData: currentProfile.boulderPoints),

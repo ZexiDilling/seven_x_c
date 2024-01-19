@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/helpters/functions.dart';
-import 'package:seven_x_c/views/missing_views/profile_view.dart';
+import 'package:seven_x_c/views/profile/profile_view.dart';
 
 import 'package:intl/intl.dart';
 
@@ -15,10 +15,12 @@ class LineChartGraph extends StatelessWidget {
   final String chartSelection;
   final TimePeriod selectedTimePeriod;
   final PointsData graphData;
+  
 
   @override
   Widget build(BuildContext context) {
     Map<int, DateTime> numberToDateMap = {};
+    
     if (chartSelection == "maxGrade") {
       graphData.boulderClimbedMaxClimbed.forEach((entryDate, colors) {
         int entryNumber = graphData.boulderSetAmount[entryDate] ?? 0;
@@ -59,6 +61,7 @@ class LineChartGraph extends StatelessWidget {
       );
     } else if (chartSelection == "SetterDataPie") {
 
+      
       return PieChart(
                 pirChartSetter(graphData.boulderSetSplit),
               );
@@ -66,8 +69,6 @@ class LineChartGraph extends StatelessWidget {
       return const Text('Invalid chart selection');
     }
   }
-
-  
 
   final Color borderColor = Colors.green;
   final Color contentColorGreen = Colors.green;
@@ -407,7 +408,7 @@ class LineChartGraph extends StatelessWidget {
         case 0:
           return PieChartSectionData(
             color: contentColorGreen,
-            value: boulderSplit["Green"].toDouble(),
+            value: (boulderSplit["Green"] ?? 0.0).toDouble(),
             title: boulderSplit["Green"].toString(),
             radius: radius,
             titleStyle: TextStyle(
@@ -420,7 +421,7 @@ class LineChartGraph extends StatelessWidget {
         case 1:
           return PieChartSectionData(
             color: contentColorYellow,
-            value: boulderSplit["Yellow"].toDouble(),
+            value: (boulderSplit["Yellow"] ?? 0.0).toDouble(),
             title: boulderSplit["Yellow"].toString(),
             radius: radius,
             titleStyle: TextStyle(
@@ -433,7 +434,7 @@ class LineChartGraph extends StatelessWidget {
         case 2:
           return PieChartSectionData(
             color: contentColorBlue,
-            value: boulderSplit["Blue"].toDouble(),
+            value: (boulderSplit["Blue"] ?? 0.0).toDouble(),
             title: boulderSplit["Blue"].toString(),
             radius: radius,
             titleStyle: TextStyle(
@@ -446,7 +447,7 @@ class LineChartGraph extends StatelessWidget {
         case 3:
           return PieChartSectionData(
             color: contentColorPurple,
-            value: boulderSplit["Purple"].toDouble(),
+            value: (boulderSplit["Purple"] ?? 0.0).toDouble(),
             title: boulderSplit["Purple"].toString(),
             radius: radius,
             titleStyle: TextStyle(
@@ -459,7 +460,7 @@ class LineChartGraph extends StatelessWidget {
           case 4:
           return PieChartSectionData(
             color: contentColorRed,
-            value: boulderSplit["Red"].toDouble(),
+            value: (boulderSplit["Red"] ?? 0.0).toDouble(),
             title: boulderSplit["Red"].toString(),
             radius: radius,
             titleStyle: TextStyle(
@@ -472,7 +473,7 @@ class LineChartGraph extends StatelessWidget {
           case 5:
           return PieChartSectionData(
             color: contentColorBlack,
-            value: boulderSplit["Black"].toDouble(),
+            value: (boulderSplit["Black"] ?? 0.0).toDouble(),
             title: boulderSplit["Black"].toString(),
             radius: radius,
             titleStyle: TextStyle(

@@ -145,6 +145,9 @@ Clean up:
 Profile
 	fix graph
 		deal with different time intervals
+
+
+
 	
 
 Low priority/ not sure:

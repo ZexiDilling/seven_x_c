@@ -127,28 +127,31 @@ class _ProfileViewState extends State<ProfileView> {
                               children: <Widget>[
                                 TextButton(
                                     child: const Text('Max Grade'),
-                                    onPressed: () {
-                                      chartSelection = "maxGrade";
+                                    onPressed: () {  setState((){
+                                      chartSelection = "maxGrade";});
                                     }),
                                 TextButton(
                                     child: const Text('Climbs'),
-                                    onPressed: () {
-                                      chartSelection = "climbs";
+                                    onPressed: () {  setState((){
+                                      chartSelection = "climbs";});
                                     }),
                                 Visibility(
                                   visible: currentProfile.isSetter,
                                   child: TextButton(
                                       child: const Text('Setter Data'),
-                                      onPressed: () {
-                                        chartSelection = "SetterData";
+                                      onPressed: () { setState((){
+                                        chartSelection = "SetterData";});
                                       }),
                                 ),
                                 Visibility(
                                   visible: currentProfile.isSetter,
                                   child: TextButton(
                                       child: const Text('Setter Pie'),
-                                      onPressed: () {
+                                      onPressed: () { setState(() {
                                         chartSelection = "SetterDataPie";
+                                      });
+                                      print(pointsData.boulderSetSplit);
+                                        
                                       }),
                                 )
                               ],
@@ -161,6 +164,7 @@ class _ProfileViewState extends State<ProfileView> {
                                   const EdgeInsets.only(right: 16, left: 6),
                               child: SizedBox(
                                 height: 500,
+                                
                                 child: LineChartGraph(
                                     chartSelection: chartSelection,
                                     graphData: pointsData,
@@ -265,11 +269,13 @@ Future<PointsData> getPoints(
         }
       }
     } else {
+      print("testing?");
       pointsBoulder = currentProfile.boulderPoints;
       pointsSetter = currentProfile.setterPoints;
       pointsChallenges = currentProfile.challengePoints;
       amountBoulder = currentProfile.climbedBoulders!.length;
       amountSetter = currentProfile.setBoulders!.length;
+      //TOdo fixc thisd " "
     }
     return PointsData(
       pointsBoulder: pointsBoulder,
