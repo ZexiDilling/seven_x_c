@@ -19,9 +19,7 @@ Future<void> showAddNewBoulder(
   double centerY,
   String wall,
   String gradingSystem,
-  FirebaseCloudStorage boulderService,
-  FirebaseCloudStorage userService,
-  FirebaseCloudStorage compService,
+  FirebaseCloudStorage fireBaseService,
   Stream<Iterable<CloudProfile>> settersStream,
 ) async {
   Color? holdColour;
@@ -258,7 +256,7 @@ Future<void> showAddNewBoulder(
 
                           CloudBoulder? newBoulder;
                           try {
-                            newBoulder = await boulderService.createNewBoulder(
+                            newBoulder = await fireBaseService.createNewBoulder(
                                 setter: setterTeam == true
                                     ? dtuSetterName
                                     : (guestSetterTeam == true
@@ -292,7 +290,7 @@ Future<void> showAddNewBoulder(
                               // Check if newBoulder is not already in currentComp.bouldersComp
                               if (!currentComp.bouldersComp!
                                   .containsKey(newBoulder.boulderID)) {
-                                compService.updatComp(
+                                fireBaseService.updatComp(
                                     compID: currentComp.compID,
                                     bouldersComp: updateBoulderCompSet(
                                         currentComp: currentComp,
@@ -306,7 +304,7 @@ Future<void> showAddNewBoulder(
                           if (newBoulder != null) {
                             if (!setterTeam && !guestSetterTeam) {
                               try {
-                                var setterProfiles = await userService
+                                var setterProfiles = await fireBaseService
                                     .getUserFromDisplayName(selectedSetter)
                                     .first;
                                 CloudProfile setterProfile =
@@ -314,7 +312,7 @@ Future<void> showAddNewBoulder(
 
                                 double setterPoints = calculateSetterPoints(
                                     setterProfile, newBoulder);
-                                await userService.updateUser(
+                                await fireBaseService.updateUser(
                                   currentProfile: setterProfile,
                                   setBoulders: updateBoulderSet(
                                     currentProfile: setterProfile,

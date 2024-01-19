@@ -654,6 +654,17 @@ class FirebaseCloudStorage {
     }
   }
 
+   Stream<Iterable<CloudChallenge>> getAllChallenges() {
+    final allChallenges = challengeCollection
+        
+        .snapshots()
+        .map(
+            (event) => event.docs.map((doc) => CloudChallenge.fromSnapshot(doc)));
+    return allChallenges;
+  }
+
+
+
   Future<void> deleteChallenge({required String challengeID}) async {
     try {
       await challengeCollection.doc(challengeID).delete();

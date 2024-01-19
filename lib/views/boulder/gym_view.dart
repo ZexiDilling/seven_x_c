@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/constants/colours_thems.dart';
+import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/constants/routes.dart';
 import 'package:seven_x_c/enums/menu_action.dart';
 import 'package:seven_x_c/helpters/painter.dart';
@@ -19,6 +20,7 @@ import 'package:seven_x_c/utilities/dialogs/auth/logout_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/comp/comp_rank_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/comp/comp_signup_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/stripping_boulder.dart';
+import 'package:seven_x_c/utilities/dialogs/info/grading_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/slides/comp_slide.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/add_new_boulder.dart';
@@ -52,10 +54,7 @@ class _GymViewState extends State<GymView> {
   bool compView = false;
   CloudComp? currentComp;
 
-  late final FirebaseCloudStorage _boulderService;
-  late final FirebaseCloudStorage _userService;
-  late final FirebaseCloudStorage _compService;
-  late final FirebaseCloudStorage _challengeService;
+  late final FirebaseCloudStorage _fireBaseService;
 
   late Stream<Iterable<CloudBoulder>> filteredBouldersStream;
 
@@ -78,7 +77,7 @@ class _GymViewState extends State<GymView> {
   }
 
   Stream<Iterable<CloudBoulder>> getFilteredBouldersStream() {
-    return _boulderService.getAllBoulders().map((boulders) {
+    return _fireBaseService.getAllBoulders().map((boulders) {
       if (showAllBouldersFilter) {return boulders;} else {
 
       if (selectedColors.isNotEmpty) {
@@ -130,10 +129,7 @@ class _GymViewState extends State<GymView> {
 
   @override
   void initState() {
-    _boulderService = FirebaseCloudStorage();
-    _userService = FirebaseCloudStorage();
-    _compService = FirebaseCloudStorage();
-    _challengeService = FirebaseCloudStorage();
+    _fireBaseService = FirebaseCloudStorage();
 
     _initializeCurrentProfile();
     super.initState();
@@ -142,7 +138,7 @@ class _GymViewState extends State<GymView> {
 
   Future<void> _initializeCurrentProfile() async {
     await for (final profiles
-        in _userService.getUser(userID: userId.toString())) {
+        in _fireBaseService.getUser(userID: userId.toString())) {
       if (profiles.isNotEmpty) {
         final CloudProfile profile = profiles.first;
         if (profile.displayName == "") {
@@ -197,15 +193,15 @@ class _GymViewState extends State<GymView> {
               ? IconButton(
                   onPressed: () {
                     showCompRankings(context,
-                        compService: _compService,
+                        compService: _fireBaseService,
                         currentComp: currentComp!,
                         currentProfile: currentProfile, setCompView: setCompView);
                   },
-                  icon: const Icon(Icons.emoji_events))
+                  icon: const Icon(IconManager.thropy))
               : const SizedBox(),
           if (currentProfile!.isAdmin || currentProfile!.isSetter)
             IconButton(
-              icon: Icon(editing ? Icons.edit : Icons.done),
+              icon: Icon(editing ? IconManager.edditing : IconManager.doneEdditing),
               onPressed: () {
                 setState(() {
                   editing = !editing;
@@ -227,7 +223,7 @@ class _GymViewState extends State<GymView> {
                   key: _gymKey,
                   onTapUp: (details) {
                     _tapping(context, details, allBoulders, currentProfile,
-                        _userService);
+                        _fireBaseService);
                   },
                   child: InteractiveViewer(
                     transformationController: _controller,
@@ -265,7 +261,7 @@ class _GymViewState extends State<GymView> {
       ),
       drawer: compView
           ? currentProfile!.isAdmin
-              ? compDrawer(context, setState, currentComp!, _compService, _userService)
+              ? compDrawer(context, setState, currentComp!, _fireBaseService)
               : null
           : filterDrawer(context, setState, currentProfile!),
     );
@@ -294,7 +290,7 @@ class _GymViewState extends State<GymView> {
             try {
               setState(() {
                 stripping(context, setState, filteredBouldersStream,
-                    _boulderService, wallRegionMap);
+                    _fireBaseService, wallRegionMap);
               });
             } catch (error) {
               showErrorDialog(context, error.toString());
@@ -312,11 +308,13 @@ class _GymViewState extends State<GymView> {
             showComp(
               context,
               currentProfile: currentProfile,
-              compService: _compService,
+              fireBaseService: _fireBaseService,
               compView: compView,
               setCompView: setCompView,
               setComp: setCurrentComp,
             );
+          case MenuAction.info:
+            showGradeInfo(context);
         }
       },
       itemBuilder: (context) {
@@ -348,6 +346,10 @@ class _GymViewState extends State<GymView> {
             child: Text("Comp"),
           ),
           const PopupMenuItem(
+            value: MenuAction.info,
+            child: Text("Info"),
+          ),
+          const PopupMenuItem(
             value: MenuAction.logout,
             child: Text("Log out"),
           ),
@@ -357,7 +359,7 @@ class _GymViewState extends State<GymView> {
   }
 
   Future<void> _tapping(BuildContext context, TapUpDetails details,
-      Iterable<CloudBoulder> allBoulders, currentProfile, userService) async {
+      Iterable<CloudBoulder> allBoulders, currentProfile, fireBaseService) async {
     // Only add circles when zoomed in
     final gradingSystem =
         (currentProfile.gradingSystem).toString().toLowerCase();
@@ -377,7 +379,7 @@ class _GymViewState extends State<GymView> {
           invertedMatrix.transform(tapVector);
       const double minDistance =
           minBoulderDistance; // Set a minimum distance to avoid overlap
-      final setters = await userService.getSetters();
+      final setters = await fireBaseService.getSetters();
       if (editing) {
         // Check for existing circles and avoid overlap
         double tempCenterX = transformedPosition.x;
@@ -420,9 +422,7 @@ class _GymViewState extends State<GymView> {
               tempCenterY,
               wall!,
               gradingSystem,
-              _boulderService,
-              _userService,
-              _compService,
+              _fireBaseService,
               setters,
             );
           });
@@ -436,7 +436,7 @@ class _GymViewState extends State<GymView> {
           double distance = (boulders.cordX - transformedPosition.x).abs() +
               (boulders.cordY - transformedPosition.y).abs();
           if (distance < minDistance) {
-            List<String> challengesOverview = await _boulderService
+            List<String> challengesOverview = await _fireBaseService
                 .grabBoulderChallenges(boulderID: boulders.boulderID);
                 challengesOverview.add("create");
             // Tapped inside the circle, perform the desired action
@@ -448,10 +448,7 @@ class _GymViewState extends State<GymView> {
                   currentProfile,
                   currentComp,
                   compView,
-                  _boulderService,
-                  _userService,
-                  _compService,
-                  _challengeService,
+                  _fireBaseService,
                   setters,
                   challengesOverview);
             });

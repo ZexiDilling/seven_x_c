@@ -13,8 +13,7 @@ import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 Future<void> createChallengeDialog(
     BuildContext context,
     setState,
-    FirebaseCloudStorage challengeService,
-    FirebaseCloudStorage boulderService,
+    FirebaseCloudStorage fireBaseService,
     CloudBoulder boulder,
     CloudProfile currentProfile) async {
   TextEditingController challengeNameController = TextEditingController();
@@ -97,6 +96,8 @@ Future<void> createChallengeDialog(
                     decoration: const InputDecoration(
                       labelText: "Description",
                     ),
+                    maxLines: 5, 
+                    keyboardType: TextInputType.multiline,
                   ),
                 ),
               ],
@@ -121,7 +122,7 @@ Future<void> createChallengeDialog(
                       challengePoint = defaultChallengePoints;
                     }
                     CloudChallenge currentChallenge =
-                        await challengeService.createNewChallenge(
+                        await fireBaseService.createNewChallenge(
                       challengeName: challengeNameController.text,
                       challengeCreator: currentProfile.userID,
                       challengeType: selectedChallengeType,
@@ -132,10 +133,11 @@ Future<void> createChallengeDialog(
                       challengeCounterRunning: 0,
                       challengeDifficulty: challengeDifficulty,
                     );
-                    boulderService.updatBoulder(
+                    fireBaseService.updatBoulder(
                         boulderID: boulder.boulderID,
                         boulderChallenges: updateBoulderChallengeMap(
-                            currentChallenge: currentChallenge, completed: false));
+                            currentChallenge: currentChallenge,
+                            completed: false));
 
                     Navigator.of(context).pop();
                     Navigator.of(context).pop();

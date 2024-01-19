@@ -1,5 +1,3 @@
-import 'dart:math' show Random;
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/comp_const.dart';
@@ -16,8 +14,7 @@ Drawer compDrawer(
   BuildContext context,
   setState,
   CloudComp currentComp,
-  FirebaseCloudStorage compService,
-  FirebaseCloudStorage userService,
+  FirebaseCloudStorage fireBaseService,
 ) {
   String selectedRule = currentComp.compRules;
   String selectedStyle = currentComp.compStyle;
@@ -167,7 +164,7 @@ Drawer compDrawer(
                 onPressed: () {
                   currentComp.activeComp
                       ? null
-                      : compService.updatComp(
+                      : fireBaseService.updatComp(
                           compID: currentComp.compID,
                           signUpActiveComp: signUp,
                           maxParticipants: maxPP);
@@ -196,7 +193,7 @@ Drawer compDrawer(
                   onPressed: () {
                     currentComp.activeComp
                         ? null
-                        : compService.updatComp(
+                        : fireBaseService.updatComp(
                             compID: currentComp.compID, startedComp: true);
                   },
                   child: const Text('Start Comp'),
@@ -204,7 +201,7 @@ Drawer compDrawer(
                 ElevatedButton(
                   onPressed: () {
                     Map<String, dynamic> rankings = compRanking(currentComp);
-                    compService.updatComp(
+                    fireBaseService.updatComp(
                         compID: currentComp.compID,
                         startedComp: false,
                         signUpActiveComp: false,
@@ -213,7 +210,7 @@ Drawer compDrawer(
                         compResults: rankings);
                     updateClimbers(
                         currentComp: currentComp,
-                        userService: userService,
+                        fireBaseService: fireBaseService,
                         compRanking: rankings);
                   },
                   child: const Text('End Comp'),
@@ -229,14 +226,14 @@ Drawer compDrawer(
 
 void updateClimbers({
   required CloudComp currentComp,
-  required FirebaseCloudStorage userService,
+  required FirebaseCloudStorage fireBaseService,
   required Map<String, dynamic> compRanking,
 }) {
   currentComp.climbersComp!.forEach((userId, climbInfo) async {
     CloudProfile currentProfile =
-        (await userService.getUser(userID: userId).first).first;
+        (await fireBaseService.getUser(userID: userId).first).first;
 
-    userService.updateUser(
+    fireBaseService.updateUser(
       currentProfile: currentProfile,
       compProfile: updateCompProfile(
         currentComp: currentComp,

@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/constants/routes.dart';
 import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
@@ -130,7 +131,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                     onPressed: () {
                       _showAnonymousInfo(context);
                     },
-                    icon: const Icon(Icons.help_outline),
+                    icon: const Icon(IconManager.info),
                   ),
                 ],
               ),
@@ -157,7 +158,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                     onPressed: () {
                       _showGradingSystemInfo(context);
                     },
-                    icon: const Icon(Icons.help_outline),
+                    icon: const Icon(IconManager.info),
                   ),
                 ],
               ),

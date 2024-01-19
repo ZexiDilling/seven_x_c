@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/comp_const.dart';
+import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/generics/info_popup.dart';
@@ -65,7 +66,7 @@ class _CompCreationViewState extends State<CompCreationView> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.help),
+                    icon: const Icon(IconManager.info),
                     onPressed: () {
                       showInformationPopup(context, "Set to 0, for unlimited");
                     },
@@ -163,7 +164,7 @@ class _CompCreationViewState extends State<CompCreationView> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.help),
+                    icon: const Icon(IconManager.info),
                     onPressed: () {
                       showInformationPopup(
                           context, "X-amount of boulder for X-amount of time");
@@ -190,7 +191,7 @@ class _CompCreationViewState extends State<CompCreationView> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.help),
+                    icon: const Icon(IconManager.info),
                     onPressed: () {
                       showInformationPopup(context,
                           "1000 points per boulder, split amount ppl that tops");
@@ -251,7 +252,7 @@ Widget buildDatePickerRow({
           decoration: InputDecoration(
             hintText: hintText,
             labelText: hintText,
-            suffixIcon: const Icon(Icons.calendar_today),
+            suffixIcon: const Icon(IconManager.calender),
           ),
         ),
       ),

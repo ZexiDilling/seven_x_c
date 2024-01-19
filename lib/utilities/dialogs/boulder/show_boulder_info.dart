@@ -4,7 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/constants/challenge_const.dart';
-import 'package:seven_x_c/helpters/challenges/challenge_create.dart';
+import 'package:seven_x_c/constants/other_const.dart';
+import 'package:seven_x_c/utilities/dialogs/challenge/challenge_create.dart';
 import 'package:seven_x_c/helpters/comp/comp_calculations.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
@@ -15,6 +16,7 @@ import 'package:seven_x_c/utilities/charts/barcharts.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
+import 'package:seven_x_c/utilities/dialogs/challenge/add_exisiting.dart';
 import 'package:seven_x_c/utilities/dialogs/generics/info_popup.dart';
 import 'package:seven_x_c/utilities/dialogs/generics/yes_no.dart';
 import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
@@ -26,10 +28,7 @@ Future<void> showBoulderInformation(
     CloudProfile currentProfile,
     CloudComp? currentComp,
     bool compView,
-    FirebaseCloudStorage boulderService,
-    FirebaseCloudStorage userService,
-    FirebaseCloudStorage compService,
-    FirebaseCloudStorage challengeService,
+    FirebaseCloudStorage fireBaseService,
     Stream<Iterable<CloudProfile>> settersStream,
     List<String> challengesOverview) async {
   int attempts = 0;
@@ -69,7 +68,7 @@ Future<void> showBoulderInformation(
       (userId, climbInfo) async {
         if (climbInfo['topped'] == true) {
           final profiles =
-              await userService.getUser(userID: userId.toString()).first;
+              await fireBaseService.getUser(userID: userId.toString()).first;
           final tempProfile = profiles.isNotEmpty ? profiles.first : null;
           if (tempProfile!.isAnonymous) {
             // Add climber information to the toppersList map
@@ -166,7 +165,7 @@ Future<void> showBoulderInformation(
                                   )),
                               subtitle: Text(boulder.boulderName ?? ""),
                               trailing: topOut
-                                  ? const Icon(Icons.arrow_upward,
+                                  ? const Icon(IconManager.topOut,
                                       size: 25.0, color: Colors.green)
                                   : const Text(""),
                             ),
@@ -187,7 +186,7 @@ Future<void> showBoulderInformation(
                                       currentProfile.isSetter,
                                   child: IconButton(
                                     icon:
-                                        Icon(editing ? Icons.edit : Icons.done),
+                                        Icon(editing ? IconManager.edditing : IconManager.doneEdditing),
                                     onPressed: () {
                                       labelText = editing
                                           ? "Vote a Grade"
@@ -224,7 +223,7 @@ Future<void> showBoulderInformation(
                                           if (compView) {
                                             if (currentComp!.activeComp) {
                                               updateCompCalculations(
-                                                  compService,
+                                                  fireBaseService,
                                                   currentComp,
                                                   boulder,
                                                   currentProfile,
@@ -236,7 +235,7 @@ Future<void> showBoulderInformation(
                                             }
                                           }
                                           if (topped) {
-                                            boulderService.updatBoulder(
+                                            fireBaseService.updatBoulder(
                                                 boulderID: boulder.boulderID,
                                                 climberTopped:
                                                     updateClimberToppedMap(
@@ -249,7 +248,7 @@ Future<void> showBoulderInformation(
                                                         existingData: boulder
                                                             .climberTopped));
                                             updateUserTopped(
-                                                userService,
+                                                fireBaseService,
                                                 currentProfile,
                                                 boulder,
                                                 flashed,
@@ -258,7 +257,7 @@ Future<void> showBoulderInformation(
                                                 repeats);
                                           } else {
                                             flashed = false;
-                                            boulderService.updatBoulder(
+                                            fireBaseService.updatBoulder(
                                                 boulderID: boulder.boulderID,
                                                 climberTopped:
                                                     updateClimberToppedMap(
@@ -270,7 +269,7 @@ Future<void> showBoulderInformation(
                                                         repeats: 0,
                                                         existingData: boulder
                                                             .climberTopped));
-                                            updateUserUndoTop(userService,
+                                            updateUserUndoTop(fireBaseService,
                                                 currentProfile, boulder);
                                           }
                                         });
@@ -288,7 +287,7 @@ Future<void> showBoulderInformation(
                                           if (compView) {
                                             if (currentComp!.activeComp) {
                                               updateCompCalculations(
-                                                  compService,
+                                                  fireBaseService,
                                                   currentComp,
                                                   boulder,
                                                   currentProfile,
@@ -300,7 +299,7 @@ Future<void> showBoulderInformation(
                                             }
                                           }
                                           if (flashed) {
-                                            boulderService.updatBoulder(
+                                            fireBaseService.updatBoulder(
                                                 boulderID: boulder.boulderID,
                                                 climberTopped:
                                                     updateClimberToppedMap(
@@ -313,7 +312,7 @@ Future<void> showBoulderInformation(
                                                         existingData: boulder
                                                             .climberTopped));
                                             updateUserTopped(
-                                                userService,
+                                                fireBaseService,
                                                 currentProfile,
                                                 boulder,
                                                 flashed,
@@ -321,7 +320,7 @@ Future<void> showBoulderInformation(
                                                 attempts,
                                                 repeats);
                                           } else {
-                                            boulderService.updatBoulder(
+                                            fireBaseService.updatBoulder(
                                                 boulderID: boulder.boulderID,
                                                 climberTopped:
                                                     updateClimberToppedMap(
@@ -334,7 +333,7 @@ Future<void> showBoulderInformation(
                                                         existingData: boulder
                                                             .climberTopped));
                                             updateUserRemovedFlashed(
-                                                userService,
+                                                fireBaseService,
                                                 currentProfile,
                                                 boulder,
                                                 flashed,
@@ -356,7 +355,7 @@ Future<void> showBoulderInformation(
                                               const Text('Repeats:'),
                                               IconButton(
                                                 icon: const Icon(
-                                                    Icons.arrow_downward),
+                                                    IconManager.decreaseNumber),
                                                 onPressed: () {
                                                   setState(() {
                                                     repeats = (repeats - 1)
@@ -364,7 +363,7 @@ Future<void> showBoulderInformation(
                                                             0, double.infinity)
                                                         .toInt();
                                                     updateUserReapet(
-                                                        userService,
+                                                        fireBaseService,
                                                         currentProfile,
                                                         boulder,
                                                         repeats);
@@ -374,12 +373,12 @@ Future<void> showBoulderInformation(
                                               Text('$repeats'),
                                               IconButton(
                                                 icon: const Icon(
-                                                    Icons.arrow_upward),
+                                                    IconManager.increaseNumber),
                                                 onPressed: () {
                                                   setState(() {
                                                     repeats++;
                                                     updateUserReapet(
-                                                        userService,
+                                                        fireBaseService,
                                                         currentProfile,
                                                         boulder,
                                                         repeats);
@@ -396,7 +395,7 @@ Future<void> showBoulderInformation(
                                               const Text('Attempts:'),
                                               IconButton(
                                                 icon: const Icon(
-                                                    Icons.arrow_downward),
+                                                    IconManager.decreaseNumber),
                                                 onPressed: () {
                                                   setState(() {
                                                     attempts = (attempts - 1)
@@ -409,7 +408,7 @@ Future<void> showBoulderInformation(
                                               Text('$attempts'),
                                               IconButton(
                                                 icon: const Icon(
-                                                    Icons.arrow_upward),
+                                                    IconManager.increaseNumber),
                                                 onPressed: () {
                                                   setState(() {
                                                     attempts++;
@@ -451,7 +450,7 @@ Future<void> showBoulderInformation(
                                                   ),
                                                   TextButton(
                                                     onPressed: () {
-                                                      boulderService
+                                                      fireBaseService
                                                           .deleteBoulder(
                                                               boulderID: boulder
                                                                   .boulderID);
@@ -471,7 +470,7 @@ Future<void> showBoulderInformation(
                                       ),
                                       ElevatedButton(
                                           onPressed: () {
-                                            boulderService.updatBoulder(
+                                            fireBaseService.updatBoulder(
                                                 boulderID: boulder.boulderID,
                                                 active: !active);
                                             active = !active;
@@ -522,7 +521,7 @@ Future<void> showBoulderInformation(
                                               }
                                               if (check) {
                                                 if (currentComp != null) {
-                                                  compService.updatComp(
+                                                  fireBaseService.updatComp(
                                                       compID:
                                                           currentComp.compID,
                                                       bouldersComp:
@@ -534,7 +533,7 @@ Future<void> showBoulderInformation(
                                                             currentComp
                                                                 .bouldersComp,
                                                       ));
-                                                  boulderService.updatBoulder(
+                                                  fireBaseService.updatBoulder(
                                                     boulderID:
                                                         boulder.boulderID,
                                                     compBoulder: compBoulder,
@@ -617,7 +616,7 @@ Future<void> showBoulderInformation(
                                                   gradeColorMap[gradeColour];
 
                                               updateUsersVotedForGrade(
-                                                  boulderService,
+                                                  fireBaseService,
                                                   boulder,
                                                   currentProfile,
                                                   gradingSystem,
@@ -648,7 +647,7 @@ Future<void> showBoulderInformation(
                                           setState(() {
                                             difficultyLevel = value.toInt();
                                             updateUsersVotedForGrade(
-                                                boulderService,
+                                                fireBaseService,
                                                 boulder,
                                                 currentProfile,
                                                 gradingSystem,
@@ -686,7 +685,7 @@ Future<void> showBoulderInformation(
                                               gradeColors = allGradeColorChoice
                                                   .join(', ');
                                               updateUsersVotedForGrade(
-                                                  boulderService,
+                                                  fireBaseService,
                                                   boulder,
                                                   currentProfile,
                                                   gradingSystem,
@@ -720,7 +719,7 @@ Future<void> showBoulderInformation(
                                                     setState(() {
                                                       gradeColorChoice = value;
                                                       updateUsersVotedForGrade(
-                                                          boulderService,
+                                                          fireBaseService,
                                                           boulder,
                                                           currentProfile,
                                                           gradingSystem,
@@ -777,7 +776,8 @@ Future<void> showBoulderInformation(
                                                       ? Text(boulder
                                                               .boulderChallenges![
                                                           challenge]["name"])
-                                                      : Text(challenge),
+                                                      : const Text(
+                                                          "Add Challenge"),
                                                   tileColor: challengeCompleted
                                                       ? Colors.green
                                                       : Colors.amber);
@@ -808,12 +808,12 @@ Future<void> showBoulderInformation(
                                                                             .clamp(0,
                                                                                 double.infinity)
                                                                             .toInt();
-                                                                        userService.updateUser(
+                                                                        fireBaseService.updateUser(
                                                                             currentProfile:
                                                                                 currentProfile,
                                                                             challengePoints:
                                                                                 updatePoints(points: -challengeMap["points"], existingData: currentProfile.challengePoints));
-                                                                        challengeService.updateChallenge(
+                                                                        fireBaseService.updateChallenge(
                                                                             challengeID:
                                                                                 challenge,
                                                                             challengeCounter:
@@ -835,10 +835,10 @@ Future<void> showBoulderInformation(
                                                                             maxChallangeCounter) {
                                                                           challengeMap[
                                                                               "runningCount"]++;
-                                                                          challengeService.updateChallenge(
+                                                                          fireBaseService.updateChallenge(
                                                                               challengeID: challenge,
                                                                               challengeCounter: challengeMap["runningCount"]);
-                                                                          userService.updateUser(
+                                                                          fireBaseService.updateUser(
                                                                               currentProfile: currentProfile,
                                                                               challengePoints: updatePoints(
                                                                                 points: challengeMap["points"],
@@ -861,11 +861,11 @@ Future<void> showBoulderInformation(
                                                                     () async {
                                                                   CloudChallenge?
                                                                       currentChallenge =
-                                                                      await challengeService
+                                                                      await fireBaseService
                                                                           .getchallenge(
                                                                               challengeMap["name"]);
                                                                   if (challengeCompleted) {
-                                                                    boulderService.updatBoulder(
+                                                                    fireBaseService.updatBoulder(
                                                                         boulderID:
                                                                             boulder
                                                                                 .boulderID,
@@ -879,7 +879,7 @@ Future<void> showBoulderInformation(
                                                                             currentProfile:
                                                                                 currentProfile));
 
-                                                                    userService.updateUser(
+                                                                    fireBaseService.updateUser(
                                                                         currentProfile:
                                                                             currentProfile,
                                                                         challengePoints: updatePoints(
@@ -887,7 +887,7 @@ Future<void> showBoulderInformation(
                                                                                 -challengeMap["points"],
                                                                             existingData: currentProfile.challengePoints));
                                                                   } else {
-                                                                    boulderService.updatBoulder(
+                                                                    fireBaseService.updatBoulder(
                                                                         boulderID:
                                                                             boulder
                                                                                 .boulderID,
@@ -898,7 +898,7 @@ Future<void> showBoulderInformation(
                                                                                 true,
                                                                             currentProfile:
                                                                                 currentProfile));
-                                                                    userService.updateUser(
+                                                                    fireBaseService.updateUser(
                                                                         currentProfile:
                                                                             currentProfile,
                                                                         challengePoints: updatePoints(
@@ -926,18 +926,41 @@ Future<void> showBoulderInformation(
                                                           ],
                                                         ),
                                                       ])
-                                                    : ElevatedButton(
-                                                        onPressed: () {
-                                                          createChallengeDialog(
-                                                              context,
-                                                              setState,
-                                                              challengeService,
-                                                              boulderService,
-                                                              boulder,
-                                                              currentProfile);
-                                                        },
-                                                        child: const Text(
-                                                            "Create your own"))
+                                                    : Row(
+                                                        children: [
+                                                          ElevatedButton(
+                                                              onPressed:
+                                                                  () {
+                                                                Stream<
+                                                                        Iterable<
+                                                                            CloudChallenge>>
+                                                                    challengeStream =
+                                                                    fireBaseService
+                                                                        .getAllChallenges();
+                                                                showAddExisitingChallenge(context,
+                                                                    challengeStream,
+                                                                    fireBaseService:
+                                                                        fireBaseService,
+                                                                    boulder:
+                                                                        boulder,
+                                                                    currentProfile:
+                                                                        currentProfile);
+                                                              },
+                                                              child: const Text(
+                                                                  "Add exisit")),
+                                                          ElevatedButton(
+                                                              onPressed: () {
+                                                                createChallengeDialog(
+                                                                    context,
+                                                                    setState,
+                                                                    fireBaseService,
+                                                                    boulder,
+                                                                    currentProfile);
+                                                              },
+                                                              child: const Text(
+                                                                  "Create")),
+                                                        ],
+                                                      )
                                               ],
                                             ),
                                             isExpanded: isExpanded,
@@ -982,7 +1005,7 @@ Future<void> showBoulderInformation(
                                 } else {
                                   gradeValue = null;
                                 }
-                                boulderService.updatBoulder(
+                                fireBaseService.updatBoulder(
                                   boulderID: boulder.boulderID,
                                   updateDateBoulder: Timestamp.now(),
                                   topOut: topOut,
@@ -1051,7 +1074,7 @@ void updateUserReapet(FirebaseCloudStorage userService,
   }
 
   double newRepeatPoints = orgRepeatPoints + repeatPoints;
-
+  print("Do we get here ? ");
   userService.updateUser(
       boulderPoints: updatePoints(
           points: repeatPoints, existingData: currentProfile.boulderPoints),
@@ -1122,8 +1145,8 @@ double calculateboulderPoints(CloudProfile currentProfile, CloudBoulder boulder,
         maxToppedGrade,
         flashed,
       );
-
   // Check if the user have points from this boulder
+  if (currentProfile.climbedBoulders !=null) {
   if (currentProfile.climbedBoulders!.containsKey((boulder.boulderID))) {
     if (currentProfile.climbedBoulders![boulder.boulderID]["topped"]) {
       boulderPoints = boulderPoints *
@@ -1131,8 +1154,7 @@ double calculateboulderPoints(CloudProfile currentProfile, CloudBoulder boulder,
               ? repeatsMultiplier - (repeats - 1) * repeatsDecrement
               : 0);
     }
-  }
-
+  }}
   return boulderPoints;
 }
 
@@ -1154,6 +1176,9 @@ void updateUserRemovedFlashed(
   } else {
     maxFlahsedGrade = currentProfile.maxFlahsedGrade;
   }
+  print(boulder.boulderID);
+  print(currentProfile.climbedBoulders![boulder.boulderID]);
+  print(currentProfile.climbedBoulders![boulder.boulderID]["boulderPoints"]);
   pointsForFlash =
       -currentProfile.climbedBoulders![boulder.boulderID]["boulderPoints"];
 
@@ -1199,9 +1224,9 @@ void updateUserUndoTop(
   if (currentProfile.climbedBoulders![boulder.boulderID] != null) {
     orgBoulderPoints = -(currentProfile.climbedBoulders![boulder.boulderID]
                 ["boulderPoints"] ??
-            0) -
+            0.0) -
         (currentProfile.climbedBoulders![boulder.boulderID]["repeatPoints"] ??
-            0);
+            0.0);
   } else {
     orgBoulderPoints = defaultBoulderPoints;
   }
@@ -1253,6 +1278,8 @@ void updateUserTopped(
       ? currentProfile.climbedBoulders![boulder.boulderID]!['boulderPoints']
       : boulderPoints;
 
+print(boulderPoints);
+print("er are here ");
   userService.updateUser(
       boulderPoints: updatePoints(
           points: boulderPoints, existingData: currentProfile.boulderPoints),

@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/constants/routes.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
@@ -12,7 +13,7 @@ import 'package:seven_x_c/utilities/dialogs/comp/gender_getter.dart';
 void showComp(
   BuildContext context, {
   required CloudProfile? currentProfile,
-  required FirebaseCloudStorage? compService,
+  required FirebaseCloudStorage? fireBaseService,
   required bool compView,
   required Function(bool) setCompView,
   required Function(CloudComp) setComp,
@@ -21,7 +22,7 @@ void showComp(
     context: context,
     builder: (BuildContext context) {
       return StreamBuilder<Object>(
-        stream: compService!.getActiveComps(),
+        stream: fireBaseService!.getActiveComps(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             var compData = snapshot.data as Iterable<CloudComp>;
@@ -63,7 +64,7 @@ void showComp(
                                       (currentComp.maxParticipants as int)) {
                                     String gender =
                                         await showGetGender(context);
-                                    compService.updatComp(
+                                    fireBaseService.updatComp(
                                         compID: currentComp.compID,
                                         climbersComp: updateCompClimbers(
                                           currentComp: currentComp,
@@ -95,7 +96,7 @@ void showComp(
                                   ),
                                   if (currentProfile!.isAdmin)
                                     IconButton(
-                                      icon: const Icon(Icons.edit),
+                                      icon: const Icon(IconManager.edditing),
                                       onPressed: () {
                                         setCompView(!compView);
                                         setComp(currentComp);

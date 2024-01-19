@@ -1,6 +1,7 @@
 import 'dart:math' show Random;
 
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/constants/other_const.dart';
 
 
 void showRadomGetter(
@@ -23,7 +24,7 @@ void showRadomGetter(
               decoration: InputDecoration(
                 labelText: "Random Climber",
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.refresh),
+                  icon: const Icon(IconManager.getRandom),
                   onPressed: () {
                     if (climbers.isNotEmpty) {
                       Random random = Random();

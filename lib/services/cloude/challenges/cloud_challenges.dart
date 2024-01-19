@@ -10,7 +10,7 @@ class CloudChallenge {
   final double challengeOwnPoints;
   final List challengeBoulders;
   final bool challengeCounter;
-  final int challengeCounterRunning;
+  int? challengeCounterRunning;
   final int challengeDifficulty;
 
   CloudChallenge(
@@ -20,7 +20,9 @@ class CloudChallenge {
       this.challengeDescription,
       this.challengeOwnPoints,
       this.challengeBoulders,
-      this.challengeCounter, this.challengeCounterRunning, this.challengeDifficulty,
+      this.challengeCounter,
+      this.challengeCounterRunning,
+      this.challengeDifficulty,
       {required this.challengeID});
 
   CloudChallenge.fromSnapshot(
@@ -33,9 +35,10 @@ class CloudChallenge {
             snapshot.data()[challengeDescriptionFieldName] as String,
         challengeOwnPoints =
             snapshot.data()[challengeOwnPointsFieldName] as double,
-        challengeBoulders =
-            snapshot.data()[challengeBouldersFieldName] as List,
+        challengeBoulders = snapshot.data()[challengeBouldersFieldName] as List,
         challengeCounter = snapshot.data()[challengeCounterFieldName] as bool,
-        challengeCounterRunning = snapshot.data()[challengeCounterRunningFieldName] as int,
-        challengeDifficulty = snapshot.data()[challengeDifficultyFieldName] as int;
+        challengeCounterRunning =
+            snapshot.data()[challengeCounterRunningFieldName] as int?,
+        challengeDifficulty =
+            snapshot.data()[challengeDifficultyFieldName] as int;
 }

@@ -65,7 +65,7 @@ Map<String, dynamic> updateClimbedBouldersMap(
     "repeats": repeats,
     "topped": topped,
     'flashed': flashed,
-    "points": boulderPoints,
+    "boulderPoints": boulderPoints,
     "repeatPoints": repeatPoints,
     "date": DateTime.now()
   };
@@ -339,3 +339,11 @@ List updateListOfRandomWinners(
       randomWinners.add(userDisplayName);
       return randomWinners;
     }
+
+
+List updateChallengeBoulderList({required CloudBoulder boulder, List? existingData}) {
+  List randomWinners = existingData ?? [];
+      randomWinners.add(boulder.boulderID);
+      return randomWinners;
+    }
+

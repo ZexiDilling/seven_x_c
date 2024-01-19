@@ -54,30 +54,6 @@ Clean up:
 	Done - Remove notes 
 	Done - remove unused code
 
-
-------------------------------------------------------------------------------------------------------------------------
-
-Missing testing:
-Done - Update Max climbed Grade for user if higher than current max climbed grade
-Done - Update Max FLashed Grade for user if higher than current max flashed grade
-Done - Boulder Points!!! 
-			Get points depending on your max grade for topping/flashing and challenges. 
-			Get points  for repeat climbs. Less per repeat. 
-			substract boulderpoints if user have no longer topped a boulder
-Done - incase of removing mark:
-			Update Max climbed Grade back to previus if removed boulder was Max climbed Grade
-			Update Max FLashed Grade back to previus if removed boulder was Max flashed Grade
-
-Done - Make a DTU setter team setter
-Done - Make A guest Setter 
-
-Done - ranking view Boulder Points
-Done - ranking view Boulder Amount
-Done - ranking view Setter Points
-Done - ranking view Setter Amount
-Done - Ranking view based on time
-Done - update Splash Screen
-
 Boulders:
 	Done - Show if a boulder is a top out. 
 	Done - show name of boulder if there is one 
@@ -86,7 +62,37 @@ Boulders:
 		Done - on flashed
 		Done - on repeats
 		Done - on grade
+	Done - Update Max climbed Grade for user if higher than current max climbed grade
+	Done - Update Max FLashed Grade for user if higher than current max flashed grade
+	Done - Boulder Points!!! 
+			Get points depending on your max grade for topping/flashing and challenges. 
+			Get points  for repeat climbs. Less per repeat. 
+			substract boulderpoints if user have no longer topped a boulder
+	Done - incase of removing mark:
+			Update Max climbed Grade back to previus if removed boulder was Max climbed Grade
+			Update Max FLashed Grade back to previus if removed boulder was Max flashed Grade
+
+
+	Done - Make a DTU setter team setter
+	Done - Make A guest Setter 
+
 	
+Extra info:
+	Done - Make a dynamic grading explainer. 
+
+
+cleanup:
+	Done - 	change all icons to use "IconMangener" for consistency and easyer to make changes 
+------------------------------------------------------------------------------------------------------------------------
+
+Missing testing:
+Done - ranking view Boulder Points
+Done - ranking view Boulder Amount
+Done - ranking view Setter Points
+Done - ranking view Setter Amount
+Done - Ranking view based on time
+Done - update Splash Screen
+
 
 Comp Module:
 	Set-up total boulder comp
@@ -117,8 +123,9 @@ Challenges:
 	add a challenge map to the user?
 		How do I want to track this on the user ? 
 
-Setter:
-	Done - Make it possible to set a non-setter as a setter
+Challenges:
+	Done - Make it possible to add old challenges to boulders. 
+
 	
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -126,11 +133,30 @@ Setter:
 ToDO:
 ------------------------------------------------------------------------------------------
 
-		
-Challenges:
-	make it possible to add old challenges to boulders. 
+Settings:
+	update settings to work ?? 
+	delete / hide options that are not needed
 
-Extra info:
+Clean up:
+	Make things pretty
+	clean up code
+
+
+Profile
+	fix graph
+		deal with different time intervals
+	
+
+Low priority/ not sure:
+------------------------------------------------------------------------------------------------------------------------
+
+Calender
+	Section cleaning
+	Setting
+	used for filter on "taking down soon" 
+
+
+Extra info: 	 - need to test to see if this is needed, or if the system make sense on its own. 
 	Explain stuff
 		What does the central colour mean
 		what does the colour around mean
@@ -148,25 +174,7 @@ Extra info:
 		Boulder
 		Setter
 
-Calender
-	Section cleaning
-	Setting
-	used for filter on "taking down soon" 
 
-Settings:
-	update settings to work ?? 
-	delete / hide options that are not needed
-
-Clean up:
-	Make things pretty
-	clean up code
-
-Profile
-	fix graph to deal with different time intervals
-	
-
-Low priority/ not sure:
-------------------------------------------------------------------------------------------------------------------------
 Filter:
 	filter on setter
 	Filter Boulders on sections / walls 

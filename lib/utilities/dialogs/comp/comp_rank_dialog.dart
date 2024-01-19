@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/helpters/comp/comp_calculations.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
@@ -37,7 +38,7 @@ void showCompRankings(
                             children: [
                               Expanded(
                                 child: IconButton(
-                                  icon: const Icon(Icons.list_alt),
+                                  icon: const Icon(IconManager.showRanking),
                                   onPressed: () {
                                     context
                                         .read<RankingBloc>()
@@ -47,7 +48,7 @@ void showCompRankings(
                               ),
                               Expanded(
                                 child: IconButton(
-                                  icon: const Icon(Icons.female),
+                                  icon: const Icon(IconManager.femaleRankings),
                                   onPressed: () {
                                     context
                                         .read<RankingBloc>()
@@ -57,7 +58,7 @@ void showCompRankings(
                               ),
                               Expanded(
                                 child: IconButton(
-                                  icon: const Icon(Icons.male),
+                                  icon: const Icon(IconManager.maleRankings),
                                   onPressed: () {
                                     context
                                         .read<RankingBloc>()
@@ -67,7 +68,7 @@ void showCompRankings(
                               ),
                               Expanded(
                                 child: IconButton(
-                                  icon: const Icon(Icons.rocket_launch),
+                                  icon: const Icon(IconManager.boulderRankings),
                                   onPressed: () {
                                     context
                                         .read<RankingBloc>()

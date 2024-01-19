@@ -9,13 +9,17 @@ double calculateDistance(double x1, double y1, double x2, double y2) {
 Map<Color, String> holdColorMap = {
   Colors.green: 'Green',
   Colors.blue: 'Blue',
+  Colors.blue.shade900: "Dark Blue",
   Colors.yellow: 'Yellow',
   Colors.orange: 'Orange',
   Colors.red: 'Red',
+  Colors.red.shade900: 'Dark Red',
   Colors.black: 'Black',
   Colors.white: 'White',
   Colors.purple: "Purple",
   Colors.grey: "Grey",
+  Colors.pink.shade200: "Pink",
+  Colors.tealAccent: "turquoise",
 };
 
 Map<Color, String> gradeColorMap = {
@@ -25,7 +29,7 @@ Map<Color, String> gradeColorMap = {
   Colors.purple: 'Purple',
   Colors.red: 'Red',
   Colors.black: 'Black',
-  Colors.grey: 'Grey',
+  Colors.grey: 'Silver',
 };
 
 Map<String, Map<String, int>> colorToGrade = {
@@ -35,7 +39,7 @@ Map<String, Map<String, int>> colorToGrade = {
   "purple": {"min": 7, "max": 8},
   "red": {"min": 9, "max": 12},
   "black": {"min": 12, "max": 19},
-  "white": {"min": 18, "max": 27},
+  "Silver": {"min": 18, "max": 27},
 };
 
 int difficultyLevelToArrow(int difficultyLevel, String gradeColorChoice) {
