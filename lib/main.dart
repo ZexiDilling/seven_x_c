@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:seven_x_c/constants/routes.dart';
 import 'package:seven_x_c/helpters/loading/loading_screen.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
@@ -17,7 +18,7 @@ import 'package:seven_x_c/views/comp/comp_setup_view.dart';
 import 'package:seven_x_c/views/profile/profile_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'
     show BlocConsumer, BlocProvider, ReadContext;
-import 'package:seven_x_c/views/admin/profile_view.dart';
+import 'package:seven_x_c/views/admin/profile_settings_view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,7 @@ void main() {
     MaterialApp(
       title: "DTU Climbing",
       theme: ThemeData(
+        textTheme: GoogleFonts.ibarraRealNovaTextTheme(),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),

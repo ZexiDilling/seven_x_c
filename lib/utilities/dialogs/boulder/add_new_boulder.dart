@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
+import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
@@ -8,7 +9,7 @@ import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/generics/yes_no.dart';
-import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
+
 
 Future<void> showAddNewBoulder(
   BuildContext context,

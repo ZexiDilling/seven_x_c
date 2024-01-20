@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
+import 'package:seven_x_c/constants/boulder_info.dart';
+
 
 void showGradeInfo(BuildContext context) {
   showDialog(

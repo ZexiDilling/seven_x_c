@@ -236,18 +236,61 @@ enum TimePeriod { week, month, semester, year, allTime }
 
 DateTime calculateDateThreshold(TimePeriod timePeriod) {
   DateTime currentTime = DateTime.now();
+
   switch (timePeriod) {
     case TimePeriod.week:
-      return currentTime.subtract(const Duration(days: 7));
+      // Find the last Monday of the current week
+      DateTime lastMonday = currentTime.subtract(Duration(days: currentTime.weekday - 1));
+      // Find the next Sunday
+      DateTime nextSunday = lastMonday.add(Duration(days: 6));
+      return lastMonday;
+
     case TimePeriod.month:
-      return currentTime.subtract(const Duration(days: 30));
+      // Return the first day of the current month
+      return DateTime(currentTime.year, currentTime.month, 1);
+
     case TimePeriod.semester:
-      // Adjust the duration as needed
-      return currentTime.subtract(const Duration(days: 180));
+      // Determine the semester start based on the current month
+      if (currentTime.month >= 1 && currentTime.month <= 6) {
+        // Semester starts in January
+        return DateTime(currentTime.year, 1, 1);
+      } else {
+        // Semester starts in August
+        return DateTime(currentTime.year, 8, 1);
+      }
+
     case TimePeriod.year:
-      return currentTime.subtract(const Duration(days: 365));
+      // Return the first day of the current month 12 months ago
+      return currentTime.subtract(Duration(days: 30 * 12)); // Assuming 30 days in a month
+
     default:
       return DateTime(0); // Or handle the default case accordingly
+  }
+}
+
+DateTime calculateEndDate(TimePeriod selectedTimePeriod, DateTime startDate) {
+  switch (selectedTimePeriod) {
+    case TimePeriod.week:
+      // Find the next Sunday from the start date
+      return startDate.add(Duration(days: (7 - startDate.weekday + 1) % 7));
+
+    case TimePeriod.month:
+      // Find the last day of the current month
+      return DateTime(startDate.year, startDate.month + 1, 1).subtract(Duration(days: 1));
+
+    case TimePeriod.semester:
+      // Determine the end of the semester based on the current month
+      if (startDate.month >= 1 && startDate.month <= 6) {
+        // Semester ends in July
+        return DateTime(startDate.year, 7, 31);
+      } else {
+        // Semester ends in December
+        return DateTime(startDate.year, 12, 31);
+      }
+
+    default:
+      // Default case (handle accordingly)
+      return DateTime.now();
   }
 }
 

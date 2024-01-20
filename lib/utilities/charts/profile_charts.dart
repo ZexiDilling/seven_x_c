@@ -1,40 +1,64 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/constants/boulder_info.dart';
+import 'package:seven_x_c/helpters/chart_function.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/views/profile/profile_view.dart';
 
-import 'package:intl/intl.dart';
+const double fontChartSize = 10;
+const double chartHeight = 150;
 
 class LineChartGraph extends StatelessWidget {
   const LineChartGraph(
       {super.key,
       required this.chartSelection,
       required this.graphData,
-      required this.selectedTimePeriod});
+      required this.selectedTimePeriod, required this.gradingSystem});
 
   final String chartSelection;
   final TimePeriod selectedTimePeriod;
   final PointsData graphData;
-  
+  final String gradingSystem;
 
   @override
   Widget build(BuildContext context) {
     Map<int, DateTime> numberToDateMap = {};
     
+      DateTime startDate = calculateDateThreshold(selectedTimePeriod);
+      DateTime endDate = calculateEndDate(selectedTimePeriod, startDate);
+      int dateCounter = 0;
+      for (DateTime date = startDate;
+          date.isBefore(endDate);
+          date = date.add(Duration(days: 1))) {
+        DateTime entryDateWithoutTime =
+            DateTime(date.year, date.month, date.day);
+
+        numberToDateMap[dateCounter] = entryDateWithoutTime;
+        dateCounter++;
+      }
     if (chartSelection == "maxGrade") {
-      graphData.boulderClimbedMaxClimbed.forEach((entryDate, colors) {
-        int entryNumber = graphData.boulderSetAmount[entryDate] ?? 0;
-        numberToDateMap[entryNumber] = entryDate;
-      });
+     
+      List<FlSpot> climbedEntries = graphData.boulderClimbedMaxClimbed.entries.map((entry) {
+        return FlSpot(
+          entry.key.millisecondsSinceEpoch.toDouble(),
+          entry.value.toDouble().clamp(0, 27),
+        );
+      }).toList();
+      double maxYValue = climbedEntries.isNotEmpty
+          ? climbedEntries
+              .map((entry) => entry.y)
+              .reduce((a, b) => a > b ? a : b)
+          : 27.0;
+
+      double maxY = (maxYValue + 4).clamp(0, 27);
+
+      double minY = (maxY - 12).clamp(0, maxY);
+      double maxX = numberToDateMap.length.toDouble();
       return LineChart(
-        maxGradeChart(graphData, numberToDateMap),
+        maxGradeChart(graphData, numberToDateMap, minY, maxY, maxX, gradingSystem),
         duration: const Duration(milliseconds: 250),
       );
     } else if (chartSelection == "climbs") {
-      graphData.boulderClimbedAmount.forEach((entryDate, colors) {
-        int entryNumber = graphData.boulderSetAmount[entryDate] ?? 0;
-        numberToDateMap[entryNumber] = entryDate;
-      });
       return BarChart(
         climbsBarChart(graphData, numberToDateMap),
       );
@@ -60,49 +84,17 @@ class LineChartGraph extends StatelessWidget {
         barChartSetterData(colorOrder, cumulativeCounts, numberToDateMap),
       );
     } else if (chartSelection == "SetterDataPie") {
-
-      
       return PieChart(
-                pirChartSetter(graphData.boulderSetSplit),
-              );
+        pirChartSetter(graphData.boulderSetSplit),
+      );
     } else {
       return const Text('Invalid chart selection');
     }
   }
 
-  final Color borderColor = Colors.green;
-  final Color contentColorGreen = Colors.green;
-  final Color contentColorYellow = Colors.yellow;
-  final Color contentColorBlue = Colors.blue;
-  final Color contentColorPurple = Colors.purple;
-  final Color contentColorRed = Colors.red;
-  final Color contentColorBlack = Colors.black;
-  final Color borderColour = Colors.black;
-  static const Color textColour = Colors.black;
-  final double barWidth = 10;
-  final shadowOpacity = 0.2;
-  final int touchedIndex = -1;
-
-  Widget bottomTitles(
-      double value, TitleMeta meta, Map<int, DateTime> numberToDateMap) {
-    const style = TextStyle(color: textColour, fontSize: 10);
-    String text = '';
-
-    // Assuming value.toInt() is the number associated with the date
-    DateTime date = numberToDateMap[value.toInt()] ?? DateTime.now();
-
-    // Format the date to your liking
-    text = DateFormat('E', 'en_US').format(
-        date); // This will display the day of the week (e.g., Mon, Tue, ...)
-
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      child: Text(text, style: style),
-    );
-  }
 
   Widget leftTitles(double value, TitleMeta meta) {
-    const style = TextStyle(color: textColour, fontSize: 10);
+    const style = TextStyle(color: textColour, fontSize: fontChartSize);
     String text;
     if (value == 0) {
       text = '0';
@@ -120,7 +112,8 @@ class LineChartGraph extends StatelessWidget {
     );
   }
 
-  BarChartData climbsBarChart(PointsData graphData, numberToDateMap) {
+  BarChartData climbsBarChart(
+      PointsData graphData, Map<int, DateTime> numbersToDates) {
     return BarChartData(
       titlesData: FlTitlesData(
         show: true,
@@ -134,7 +127,8 @@ class LineChartGraph extends StatelessWidget {
               showTitles: true,
               reservedSize: 32,
               getTitlesWidget: (double value, TitleMeta meta) {
-                return bottomTitles(value, meta, numberToDateMap);
+                return bottomTitles(
+                    value, meta, numbersToDates, selectedTimePeriod);
               }),
         ),
         leftTitles: AxisTitles(
@@ -157,9 +151,14 @@ class LineChartGraph extends StatelessWidget {
       borderData: FlBorderData(
         show: false,
       ),
-      barGroups: graphData.boulderClimbedAmount.entries.map((entry) {
-        return BarChartGroupData(
-          x: entry.key.millisecondsSinceEpoch,
+      minY: 0,
+      maxY: 30,
+      barGroups: graphData.boulderClimbedAmount.entries
+        .where((entry) => numbersToDates.containsValue(entry.key))
+        .map((entry) {
+          final xValue = findNumberFromDate(entry.key, numbersToDates);
+          return BarChartGroupData(
+            x: xValue,
           barRods: [
             BarChartRodData(
               toY: entry.value.toDouble(),
@@ -172,7 +171,8 @@ class LineChartGraph extends StatelessWidget {
     );
   }
 
-  LineChartData maxGradeChart(PointsData graphData, numberToDateMap) {
+  LineChartData maxGradeChart(PointsData graphData, numbersToDates, double minY,
+      double maxY, double maxX, String gradingSystem) {
     return LineChartData(
       titlesData: FlTitlesData(
         show: true,
@@ -186,13 +186,17 @@ class LineChartGraph extends StatelessWidget {
               showTitles: true,
               reservedSize: 32,
               getTitlesWidget: (double value, TitleMeta meta) {
-                return bottomTitles(value, meta, numberToDateMap);
+                return bottomTitles(
+                    value, meta, numbersToDates, selectedTimePeriod);
               }),
         ),
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            getTitlesWidget: leftTitles,
+            
+            getTitlesWidget: (double value, TitleMeta meta) {
+            return getGradeLabel(value, meta, gradingSystem);
+          },
             interval: 5,
             reservedSize: 42,
           ),
@@ -209,31 +213,42 @@ class LineChartGraph extends StatelessWidget {
       borderData: FlBorderData(
         show: false,
       ),
+      minY: 0,
+      maxY: maxY,
+      minX: 0,
+      maxX: maxX,
       lineBarsData: [
         LineChartBarData(
-          spots: graphData.boulderClimbedMaxClimbed.entries.map((entry) {
-            return FlSpot(entry.key.millisecondsSinceEpoch.toDouble(),
-                entry.value.toDouble());
+          spots: graphData.boulderClimbedMaxClimbed.entries
+              .where((entry) => numbersToDates.containsValue(entry.key))
+              .map((entry) {
+            return FlSpot(
+              findNumberFromDate(entry.key, numbersToDates).toDouble(),
+              entry.value.toDouble(),
+            );
           }).toList(),
           isCurved: true,
-          belowBarData: BarAreaData(show: false),
-          color: Colors.blue, // Adjust color as needed
-          dotData: const FlDotData(show: false),
+          belowBarData: BarAreaData(show: true),
+          color: const Color.fromARGB(255, 243, 33, 208),
+          dotData: const FlDotData(show: true),
           isStrokeCapRound: true,
           barWidth: 4,
           isStrokeJoinRound: true,
         ),
         LineChartBarData(
-          spots: graphData.boulderClimbedMaxFlashed.entries.map((entry) {
-            return FlSpot(entry.key.millisecondsSinceEpoch.toDouble(),
-                entry.value.toDouble());
+          spots: graphData.boulderClimbedMaxFlashed.entries
+              .where((entry) => numbersToDates.containsValue(entry.key))
+              .map((entry) {
+            return FlSpot(
+              findNumberFromDate(entry.key, numbersToDates).toDouble(),
+              entry.value.toDouble(),
+            );
           }).toList(),
           isCurved: true,
           belowBarData: BarAreaData(show: false),
-          color: Colors.red, // Adjust color as needed
+          color: const Color.fromARGB(255, 43, 219, 8),
           dotData: const FlDotData(show: false),
-          isStrokeCapRound: true,
-
+          isStrokeCapRound: false,
           barWidth: 4,
           isStrokeJoinRound: true,
         ),
@@ -351,7 +366,7 @@ class LineChartGraph extends StatelessWidget {
     return BarChartData(
       alignment: BarChartAlignment.center,
       maxY: 20,
-      minY: -20,
+      minY: 0,
       groupsSpace: 12,
       titlesData: FlTitlesData(
         show: true,
@@ -365,7 +380,8 @@ class LineChartGraph extends StatelessWidget {
               showTitles: true,
               reservedSize: 32,
               getTitlesWidget: (double value, TitleMeta meta) {
-                return bottomTitles(value, meta, numberToDateMap);
+                return bottomTitles(
+                    value, meta, numberToDateMap, selectedTimePeriod);
               }),
         ),
         leftTitles: AxisTitles(
@@ -397,8 +413,7 @@ class LineChartGraph extends StatelessWidget {
     );
   }
 
-
- List<PieChartSectionData> showingSections(boulderSplit) {
+  List<PieChartSectionData> showingSections(boulderSplit) {
     return List.generate(4, (i) {
       final isTouched = i == touchedIndex;
       final fontSize = isTouched ? 20.0 : 16.0;
@@ -457,7 +472,7 @@ class LineChartGraph extends StatelessWidget {
               shadows: shadows,
             ),
           );
-          case 4:
+        case 4:
           return PieChartSectionData(
             color: contentColorRed,
             value: (boulderSplit["Red"] ?? 0.0).toDouble(),
@@ -470,7 +485,7 @@ class LineChartGraph extends StatelessWidget {
               shadows: shadows,
             ),
           );
-          case 5:
+        case 5:
           return PieChartSectionData(
             color: contentColorBlack,
             value: (boulderSplit["Black"] ?? 0.0).toDouble(),
@@ -489,43 +504,16 @@ class LineChartGraph extends StatelessWidget {
     });
   }
 
-
   PieChartData pirChartSetter(boulderSplit) {
     return PieChartData(
-                pieTouchData: PieTouchData(
-                 
-                ),
-                borderData: FlBorderData(
-                  show: false,
-                ),
-                sectionsSpace: 0,
-                centerSpaceRadius: 40,
-                sections: showingSections(boulderSplit),
-              );
-  }
-
-
-}
-
-// Implement this method to get the color based on the color name
-Color getNameFromColour(String colorName) {
-  // Add your color logic here, return Colors.green for 'Green', Colors.yellow for 'Yellow', etc.
-  // You can use a Map or a switch statement for simplicity.
-  // For example:
-  switch (colorName) {
-    case 'Green':
-      return Colors.green;
-    case 'Yellow':
-      return Colors.yellow;
-    case 'Blue':
-      return Colors.blue;
-    case 'Purple':
-      return Colors.purple;
-    case 'Red':
-      return Colors.red;
-    case 'Black':
-      return Colors.black;
-    default:
-      return Colors.grey;
+      pieTouchData: PieTouchData(),
+      borderData: FlBorderData(
+        show: false,
+      ),
+      sectionsSpace: 0,
+      centerSpaceRadius: 40,
+      sections: showingSections(boulderSplit),
+    );
   }
 }
+

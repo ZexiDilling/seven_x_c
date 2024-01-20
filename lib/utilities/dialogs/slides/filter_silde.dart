@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
-import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
+
 
 String? filterDropdownValue;
 bool missingFilter = false;

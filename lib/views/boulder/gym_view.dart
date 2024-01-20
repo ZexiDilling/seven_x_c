@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
+import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/constants/colours_thems.dart';
 import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/constants/routes.dart';
@@ -22,7 +23,6 @@ import 'package:seven_x_c/utilities/dialogs/comp/comp_signup_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/stripping_boulder.dart';
 import 'package:seven_x_c/utilities/dialogs/info/grading_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/slides/comp_slide.dart';
-import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/add_new_boulder.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/show_boulder_info.dart';
 import 'package:seven_x_c/utilities/dialogs/slides/filter_silde.dart';
@@ -182,8 +182,8 @@ class _GymViewState extends State<GymView> {
             // Use the length of the boulders list to update the app bar title
             final bouldersCount = snapshot.data?.length ?? 0;
             return compView
-                ? Text(currentComp!.compName)
-                : Text('DTU Climbing - $bouldersCount');
+                ? Text(currentComp!.compName, style: compBarStyle,)
+                : Text('DTU Climbing - $bouldersCount', style: appBarStyle);
             // : Text("$compView");
           },
         ),

@@ -1,10 +1,10 @@
-// ignore_for_file: use_build_context_synchronously
+
 
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
-import 'package:seven_x_c/utilities/info_data/boulder_info.dart'
-    show WallRegion, wallRegions, wallSections;
+
 
 Future<void> stripping(
     context,

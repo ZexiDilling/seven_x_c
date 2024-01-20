@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
+import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/constants/challenge_const.dart';
 import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/utilities/dialogs/challenge/challenge_create.dart';
@@ -19,7 +20,6 @@ import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/challenge/add_exisiting.dart';
 import 'package:seven_x_c/utilities/dialogs/generics/info_popup.dart';
 import 'package:seven_x_c/utilities/dialogs/generics/yes_no.dart';
-import 'package:seven_x_c/utilities/info_data/boulder_info.dart';
 
 Future<void> showBoulderInformation(
     BuildContext context,

@@ -430,4 +430,37 @@ class CircleData {
   });
 }
 
+Map<DateTime, int> placeholder2 = {
+  DateTime.parse('2024-01-19 00:00:00.000'): 10,
+  DateTime.parse('2024-01-18 00:00:00.000'): 10,
+  DateTime.parse('2024-01-17 00:00:00.000'): 10,
+  DateTime.parse('2024-01-16 00:00:00.000'): 8,
+  DateTime.parse('2024-01-15 00:00:00.000'): 8,
+  DateTime.parse('2024-01-14 00:00:00.000'): 8,
+  DateTime.parse('2024-01-13 00:00:00.000'): 8,
+  DateTime.parse('2024-01-12 00:00:00.000'): 8,
+  DateTime.parse('2024-01-11 00:00:00.000'): 8,
+  DateTime.parse('2024-01-10 00:00:00.000'): 7,
+  DateTime.parse('2024-01-09 00:00:00.000'): 6,
+  DateTime.parse('2024-01-08 00:00:00.000'): 6,
+  DateTime.parse('2024-01-07 00:00:00.000'): 5,
+  DateTime.parse('2024-01-06 00:00:00.000'): 5,
+  DateTime.parse('2024-01-05 00:00:00.000'): 5,
+  DateTime.parse('2024-01-04 00:00:00.000'): 5,
+  DateTime.parse('2024-01-03 00:00:00.000'): 4,
+  DateTime.parse('2024-01-02 00:00:00.000'): 3,
+  DateTime.parse('2024-01-01 00:00:00.000'): 3,
+  DateTime.parse('2023-12-31 00:00:00.000'): 3,
+  DateTime.parse('2023-12-30 00:00:00.000'): 3,
+  DateTime.parse('2023-12-29 00:00:00.000'): 3,
+  DateTime.parse('2023-12-28 00:00:00.000'): 0,
+  DateTime.parse('2023-12-27 00:00:00.000'): 0,
+};
 
+int findNumberFromDate(DateTime date, Map<int, DateTime> numberToDateMap) {
+  // Calculate the difference in days between the given date and the start date
+  int daysDifference = date.difference(numberToDateMap[0]!).inDays;
+
+  // Ensure the result is non-negative
+  return daysDifference >= 0 ? daysDifference : 0;
+}

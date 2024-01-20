@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/constants/colours_thems.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
@@ -33,7 +34,9 @@ class _ProfileViewState extends State<ProfileView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text('Profile', style: appBarStyle,), 
+        backgroundColor: profileAppBar,
+        
       ),
       body: Column(
         children: [
@@ -113,45 +116,42 @@ class _ProfileViewState extends State<ProfileView> {
                             const SizedBox(
                               height: 40,
                             ),
-                            const Text(
-                              "Chart",
-                              style: TextStyle(
-                                  color: Colors.pink,
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 2),
-                              textAlign: TextAlign.center,
-                            ),
                             OverflowBar(
                               alignment: MainAxisAlignment.spaceEvenly,
                               children: <Widget>[
                                 TextButton(
                                     child: const Text('Max Grade'),
-                                    onPressed: () {  setState((){
-                                      chartSelection = "maxGrade";});
+                                    onPressed: () {
+                                      setState(() {
+                                        chartSelection = "maxGrade";
+                                      });
                                     }),
                                 TextButton(
                                     child: const Text('Climbs'),
-                                    onPressed: () {  setState((){
-                                      chartSelection = "climbs";});
+                                    onPressed: () {
+                                      setState(() {
+                                        chartSelection = "climbs";
+                                      });
                                     }),
                                 Visibility(
                                   visible: currentProfile.isSetter,
                                   child: TextButton(
                                       child: const Text('Setter Data'),
-                                      onPressed: () { setState((){
-                                        chartSelection = "SetterData";});
+                                      onPressed: () {
+                                        setState(() {
+                                          chartSelection = "SetterData";
+                                        });
                                       }),
                                 ),
                                 Visibility(
                                   visible: currentProfile.isSetter,
                                   child: TextButton(
                                       child: const Text('Setter Pie'),
-                                      onPressed: () { setState(() {
-                                        chartSelection = "SetterDataPie";
-                                      });
-                                      print(pointsData.boulderSetSplit);
-                                        
+                                      onPressed: () {
+                                        setState(() {
+                                          chartSelection = "SetterDataPie";
+                                        });
+                                        print(pointsData.boulderSetSplit);
                                       }),
                                 )
                               ],
@@ -164,11 +164,10 @@ class _ProfileViewState extends State<ProfileView> {
                                   const EdgeInsets.only(right: 16, left: 6),
                               child: SizedBox(
                                 height: 500,
-                                
                                 child: LineChartGraph(
                                     chartSelection: chartSelection,
                                     graphData: pointsData,
-                                    selectedTimePeriod: selectedTimePeriod),
+                                    selectedTimePeriod: selectedTimePeriod, gradingSystem: currentProfile.gradingSystem),
                               ),
                             ),
                             const SizedBox(
@@ -206,17 +205,22 @@ Future<PointsData> getPoints(
   LinkedHashMap<String, int> boulderSetSplit = LinkedHashMap();
 
   try {
-    if (selectedTimePeriod != TimePeriod.allTime) {
-      if (currentProfile.climbedBoulders != null) {
+    if (currentProfile.climbedBoulders != null) {
+      if (selectedTimePeriod != TimePeriod.allTime) {
+        
         for (var entry in currentProfile.climbedBoulders!.entries) {
+          
           DateTime entryDate = entry.value['date'].toDate();
+          
           DateTime entryDateWithoutTime =
               DateTime(entryDate.year, entryDate.month, entryDate.day);
+              
           if (entryDateWithoutTime.isAfter(dateThreshold)) {
-            pointsBoulder += entry.value["points"];
+            pointsBoulder += entry.value["boulderPoints"];
             amountBoulder += 1;
             boulderClimbedAmount[entryDateWithoutTime] =
                 (boulderClimbedAmount[entryDateWithoutTime] ?? 0) + 1;
+
 
             int boulderGrade = entry.value["gradeNumber"];
 
@@ -248,8 +252,10 @@ Future<PointsData> getPoints(
             boulderSetAmount[entryDateWithoutTime] =
                 (boulderSetAmount[entryDateWithoutTime] ?? 0) + 1;
             String boulderGradeColour = entry.value["gradeColour"];
-            boulderSetSplit[boulderGradeColour] ?? 0 + 1;boulderSetSplit[boulderGradeColour] = (boulderSetSplit[boulderGradeColour] ?? 0) + 1;
-  
+            boulderSetSplit[boulderGradeColour] ?? 0 + 1;
+            boulderSetSplit[boulderGradeColour] =
+                (boulderSetSplit[boulderGradeColour] ?? 0) + 1;
+
             if (boulderSetColours.containsKey(entryDateWithoutTime)) {
               if (boulderSetColours[entryDateWithoutTime]!
                   .containsKey(boulderGradeColour)) {
@@ -267,15 +273,76 @@ Future<PointsData> getPoints(
             }
           }
         }
+        // for when looking at all times:
+      } else {
+        pointsBoulder = currentProfile.boulderPoints;
+        pointsSetter = currentProfile.setterPoints;
+        pointsChallenges = currentProfile.challengePoints;
+        amountBoulder = currentProfile.climbedBoulders?.length ?? 0;
+        amountSetter = currentProfile.setBoulders?.length ?? 0;
+        amountChallenges = currentProfile.challengeProfile?.length ?? 0;
+        for (var entry in currentProfile.climbedBoulders!.entries) {
+          DateTime entryDate = entry.value['date'].toDate();
+          DateTime entryDateWithoutTime =
+              DateTime(entryDate.year, entryDate.month, entryDate.day);
+          boulderClimbedAmount[entryDateWithoutTime] =
+              (boulderClimbedAmount[entryDateWithoutTime] ?? 0) + 1;
+
+          int boulderGrade = entry.value["gradeNumber"];
+
+          if (entry.value["flashed"]) {
+            if (boulderClimbedMaxFlashed.containsKey(entryDateWithoutTime)) {
+              if (boulderClimbedMaxFlashed[entryDateWithoutTime]! <
+                  boulderGrade) {
+                boulderClimbedMaxFlashed[entryDateWithoutTime] = boulderGrade;
+              }
+            } else {
+              boulderClimbedMaxFlashed[entryDateWithoutTime] = boulderGrade;
+            }
+          }
+          if (boulderClimbedMaxClimbed.containsKey(entryDateWithoutTime)) {
+            boulderClimbedAmount[entryDateWithoutTime] =
+                (boulderClimbedAmount[entryDateWithoutTime] ?? 0) + 1;
+          } else {
+            boulderClimbedMaxClimbed[entryDateWithoutTime] = boulderGrade;
+          }
+        }
+
+        for (var entry in currentProfile.setBoulders!.entries) {
+          DateTime entryDate = entry.value['setDateBoulder'].toDate();
+          DateTime entryDateWithoutTime =
+              DateTime(entryDate.year, entryDate.month, entryDate.day);
+          boulderSetAmount[entryDateWithoutTime] =
+              (boulderSetAmount[entryDateWithoutTime] ?? 0) + 1;
+          String boulderGradeColour = entry.value["gradeColour"];
+          boulderSetSplit[boulderGradeColour] ?? 0 + 1;
+          boulderSetSplit[boulderGradeColour] =
+              (boulderSetSplit[boulderGradeColour] ?? 0) + 1;
+
+          if (boulderSetColours.containsKey(entryDateWithoutTime)) {
+            if (boulderSetColours[entryDateWithoutTime]!
+                .containsKey(boulderGradeColour)) {
+              boulderSetColours[entryDateWithoutTime]![boulderGradeColour] =
+                  (boulderSetColours[entryDateWithoutTime]![
+                              boulderGradeColour] ??
+                          0) +
+                      1;
+            } else {
+              boulderSetColours[entryDateWithoutTime]![boulderGradeColour] = 1;
+            }
+          } else {
+            boulderSetColours[entryDateWithoutTime] = {boulderGradeColour: 1};
+          }
+        }
       }
+      // IF the profile have not done anything:
     } else {
-      print("testing?");
-      pointsBoulder = currentProfile.boulderPoints;
-      pointsSetter = currentProfile.setterPoints;
-      pointsChallenges = currentProfile.challengePoints;
-      amountBoulder = currentProfile.climbedBoulders!.length;
-      amountSetter = currentProfile.setBoulders!.length;
-      //TOdo fixc thisd " "
+      pointsBoulder = 0;
+      pointsSetter = 0;
+      pointsChallenges = 0;
+      amountBoulder = 0;
+      amountSetter = 0;
+      amountChallenges = 0;
     }
     return PointsData(
       pointsBoulder: pointsBoulder,
@@ -292,6 +359,9 @@ Future<PointsData> getPoints(
       boulderSetSplit: boulderSetSplit,
     );
   } catch (e) {
+    
+    print(e);
+    print("do we have an error?");
     return PointsData(
       pointsBoulder: 0,
       pointsSetter: 0,
