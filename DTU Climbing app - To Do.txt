@@ -126,12 +126,20 @@ Challenges:
 Challenges:
 	Done - Make it possible to add old challenges to boulders. 
 
+Profile
+	fix graph
+		deal with different time intervals
+
+
 	
 ------------------------------------------------------------------------------------------------------------------------
 
 
 ToDO:
 ------------------------------------------------------------------------------------------
+
+Low priority/ not sure:
+------------------------------------------------------------------------------------------------------------------------
 
 Settings:
 	update settings to work ?? 
@@ -140,18 +148,7 @@ Settings:
 Clean up:
 	Make things pretty
 	clean up code
-
-
-Profile
-	fix graph
-		deal with different time intervals
-
-
-
 	
-
-Low priority/ not sure:
-------------------------------------------------------------------------------------------------------------------------
 
 Calender
 	Section cleaning
