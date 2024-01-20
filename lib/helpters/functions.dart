@@ -242,7 +242,6 @@ DateTime calculateDateThreshold(TimePeriod timePeriod) {
       // Find the last Monday of the current week
       DateTime lastMonday = currentTime.subtract(Duration(days: currentTime.weekday - 1));
       // Find the next Sunday
-      DateTime nextSunday = lastMonday.add(Duration(days: 6));
       return lastMonday;
 
     case TimePeriod.month:
@@ -261,7 +260,7 @@ DateTime calculateDateThreshold(TimePeriod timePeriod) {
 
     case TimePeriod.year:
       // Return the first day of the current month 12 months ago
-      return currentTime.subtract(Duration(days: 30 * 12)); // Assuming 30 days in a month
+      return currentTime.subtract(const Duration(days: 30 * 12)); // Assuming 30 days in a month
 
     default:
       return DateTime(0); // Or handle the default case accordingly
@@ -276,7 +275,7 @@ DateTime calculateEndDate(TimePeriod selectedTimePeriod, DateTime startDate) {
 
     case TimePeriod.month:
       // Find the last day of the current month
-      return DateTime(startDate.year, startDate.month + 1, 1).subtract(Duration(days: 1));
+      return DateTime(startDate.year, startDate.month + 1, 1).subtract(const Duration(days: 1));
 
     case TimePeriod.semester:
       // Determine the end of the semester based on the current month

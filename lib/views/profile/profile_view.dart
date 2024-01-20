@@ -151,7 +151,6 @@ class _ProfileViewState extends State<ProfileView> {
                                         setState(() {
                                           chartSelection = "SetterDataPie";
                                         });
-                                        print(pointsData.boulderSetSplit);
                                       }),
                                 )
                               ],
@@ -359,9 +358,6 @@ Future<PointsData> getPoints(
       boulderSetSplit: boulderSetSplit,
     );
   } catch (e) {
-    
-    print(e);
-    print("do we have an error?");
     return PointsData(
       pointsBoulder: 0,
       pointsSetter: 0,

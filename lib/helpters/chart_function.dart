@@ -1,22 +1,21 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/utilities/charts/profile_charts.dart';
 
-final Color borderColor = Colors.green;
-final Color contentColorGreen = Colors.green;
-final Color contentColorYellow = Colors.yellow;
-final Color contentColorBlue = Colors.blue;
-final Color contentColorPurple = Colors.purple;
-final Color contentColorRed = Colors.red;
-final Color contentColorBlack = Colors.black;
-final Color borderColour = Colors.black;
+const Color borderColor = Colors.green;
+const Color contentColorGreen = Colors.green;
+const Color contentColorYellow = Colors.yellow;
+const Color contentColorBlue = Colors.blue;
+const Color contentColorPurple = Colors.purple;
+const Color contentColorRed = Colors.red;
+const Color contentColorBlack = Colors.black;
+const Color borderColour = Colors.black;
 const Color textColour = Colors.black;
-final double barWidth = 10;
-final shadowOpacity = 0.2;
-final int touchedIndex = -1;
+const double barWidth = 10;
+const shadowOpacity = 0.2;
+const int touchedIndex = -1;
 
 Widget bottomTitles(
   double value,

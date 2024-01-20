@@ -29,7 +29,7 @@ class LineChartGraph extends StatelessWidget {
       int dateCounter = 0;
       for (DateTime date = startDate;
           date.isBefore(endDate);
-          date = date.add(Duration(days: 1))) {
+          date = date.add(const Duration(days: 1))) {
         DateTime entryDateWithoutTime =
             DateTime(date.year, date.month, date.day);
 
