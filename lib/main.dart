@@ -24,6 +24,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: "DTU Climbing",
       theme: ThemeData(
         textTheme: GoogleFonts.ibarraRealNovaTextTheme(),
