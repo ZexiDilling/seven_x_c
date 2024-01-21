@@ -55,7 +55,7 @@ Future<void> showBoulderInformation(
   Map<String, bool> expandedStates = {};
 
   bool active = boulder.active;
-  bool updated = false;
+  bool updatedBoulder = false;
   bool topOut = boulder.topOut;
   bool compBoulder = boulder.compBoulder;
   bool hiddenGrade = boulder.hiddenGrade;
@@ -482,10 +482,10 @@ Future<void> showBoulderInformation(
                                       children: [
                                         const Text("Updated?"),
                                         Checkbox(
-                                          value: updated,
+                                          value: updatedBoulder,
                                           onChanged: (bool? value) {
                                             setState(() {
-                                              updated = value ?? false;
+                                              updatedBoulder = value ?? false;
                                             });
                                           },
                                         ),
@@ -1007,7 +1007,7 @@ Future<void> showBoulderInformation(
                                 }
                                 fireBaseService.updatBoulder(
                                   boulderID: boulder.boulderID,
-                                  updateDateBoulder: Timestamp.now(),
+                                  updateDateBoulder: updatedBoulder ? Timestamp.now() : null, 
                                   topOut: topOut,
                                   hiddenGrade: hiddenGrade,
                                   setter: selectedSetter,
@@ -1015,6 +1015,7 @@ Future<void> showBoulderInformation(
                                   gradeColour: gradeColorChoice,
                                   gradeNumberSetter: gradeValue,
                                   compBoulder: compBoulder,
+                                  climberTopped: updatedBoulder ? {} : null
                                 );
                                 Navigator.of(context).pop();
                               },
