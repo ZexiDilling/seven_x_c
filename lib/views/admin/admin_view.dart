@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
+import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
+import 'package:seven_x_c/utilities/dialogs/admin_settings/colour_chooser.dart';
 
 class AdminPanelView extends StatefulWidget {
   const AdminPanelView({super.key});
@@ -12,12 +15,49 @@ class AdminPanelView extends StatefulWidget {
 }
 
 class _AdminPanelViewState extends State<AdminPanelView> {
-  late final FirebaseCloudStorage _userService;
+  late final FirebaseCloudStorage fireBaseService;
+  late CloudProfile? currentProfile;
+  late String userId;
+  late CloudSettings? currentSettings;
 
   @override
   void initState() {
-    _userService = FirebaseCloudStorage();
     super.initState();
+    userId = AuthService.firebase().currentUser!.id;
+    fireBaseService = FirebaseCloudStorage();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    print("HEJ");
+    await _initializeCurrentProfile();
+    print("MED");
+    await _initSettings();
+    print("DIG");
+  }
+
+  Future<void> _initSettings() async {
+    print("HEH HEJ");
+
+    final CloudSettings? tempSettings =
+        (await fireBaseService.getSettings(currentProfile!.settingsID)) as CloudSettings?;
+    setState(() {
+      currentSettings = tempSettings;
+    });
+    print("currentSettings - $currentSettings");
+  }
+
+  Future<CloudProfile?> _initializeCurrentProfile() async {
+    print("HOG HEJ");
+
+    await for (final profiles
+        in fireBaseService.getUser(userID: userId.toString())) {
+      final CloudProfile profile = profiles.first;
+      setState(() {
+        currentProfile = profile;
+      });
+      return currentProfile;
+    }
   }
 
   @override
@@ -72,7 +112,7 @@ class _AdminPanelViewState extends State<AdminPanelView> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  _searchUser(_userService, _emailQuery, _displayNameQuery);
+                  _searchUser(fireBaseService, _emailQuery, _displayNameQuery);
                 },
                 child: const Text('Search'),
               ),
@@ -90,6 +130,28 @@ class _AdminPanelViewState extends State<AdminPanelView> {
                   }
                 },
               ),
+              Row(
+                children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        print(currentSettings!.settingsHoldColour);
+                        print(currentSettings!.settingsGradeColour);
+                        showColorPickerDialog(context);
+                      },
+                      child: const Text("Hold Colours")),
+                  ElevatedButton(
+                      onPressed: () {
+                        showColorPickerDialog(context);
+                      },
+                      child: const Text("Grades"))
+                ],
+              ),
+              Row(
+                children: [
+                  ElevatedButton(
+                      onPressed: () {}, child: const Text("Update Wall")),
+                ],
+              )
             ],
           ),
         ),
@@ -124,7 +186,8 @@ class _AdminPanelViewState extends State<AdminPanelView> {
                   .isAdmin, // Replace with the actual field from your CloudProfile model
               onChanged: (bool? value) {
                 // Handle the change and update the user's isAdmin status
-                _userService.updateUser(currentProfile: user, isAdmin: value);
+                fireBaseService.updateUser(
+                    currentProfile: user, isAdmin: value);
               },
             ),
             CheckboxListTile(
@@ -133,7 +196,8 @@ class _AdminPanelViewState extends State<AdminPanelView> {
                   .isSetter, // Replace with the actual field from your CloudProfile model
               onChanged: (bool? value) {
                 // Handle the change and update the user's isSetter status
-                _userService.updateUser(currentProfile: user, isSetter: value);
+                fireBaseService.updateUser(
+                    currentProfile: user, isSetter: value);
               },
             ),
             // Add other user details based on your CloudProfile model
@@ -158,10 +222,7 @@ class _AdminPanelViewState extends State<AdminPanelView> {
         _searchController.add(searchResults);
       },
       onError: (error) {},
-      onDone: () {
-      },
+      onDone: () {},
     );
   }
-
-
 }

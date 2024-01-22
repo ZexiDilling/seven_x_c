@@ -8,6 +8,7 @@ class CloudProfile {
   final double challengePoints;
   final bool isSetter;
   final bool isAdmin;
+  final String? settingsID;
   final bool isAnonymous;
   final Map<String, dynamic>? climbedBoulders;
   final Map<String, dynamic>? setBoulders;
@@ -29,6 +30,7 @@ class CloudProfile {
     this.challengePoints,
     this.isSetter,
     this.isAdmin,
+    this.settingsID,
     this.isAnonymous,
     this.climbedBoulders,
     this.setBoulders,
@@ -57,6 +59,7 @@ class CloudProfile {
                 0.0,
         isSetter = snapshot.data()[isSetterFieldName] as bool,
         isAdmin = snapshot.data()[isAdminFieldName] as bool,
+        settingsID = snapshot.data()[settingsIDFieldName] as String?,
         isAnonymous = snapshot.data()[isAnonymousFieldName] as bool,
         climbedBoulders =
             snapshot.data()[climbedBouldersFieldName] as Map<String, dynamic>?,
