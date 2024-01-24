@@ -76,6 +76,7 @@ const challengeCounterRunningFieldName = "challengeCounterRunning";
 const challengeDifficultyFieldName = "challengeDifficulty";
 
 //Settings
+const settingsNameIDFieldName = "settingsNameID";
 const settingsNameFieldName = "settingsName";
 const settingsCountryFieldName = "settingsCountry";
 const settingsLocationFieldName = "settingsLocation";

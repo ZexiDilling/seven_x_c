@@ -20,6 +20,7 @@ class _AdminPanelViewState extends State<AdminPanelView> {
   late String userId;
   late CloudSettings? currentSettings;
 
+
   @override
   void initState() {
     super.initState();
@@ -29,27 +30,23 @@ class _AdminPanelViewState extends State<AdminPanelView> {
   }
 
   Future<void> _initializeData() async {
-    print("HEJ");
     await _initializeCurrentProfile();
-    print("MED");
     await _initSettings();
-    print("DIG");
+    _initSettingsData();
   }
 
-  Future<void> _initSettings() async {
-    print("HEH HEJ");
-
+  Future<CloudSettings?> _initSettings() async {
     final CloudSettings? tempSettings =
-        (await fireBaseService.getSettings(currentProfile!.settingsID)) as CloudSettings?;
+        await fireBaseService.getSettings(currentProfile!.settingsID);
     setState(() {
       currentSettings = tempSettings;
     });
     print("currentSettings - $currentSettings");
+    print(currentSettings!.settingsGradeColour);
+    return currentSettings;
   }
 
   Future<CloudProfile?> _initializeCurrentProfile() async {
-    print("HOG HEJ");
-
     await for (final profiles
         in fireBaseService.getUser(userID: userId.toString())) {
       final CloudProfile profile = profiles.first;
@@ -58,6 +55,14 @@ class _AdminPanelViewState extends State<AdminPanelView> {
       });
       return currentProfile;
     }
+    return null;
+  }
+
+  void _initSettingsData() {
+    print(currentSettings!.settingsGradeColour);
+    print(currentSettings!.settingsHoldColour);
+
+
   }
 
   @override
@@ -136,12 +141,12 @@ class _AdminPanelViewState extends State<AdminPanelView> {
                       onPressed: () {
                         print(currentSettings!.settingsHoldColour);
                         print(currentSettings!.settingsGradeColour);
-                        showColorPickerDialog(context);
+                        showColorPickerDialog(context, fireBaseService, currentSettings!, "holds");
                       },
                       child: const Text("Hold Colours")),
                   ElevatedButton(
                       onPressed: () {
-                        showColorPickerDialog(context);
+                        showColorPickerDialog(context, fireBaseService, currentSettings!, "grades");
                       },
                       child: const Text("Grades"))
                 ],

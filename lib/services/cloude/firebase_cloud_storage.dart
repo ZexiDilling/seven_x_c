@@ -537,11 +537,8 @@ class FirebaseCloudStorage {
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {
-      // If there's at least one document with the specified compID
-      // Return the first document as a CloudComp instance
       return CloudComp.fromSnapshot(querySnapshot.docs.first);
     } else {
-      // If no document with the specified compID is found, return null
       return null;
     }
   }
@@ -676,6 +673,7 @@ class FirebaseCloudStorage {
 
   Future<CloudSettings> createSettings({
     required String settingsID,
+    required String settingsNameID,
     required String settingsName,
     required String settingsCountry,
     required String settingsLocation,
@@ -689,6 +687,7 @@ class FirebaseCloudStorage {
     Map<String, dynamic>? settingsWallRegions,
   }) async {
     final document = await settingsCollection.add({
+      settingsNameIDFieldName: settingsNameID,
       settingsNameFieldName: settingsName,
       settingsCountryFieldName: settingsCountry,
       settingsLocationFieldName: settingsLocation,
@@ -703,6 +702,7 @@ class FirebaseCloudStorage {
     });
     final fetchChallenge = await document.get();
     return CloudSettings(
+      settingsNameID,
       settingsName,
       settingsCountry,
       settingsLocation,
@@ -775,23 +775,22 @@ class FirebaseCloudStorage {
 
       await settingsCollection.doc(settingsID).update(updatedData);
     } catch (e) {
+      print(e);
       throw CouldNotUpdateSettings();
     }
   }
 
-Future<DocumentSnapshot<Map<String, dynamic>>?> getSettings(String? settingsID) async {
-  final DocumentSnapshot<Map<String, dynamic>> docSnapshot =
-      await settingsCollection.doc(settingsID).get();
+Future<CloudSettings?> getSettings(String? settingsNameID) async {
+  final querySnapshot = await settingsCollection
+        .where(settingsNameIDFieldName, isEqualTo: settingsNameID)
+        .get();
 
-  if (docSnapshot.exists) {
-    return docSnapshot;
-  } else {
-    // If no document with the specified settingsID is found, return null
-    return null;
+    if (querySnapshot.docs.isNotEmpty) {
+      return CloudSettings.fromSnapshot(querySnapshot.docs.first);
+    } else {
+      return null;
+    }
   }
-}
-
-
 
   Future<void> deleteChallenge({required String challengeID}) async {
     try {

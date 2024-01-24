@@ -5,6 +5,7 @@ import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 @immutable
 class CloudSettings {
   final String settingsID;
+  final String settingsNameID;
   final String settingsName;
   final String settingsCountry;
   final String settingsLocation;
@@ -20,6 +21,7 @@ class CloudSettings {
   final Map<String, dynamic>? settingsWallRegions;
 
   const CloudSettings(
+    this.settingsNameID,
     this.settingsName,
     this.settingsCountry,
     this.settingsLocation,
@@ -37,6 +39,7 @@ class CloudSettings {
   CloudSettings.fromSnapshot(
       QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
       : settingsID = snapshot.id,
+      settingsNameID = snapshot.data()[settingsNameIDFieldName] as String,
         settingsName = snapshot.data()[settingsNameFieldName] as String,
         settingsCountry = snapshot.data()[settingsCountryFieldName] as String,
         settingsLocation = snapshot.data()[settingsLocationFieldName] as String,
