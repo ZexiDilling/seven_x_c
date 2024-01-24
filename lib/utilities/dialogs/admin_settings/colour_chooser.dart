@@ -8,12 +8,14 @@ import 'package:seven_x_c/helpters/functions.dart'
         updateSettingsHoldColours,
         deletSubSettings;
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
+import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 
 showColorPickerDialog(
     BuildContext context,
     FirebaseCloudStorage fireBaseService,
+    CloudProfile currentProfile,
     CloudSettings currentSettings,
     String? colourType) {
   TextEditingController nameController = TextEditingController();
@@ -50,7 +52,11 @@ showColorPickerDialog(
   Color selectedColor = colorsFromFirebase.last.toColor();
   String selectedMinGrade = "0";
   String selectedMaxGrade = "15";
-  String currentGradingSystem = "french";
+  String currentGradingSystem;
+  if (currentProfile.gradingSystem == "coloured")
+    {currentGradingSystem = "french";}
+  else
+  {currentGradingSystem = currentProfile.gradingSystem;}
 
   showDialog(
     context: context,

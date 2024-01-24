@@ -141,12 +141,12 @@ class _AdminPanelViewState extends State<AdminPanelView> {
                       onPressed: () {
                         print(currentSettings!.settingsHoldColour);
                         print(currentSettings!.settingsGradeColour);
-                        showColorPickerDialog(context, fireBaseService, currentSettings!, "holds");
+                        showColorPickerDialog(context, fireBaseService, currentProfile!, currentSettings!, "holds");
                       },
                       child: const Text("Hold Colours")),
                   ElevatedButton(
                       onPressed: () {
-                        showColorPickerDialog(context, fireBaseService, currentSettings!, "grades");
+                        showColorPickerDialog(context, fireBaseService, currentProfile!, currentSettings!, "grades");
                       },
                       child: const Text("Grades"))
                 ],
