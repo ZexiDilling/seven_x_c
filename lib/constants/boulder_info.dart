@@ -6,31 +6,40 @@ double calculateDistance(double x1, double y1, double x2, double y2) {
 }
 
 // Define maps for holds and grades, where the key is the color and the value is the name
-Map<Color, String> holdColorMap = {
-  Colors.green: 'Green',
-  Colors.blue: 'Blue',
-  Colors.blue.shade900: "Dark Blue",
-  Colors.yellow: 'Yellow',
-  Colors.orange: 'Orange',
-  Colors.red: 'Red',
-  Colors.red.shade900: 'Dark Red',
-  Colors.black: 'Black',
-  Colors.white: 'White',
-  Colors.purple: "Purple",
-  Colors.grey: "Grey",
-  Colors.pink.shade200: "Pink",
-  Colors.tealAccent: "turquoise",
-};
+// Map<Color, String> holdColorMap = {
+//   Colors.green: 'Green',
+//   Colors.blue: 'Blue',
+//   Colors.blue.shade900: "Dark Blue",
+//   Colors.yellow: 'Yellow',
+//   Colors.orange: 'Orange',
+//   Colors.red: 'Red',
+//   Colors.red.shade900: 'Dark Red',
+//   Colors.black: 'Black',
+//   Colors.white: 'White',
+//   Colors.purple: "Purple",
+//   Colors.grey: "Grey",
+//   Colors.pink.shade200: "Pink",
+//   Colors.tealAccent: "turquoise",
+// };
 
-Map<Color, String> gradeColorMap = {
-  Colors.green: 'Green',
-  Colors.yellow: 'Yellow',
-  Colors.blue: 'Blue',
-  Colors.purple: 'Purple',
-  Colors.red: 'Red',
-  Colors.black: 'Black',
-  Colors.grey: 'Silver',
-};
+  Color nameToColor(Map<String, dynamic> data) {
+  return Color.fromARGB(
+    data["alpha"] ?? 255,
+    data["red"] ?? 0,
+    data["green"] ?? 0,
+    data["blue"] ?? 0,
+  );
+}
+
+// Map<Color, String> gradeColorMap = {
+//   Colors.green: 'Green',
+//   Colors.yellow: 'Yellow',
+//   Colors.blue: 'Blue',
+//   Colors.purple: 'Purple',
+//   Colors.red: 'Red',
+//   Colors.black: 'Black',
+//   Colors.grey: 'Silver',
+// };
 
 Map<String, Map<String, int>> colorToGrade = {
   "green": {"min": 0, "max": 4},
@@ -124,20 +133,6 @@ List<String> mapNumberToColors(int number) {
   }
 
   return matchingColors;
-}
-
-Color? getColorFromName(String colorName) {
-  for (var entry in holdColorMap.entries) {
-    if (entry.value == colorName) {
-      return entry.key;
-    }
-  }
-  return null;
-}
-
-Color? numberToColor(int number) {
-  List<String> colorName = mapNumberToColors(number);
-  return getColorFromName(colorName[0]);
 }
 
 int getGradeValue(

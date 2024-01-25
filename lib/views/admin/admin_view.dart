@@ -41,8 +41,6 @@ class _AdminPanelViewState extends State<AdminPanelView> {
     setState(() {
       currentSettings = tempSettings;
     });
-    print("currentSettings - $currentSettings");
-    print(currentSettings!.settingsGradeColour);
     return currentSettings;
   }
 

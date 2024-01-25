@@ -7,9 +7,9 @@ import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
+import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/generics/yes_no.dart';
-
 
 Future<void> showAddNewBoulder(
   BuildContext context,
@@ -20,11 +20,11 @@ Future<void> showAddNewBoulder(
   double centerY,
   String wall,
   String gradingSystem,
+  Map<String, Map<String, int>> colorToGrade,
   FirebaseCloudStorage fireBaseService,
+  CloudSettings currentSettings,
   Stream<Iterable<CloudProfile>> settersStream,
 ) async {
-  Color? holdColour;
-  Color? gradeColor;
   bool setterTeam = false;
   bool guestSetterTeam = false;
   bool topOut = false;
@@ -37,7 +37,8 @@ Future<void> showAddNewBoulder(
   // const gradingSystem = "colour";
   // const gradingSystem = "french";
   // const gradingSystem = "v_grade";
-  String? gradeColorChoice = "";
+  String? gradeColorChoice;
+  String? holdColorChoice;
   String? gradeColors = "";
   var gradeValue = 0;
   List<String> allGradeColorChoice = [];
@@ -68,44 +69,58 @@ Future<void> showAddNewBoulder(
                         children: [
                           Text("Wall - $wall"),
                           Text("Grading Style - $gradingSystem"),
-                          DropdownButtonFormField<Color>(
-                            value: holdColour,
-                            onChanged: (Color? value) {
+                          DropdownButtonFormField<String>(
+                            value: holdColorChoice,
+                            onChanged: (value) {
                               setState(() {
-                                holdColour = value;
+                                holdColorChoice = value!;
                               });
                             },
-                            items: holdColorMap.entries
-                                .map((MapEntry<Color, String> entry) {
-                              return DropdownMenuItem(
-                                value: entry.key,
-                                child: Text(entry.value),
-                              );
-                            }).toList(),
+                            items: [
+                              const DropdownMenuItem(
+                                value: null,
+                                child: Text('Select Hold Color'),
+                              ),
+                              ...currentSettings.settingsHoldColour!.entries
+                                  .map((entry) {
+                                String holdColorName = entry.key;
+                                return DropdownMenuItem(
+                                  value: holdColorName,
+                                  child: Text(holdColorName),
+                                );
+                              }),
+                            ],
                             decoration:
                                 const InputDecoration(labelText: 'Hold Color'),
                           ),
                           gradingSystem == "coloured"
                               ? Column(
                                   children: [
-                                    DropdownButtonFormField<Color>(
-                                      value: gradeColor,
-                                      onChanged: (Color? value) {
+                                    DropdownButtonFormField<String>(
+                                      value: gradeColorChoice,
+                                      onChanged: (String? value) {
                                         setState(() {
-                                          gradeColor = value;
-                                          gradeColorChoice =
-                                              gradeColorMap[gradeColor];
+                                          gradeColorChoice = value;
                                         });
                                       },
-                                      items: gradeColorMap.entries
-                                          .map((MapEntry<Color, String> entry) {
-                                        return DropdownMenuItem(
-                                          value: entry.key,
-                                          child: Text(entry.value),
-                                        );
-                                      }).toList(),
+                                      items: [
+                                        // Add an empty item at the beginning
+                                        const DropdownMenuItem(
+                                          value: null,
+                                          child: Text('Select Grade Color'),
+                                        ),
+                                        // Map the entries from colorToGrade
+                                        ...colorToGrade.entries.map((entry) {
+                                          String colorName = entry.key;
+                                          return DropdownMenuItem(
+                                            value: colorName,
+                                            child: Text(colorName),
+                                          );
+                                        }),
+                                      ],
                                       decoration: const InputDecoration(
-                                          labelText: 'Grade Color'),
+                                        labelText: 'Grade Color',
+                                      ),
                                     ),
                                     Slider(
                                       value: difficultyLevel.toDouble(),
@@ -167,7 +182,7 @@ Future<void> showAddNewBoulder(
                                                 groupValue: gradeColorChoice,
                                                 onChanged: (value) {
                                                   setState(() {
-                                                    gradeColorChoice = value;
+                                                    gradeColorChoice = value!;
                                                   });
                                                 },
                                               ))
@@ -240,99 +255,107 @@ Future<void> showAddNewBoulder(
                     actions: [
                       ElevatedButton(
                         onPressed: () async {
-                          if (selectedGrade == "") {
-                            gradeValue = difficultyLevelToArrow(
-                                difficultyLevel, gradeColorChoice!);
-                          }
-                          if (compView && !compBoulder) {
-                            // Show a confirmation dialog
-                            bool confirmResult = await showConfirmationDialog(
-                                context, "Is this boulder a compBoulder?");
-
-                            if (confirmResult) {
-                              // If user confirms, toggle the value of compBoulder
-                              compBoulder = !compBoulder;
+                          if (holdColorChoice == null ||
+                              gradeColorChoice == null) {
+                            showErrorDialog(
+                                context, "Please select Colours/grades");
+                          } else {
+                            if (selectedGrade == "") {
+                              gradeValue = difficultyLevelToArrow(
+                                  difficultyLevel, gradeColorChoice!);
                             }
-                          }
+                            if (compView && !compBoulder) {
+                              // Show a confirmation dialog
+                              bool confirmResult = await showConfirmationDialog(
+                                  context, "Is this boulder a compBoulder?");
 
-                          CloudBoulder? newBoulder;
-                          try {
-                            newBoulder = await fireBaseService.createNewBoulder(
-                                setter: setterTeam == true
-                                    ? dtuSetterName
-                                    : (guestSetterTeam == true
-                                        ? guestSetter
-                                        : selectedSetter),
-                                cordX: centerX,
-                                cordY: centerY,
-                                wall: wall,
-                                holdColour: holdColorMap[holdColour]!,
-                                gradeColour: gradeColorChoice!,
-                                gradeNumberSetter: gradeValue,
-                                topOut: topOut,
-                                active: true,
-                                hiddenGrade: hiddenGrade,
-                                compBoulder: compBoulder,
-                                gotZone: gotZone,
-                                setDateBoulder: Timestamp.now());
-                          } catch (e) {
-                            if (e.toString().contains(
-                                "type 'Null' is not a subtype of type 'String' of 'holdColour'")) {
-                              // ignore: use_build_context_synchronously
-                              showErrorDialog(context, "Missing Hold Colour");
-                            } else {
-                              // ignore: use_build_context_synchronously
-                              showErrorDialog(context, "$e");
-                              newBoulder = null;
-                            }
-                          }
-                          if (currentComp != null && compView) {
-                            if (newBoulder != null) {
-                              // Check if newBoulder is not already in currentComp.bouldersComp
-                              if (!currentComp.bouldersComp!
-                                  .containsKey(newBoulder.boulderID)) {
-                                fireBaseService.updatComp(
-                                    compID: currentComp.compID,
-                                    bouldersComp: updateBoulderCompSet(
-                                        currentComp: currentComp,
-                                        boulder: newBoulder,
-                                        existingData:
-                                            currentComp.bouldersComp));
+                              if (confirmResult) {
+                                // If user confirms, toggle the value of compBoulder
+                                compBoulder = !compBoulder;
                               }
                             }
-                          }
 
-                          if (newBoulder != null) {
-                            if (!setterTeam && !guestSetterTeam) {
-                              try {
-                                var setterProfiles = await fireBaseService
-                                    .getUserFromDisplayName(selectedSetter)
-                                    .first;
-                                CloudProfile setterProfile =
-                                    setterProfiles.first;
-
-                                double setterPoints = calculateSetterPoints(
-                                    setterProfile, newBoulder);
-                                await fireBaseService.updateUser(
-                                  currentProfile: setterProfile,
-                                  setBoulders: updateBoulderSet(
-                                    currentProfile: setterProfile,
-                                    newBoulder: newBoulder,
-                                    setterPoints: setterPoints,
-                                    existingData: setterProfile.setBoulders,
-                                  ),
-                                  setterPoints: updatePoints(
-                                      points: setterPoints,
-                                      existingData: setterProfile.setterPoints),
-                                );
-                              } catch (e) {
+                            CloudBoulder? newBoulder;
+                            try {
+                              newBoulder =
+                                  await fireBaseService.createNewBoulder(
+                                      setter: setterTeam == true
+                                          ? dtuSetterName
+                                          : (guestSetterTeam == true
+                                              ? guestSetter
+                                              : selectedSetter),
+                                      cordX: centerX,
+                                      cordY: centerY,
+                                      wall: wall,
+                                      holdColour: holdColorChoice!,
+                                      gradeColour: gradeColorChoice!,
+                                      gradeNumberSetter: gradeValue,
+                                      topOut: topOut,
+                                      active: true,
+                                      hiddenGrade: hiddenGrade,
+                                      compBoulder: compBoulder,
+                                      gotZone: gotZone,
+                                      setDateBoulder: Timestamp.now());
+                            } catch (e) {
+                              if (e.toString().contains(
+                                  "type 'Null' is not a subtype of type 'String' of 'holdColour'")) {
+                                // ignore: use_build_context_synchronously
+                                showErrorDialog(context, "Missing Hold Colour");
+                              } else {
                                 // ignore: use_build_context_synchronously
                                 showErrorDialog(context, "$e");
+                                newBoulder = null;
                               }
                             }
+                            if (currentComp != null && compView) {
+                              if (newBoulder != null) {
+                                // Check if newBoulder is not already in currentComp.bouldersComp
+                                if (!currentComp.bouldersComp!
+                                    .containsKey(newBoulder.boulderID)) {
+                                  fireBaseService.updatComp(
+                                      compID: currentComp.compID,
+                                      bouldersComp: updateBoulderCompSet(
+                                          currentComp: currentComp,
+                                          boulder: newBoulder,
+                                          existingData:
+                                              currentComp.bouldersComp));
+                                }
+                              }
+                            }
+
+                            if (newBoulder != null) {
+                              if (!setterTeam && !guestSetterTeam) {
+                                try {
+                                  var setterProfiles = await fireBaseService
+                                      .getUserFromDisplayName(selectedSetter)
+                                      .first;
+                                  CloudProfile setterProfile =
+                                      setterProfiles.first;
+
+                                  double setterPoints = calculateSetterPoints(
+                                      setterProfile, newBoulder);
+                                  await fireBaseService.updateUser(
+                                    currentProfile: setterProfile,
+                                    setBoulders: updateBoulderSet(
+                                      currentProfile: setterProfile,
+                                      newBoulder: newBoulder,
+                                      setterPoints: setterPoints,
+                                      existingData: setterProfile.setBoulders,
+                                    ),
+                                    setterPoints: updatePoints(
+                                        points: setterPoints,
+                                        existingData:
+                                            setterProfile.setterPoints),
+                                  );
+                                } catch (e) {
+                                  // ignore: use_build_context_synchronously
+                                  showErrorDialog(context, "$e");
+                                }
+                              }
+                            }
+                            // ignore: use_build_context_synchronously
+                            Navigator.of(context).pop();
                           }
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pop();
                         },
                         child: const Text('Save'),
                       ),

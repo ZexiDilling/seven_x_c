@@ -143,7 +143,6 @@ showColorPickerDialog(
                     onColorChanged: (color) {
                       setState(() {
                         selectedColor = color;
-                        nameController.text = "";
                       });
                     },
                     pickerAreaHeightPercent: 0.8,
