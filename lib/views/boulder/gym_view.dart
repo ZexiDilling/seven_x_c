@@ -188,7 +188,6 @@ class _GymViewState extends State<GymView> {
       } else {
         Navigator.of(context).popAndPushNamed(profileSettings);
       }
-      ;
       return currentProfile;
     }
     return null;

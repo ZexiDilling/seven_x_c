@@ -775,7 +775,7 @@ class FirebaseCloudStorage {
 
       await settingsCollection.doc(settingsID).update(updatedData);
     } catch (e) {
-      print(e);
+      
       throw CouldNotUpdateSettings();
     }
   }

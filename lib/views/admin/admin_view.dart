@@ -32,7 +32,7 @@ class _AdminPanelViewState extends State<AdminPanelView> {
   Future<void> _initializeData() async {
     await _initializeCurrentProfile();
     await _initSettings();
-    _initSettingsData();
+    // _initSettingsData();
   }
 
   Future<CloudSettings?> _initSettings() async {
@@ -56,12 +56,8 @@ class _AdminPanelViewState extends State<AdminPanelView> {
     return null;
   }
 
-  void _initSettingsData() {
-    print(currentSettings!.settingsGradeColour);
-    print(currentSettings!.settingsHoldColour);
-
-
-  }
+  // void _initSettingsData() {
+  // }
 
   @override
   void dispose() {
@@ -137,8 +133,6 @@ class _AdminPanelViewState extends State<AdminPanelView> {
                 children: [
                   ElevatedButton(
                       onPressed: () {
-                        print(currentSettings!.settingsHoldColour);
-                        print(currentSettings!.settingsGradeColour);
                         showColorPickerDialog(context, fireBaseService, currentProfile!, currentSettings!, "holds");
                       },
                       child: const Text("Hold Colours")),

@@ -25,7 +25,7 @@ List<BarChartGroupData> getGradeColourChartData(CloudBoulder boulder, CloudSetti
     String gradeColour = entry.key;
     
     int voteCount = entry.value;
-    Color color = nameToColor(currentSettings.settingsGradeColour![gradeColour]) ?? Colors.grey;
+    Color color = nameToColor(currentSettings.settingsGradeColour![gradeColour]);
 
     return BarChartGroupData(
       x: colorNames.indexOf(gradeColour),
