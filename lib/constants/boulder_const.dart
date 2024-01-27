@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart' show Color, Colors;
 
+const String constSettingsID = "dtu_climbing";
+
 const String dtuSetterName = "DTU Setter Team";
 const String guestSetter = "Guest Setter";
 

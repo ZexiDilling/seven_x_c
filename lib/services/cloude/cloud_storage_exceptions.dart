@@ -20,4 +20,6 @@ class CouldNotUpdateComp extends CloudStorageException {}
 
 class CouldNotUpdateChallenge extends CloudStorageException {}
 
+class CouldNotUpdateSettings extends CloudStorageException {}
+
 class NoChallenges extends CloudStorageException {}

@@ -6,6 +6,7 @@ import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/constants/challenge_const.dart';
 import 'package:seven_x_c/constants/other_const.dart';
+import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 import 'package:seven_x_c/utilities/dialogs/challenge/challenge_create.dart';
 import 'package:seven_x_c/helpters/comp/comp_calculations.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
@@ -29,6 +30,7 @@ Future<void> showBoulderInformation(
     CloudComp? currentComp,
     bool compView,
     FirebaseCloudStorage fireBaseService,
+    CloudSettings currentSettings,
     Stream<Iterable<CloudProfile>> settersStream,
     List<String> challengesOverview) async {
   int attempts = 0;
@@ -42,12 +44,11 @@ Future<void> showBoulderInformation(
   String? gradingShow = "";
   bool editing = false;
   int difficultyLevel = 1;
-  String? gradeColorChoice = "";
-  String? gradeColors = "";
+  String? holdColorChoice;
+  String? gradeColorChoice;
+  String gradeColors = "";
   String? selectedGrade = '';
-  Color? gradeColour;
   int? gradeValue = 0;
-  Color? holdColour = getColorFromName(boulder.holdColour);
   List<String> allGradeColorChoice = [];
   String labelText = "Vote a Grade";
   bool expandPanelState = false;
@@ -97,9 +98,7 @@ Future<void> showBoulderInformation(
 
       if (userClimbInfo["gradeColour"] != "" &&
           userClimbInfo["gradeColour"] != null) {}
-      gradeColour =
-          getColorFromName(userClimbInfo["gradeColour"] ?? boulder.gradeColour);
-      gradeColorChoice = gradeColorMap[gradeColour];
+      gradeColorChoice = userClimbInfo["gradeColour"] ?? boulder.gradeColour;
       selectedGrade = allGrading[gradeValue]![gradingSystem];
       // difficultyLevel = userClimbInfo["gradeArrowVoted"] ?? 0;
     }
@@ -149,12 +148,13 @@ Future<void> showBoulderInformation(
                                 height: 30,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: getColorFromName(
-                                      boulder.holdColour), // Outline color
+                                  color: nameToColor(
+                                      currentSettings.settingsHoldColour![
+                                          boulder.holdColour]), // Outline color
                                 ),
                                 child: Center(
-                                  child:
-                                      gradingCirleDrawing(boulder, gradingShow),
+                                  child: gradingCirleDrawing(
+                                      boulder, currentSettings, gradingShow),
                                 ),
                               ),
                               title: Text("Setter ${boulder.setter}",
@@ -185,16 +185,14 @@ Future<void> showBoulderInformation(
                                   visible: currentProfile.isAdmin ||
                                       currentProfile.isSetter,
                                   child: IconButton(
-                                    icon:
-                                        Icon(editing ? IconManager.edditing : IconManager.doneEdditing),
+                                    icon: Icon(editing
+                                        ? IconManager.edditing
+                                        : IconManager.doneEdditing),
                                     onPressed: () {
                                       labelText = editing
                                           ? "Vote a Grade"
                                           : "Choose a Grade";
-                                      gradeColour =
-                                          getColorFromName(boulder.gradeColour);
-                                      gradeColorChoice =
-                                          gradeColorMap[gradeColour];
+                                      gradeColorChoice = boulder.gradeColour;
                                       gradeValue = boulder.gradeNumberSetter;
                                       difficultyLevel = getdifficultyFromArrow(
                                           getArrowFromNumberAndColor(
@@ -581,20 +579,28 @@ Future<void> showBoulderInformation(
                                           labelText: 'Choose Setter'),
                                     ),
                                     const SizedBox(height: 20),
-                                    DropdownButtonFormField<Color>(
-                                      value: holdColour,
-                                      onChanged: (Color? value) {
+                                    DropdownButtonFormField<String>(
+                                      value: holdColorChoice,
+                                      onChanged: (value) {
                                         setState(() {
-                                          holdColour = value;
+                                          holdColorChoice = value!;
                                         });
                                       },
-                                      items: holdColorMap.entries
-                                          .map((MapEntry<Color, String> entry) {
-                                        return DropdownMenuItem(
-                                          value: entry.key,
-                                          child: Text(entry.value),
-                                        );
-                                      }).toList(),
+                                      items: [
+                                        const DropdownMenuItem(
+                                          value: null,
+                                          child: Text('Select Hold Color'),
+                                        ),
+                                        ...currentSettings
+                                            .settingsHoldColour!.entries
+                                            .map((entry) {
+                                          String holdColorName = entry.key;
+                                          return DropdownMenuItem(
+                                            value: holdColorName,
+                                            child: Text(holdColorName),
+                                          );
+                                        }),
+                                      ],
                                       decoration: const InputDecoration(
                                           labelText: 'Hold Color'),
                                     ),
@@ -607,13 +613,11 @@ Future<void> showBoulderInformation(
                                     children: [
                                       SizedBox(
                                         width: 250,
-                                        child: DropdownButtonFormField<Color>(
-                                          value: gradeColour,
-                                          onChanged: (Color? value) {
+                                        child: DropdownButtonFormField<String>(
+                                          value: gradeColorChoice,
+                                          onChanged: (String? value) {
                                             setState(() {
-                                              gradeColour = value;
-                                              gradeColorChoice =
-                                                  gradeColorMap[gradeColour];
+                                              gradeColorChoice = value!;
 
                                               updateUsersVotedForGrade(
                                                   fireBaseService,
@@ -625,15 +629,25 @@ Future<void> showBoulderInformation(
                                                   gradeColorChoice);
                                             });
                                           },
-                                          items: gradeColorMap.entries.map(
-                                              (MapEntry<Color, String> entry) {
-                                            return DropdownMenuItem(
-                                              value: entry.key,
-                                              child: Text(entry.value),
-                                            );
-                                          }).toList(),
-                                          decoration: InputDecoration(
-                                              labelText: labelText),
+                                          items: [
+                                            // Add an empty item at the beginning
+                                            const DropdownMenuItem(
+                                              value: null,
+                                              child: Text('Select Grade Color'),
+                                            ),
+                                            // Map the entries from colorToGrade
+                                            ...colorToGrade.entries
+                                                .map((entry) {
+                                              String colorName = entry.key;
+                                              return DropdownMenuItem(
+                                                value: colorName,
+                                                child: Text(colorName),
+                                              );
+                                            }),
+                                          ],
+                                          decoration: const InputDecoration(
+                                            labelText: 'Grade Color',
+                                          ),
                                         ),
                                       ),
                                       Slider(
@@ -658,7 +672,7 @@ Future<void> showBoulderInformation(
                                         },
                                       ),
                                       const Text('Grade Colour Chart'),
-                                      barGraphColours(boulder),
+                                      barGraphColours(boulder, currentSettings),
                                     ],
                                   )
                                 : Column(
@@ -707,7 +721,7 @@ Future<void> showBoulderInformation(
                                         ),
                                       ),
                                       Text(
-                                          "Grade: ${capitalizeFirstLetter(gradeColors!)}"),
+                                          "Grade: ${capitalizeFirstLetter(gradeColors)}"),
                                       if (allGradeColorChoice.length >
                                           1) // Show radio buttons if there is more than one color
                                         ...allGradeColorChoice.map(
@@ -717,7 +731,7 @@ Future<void> showBoulderInformation(
                                                   groupValue: gradeColorChoice,
                                                   onChanged: (value) {
                                                     setState(() {
-                                                      gradeColorChoice = value;
+                                                      gradeColorChoice = value!;
                                                       updateUsersVotedForGrade(
                                                           fireBaseService,
                                                           boulder,
@@ -730,8 +744,8 @@ Future<void> showBoulderInformation(
                                                   },
                                                 )),
                                       const SizedBox(height: 20),
-                                      barChartGradeNumbering(
-                                          gradingSystem, boulder),
+                                      barChartGradeNumbering(gradingSystem,
+                                          currentSettings, boulder),
                                     ],
                                   ),
                             const SizedBox(height: 20),
@@ -929,8 +943,7 @@ Future<void> showBoulderInformation(
                                                     : Row(
                                                         children: [
                                                           ElevatedButton(
-                                                              onPressed:
-                                                                  () {
+                                                              onPressed: () {
                                                                 Stream<
                                                                         Iterable<
                                                                             CloudChallenge>>
@@ -999,25 +1012,33 @@ Future<void> showBoulderInformation(
                           visible: editing,
                           child: ElevatedButton(
                               onPressed: () {
-                                if (gradingSystem == "coloured") {
-                                  gradeValue = difficultyLevelToArrow(
-                                      difficultyLevel, gradeColorChoice!);
+                                if (holdColorChoice == null ||
+                                    gradeColorChoice == null) {
+                                  showErrorDialog(
+                                      context, "Please select color and grade");
                                 } else {
-                                  gradeValue = null;
+                                  if (gradingSystem == "coloured") {
+                                    gradeValue = difficultyLevelToArrow(
+                                        difficultyLevel, gradeColorChoice!);
+                                  } else {
+                                    gradeValue = null;
+                                  }
+                                  fireBaseService.updatBoulder(
+                                      boulderID: boulder.boulderID,
+                                      updateDateBoulder: updatedBoulder
+                                          ? Timestamp.now()
+                                          : null,
+                                      topOut: topOut,
+                                      hiddenGrade: hiddenGrade,
+                                      setter: selectedSetter,
+                                      holdColour: holdColorChoice,
+                                      gradeColour: gradeColorChoice,
+                                      gradeNumberSetter: gradeValue,
+                                      compBoulder: compBoulder,
+                                      climberTopped:
+                                          updatedBoulder ? {} : null);
+                                  Navigator.of(context).pop();
                                 }
-                                fireBaseService.updatBoulder(
-                                  boulderID: boulder.boulderID,
-                                  updateDateBoulder: updatedBoulder ? Timestamp.now() : null, 
-                                  topOut: topOut,
-                                  hiddenGrade: hiddenGrade,
-                                  setter: selectedSetter,
-                                  holdColour: holdColorMap[holdColour],
-                                  gradeColour: gradeColorChoice,
-                                  gradeNumberSetter: gradeValue,
-                                  compBoulder: compBoulder,
-                                  climberTopped: updatedBoulder ? {} : null
-                                );
-                                Navigator.of(context).pop();
                               },
                               child: const Text("Apply")))
                     ],
@@ -1146,15 +1167,16 @@ double calculateboulderPoints(CloudProfile currentProfile, CloudBoulder boulder,
         flashed,
       );
   // Check if the user have points from this boulder
-  if (currentProfile.climbedBoulders !=null) {
-  if (currentProfile.climbedBoulders!.containsKey((boulder.boulderID))) {
-    if (currentProfile.climbedBoulders![boulder.boulderID]["topped"]) {
-      boulderPoints = boulderPoints *
-          (repeats > 0
-              ? repeatsMultiplier - (repeats - 1) * repeatsDecrement
-              : 0);
+  if (currentProfile.climbedBoulders != null) {
+    if (currentProfile.climbedBoulders!.containsKey((boulder.boulderID))) {
+      if (currentProfile.climbedBoulders![boulder.boulderID]["topped"]) {
+        boulderPoints = boulderPoints *
+            (repeats > 0
+                ? repeatsMultiplier - (repeats - 1) * repeatsDecrement
+                : 0);
+      }
     }
-  }}
+  }
   return boulderPoints;
 }
 
@@ -1318,16 +1340,17 @@ SizedBox climberTopList(List<Map<String, dynamic>> toppersList) {
   );
 }
 
-Container gradingCirleDrawing(CloudBoulder boulder, String? gradingShow) {
+Container gradingCirleDrawing(
+    CloudBoulder boulder, CloudSettings currentSettings, String? gradingShow) {
   return Container(
     width: 26,
     height: 26,
     decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      color: boulder.hiddenGrade == true
-          ? hiddenGradeColor
-          : getColorFromName(capitalizeFirstLetter(boulder.gradeColour)),
-    ),
+        shape: BoxShape.circle,
+        color: boulder.hiddenGrade == true
+            ? hiddenGradeColor
+            : nameToColor(
+                currentSettings.settingsHoldColour![boulder.holdColour])),
     child: Center(
       child: Padding(
         padding: const EdgeInsets.only(left: 0.0),
@@ -1346,7 +1369,7 @@ Container gradingCirleDrawing(CloudBoulder boulder, String? gradingShow) {
   );
 }
 
-SizedBox barGraphColours(CloudBoulder boulder) {
+SizedBox barGraphColours(CloudBoulder boulder, CloudSettings currentSettings) {
   return SizedBox(
     width: 250,
     height: 150,
@@ -1356,13 +1379,14 @@ SizedBox barGraphColours(CloudBoulder boulder) {
         groupsSpace: 12,
         borderData: FlBorderData(show: false),
         titlesData: const FlTitlesData(show: false),
-        barGroups: getGradeColourChartData(boulder),
+        barGroups: getGradeColourChartData(boulder, currentSettings),
       ),
     ),
   );
 }
 
-SizedBox barChartGradeNumbering(String gradingSystem, CloudBoulder boulder) {
+SizedBox barChartGradeNumbering(
+    String gradingSystem, CloudSettings currentSettings, CloudBoulder boulder) {
   return SizedBox(
     width: 250,
     height: 200,
@@ -1386,7 +1410,8 @@ SizedBox barChartGradeNumbering(String gradingSystem, CloudBoulder boulder) {
                     getBottomTitlesNumberGrade(value, meta, gradingSystem),
               ),
             )),
-        barGroups: getGradeNumberChartData(boulder, gradingSystem),
+        barGroups:
+            getGradeNumberChartData(boulder, currentSettings, gradingSystem),
       ),
     ),
   );

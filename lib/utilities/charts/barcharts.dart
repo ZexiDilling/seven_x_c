@@ -2,12 +2,13 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
+import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 
 
 double barRoundness = 2;
 double barWidth = 10;
 
-List<BarChartGroupData> getGradeColourChartData(CloudBoulder boulder) {
+List<BarChartGroupData> getGradeColourChartData(CloudBoulder boulder, CloudSettings currentSettings) {
   Map<String, int> colorVotes = {};
 
   if (boulder.climberTopped != null && boulder.climberTopped!.isNotEmpty) {
@@ -18,14 +19,16 @@ List<BarChartGroupData> getGradeColourChartData(CloudBoulder boulder) {
     });
   }
 
+   List<String> colorNames = currentSettings.settingsGradeColour!.keys.toList();
+
   List<BarChartGroupData> barGroups = colorVotes.entries.map((entry) {
     String gradeColour = entry.key;
     
     int voteCount = entry.value;
-    Color color = getColorFromName(gradeColour) ?? Colors.grey;
+    Color color = nameToColor(currentSettings.settingsGradeColour![gradeColour]);
 
     return BarChartGroupData(
-      x: gradeColorMap.keys.toList().indexOf(color),
+      x: colorNames.indexOf(gradeColour),
       barRods: [
         BarChartRodData(
           toY: voteCount.toDouble(),
@@ -40,14 +43,14 @@ List<BarChartGroupData> getGradeColourChartData(CloudBoulder boulder) {
   return barGroups;
 }
 
-List<BarChartGroupData> getGradeNumberChartData(boulder, gradingSystem) {
+List<BarChartGroupData> getGradeNumberChartData(CloudBoulder boulder, CloudSettings currentSettings, String gradingSystem) {
   Map<int, int> gradeVotes = {};
 
   if (gradingSystem.toLowerCase() == "coloured") {
     gradingSystem = "french";
   }
-  if (boulder.climberTopped != null && boulder.climberTopped.isNotEmpty) {
-    boulder.climberTopped.forEach((userId, climbInfo) {
+  if (boulder.climberTopped != null && boulder.climberTopped!.isNotEmpty) {
+    boulder.climberTopped!.forEach((userId, climbInfo) {
       if (climbInfo['gradeNumber'] == int) {
         int gradeNumber = climbInfo['gradeNumber'];
 
@@ -68,7 +71,7 @@ List<BarChartGroupData> getGradeNumberChartData(boulder, gradingSystem) {
       barRods: [
         BarChartRodData(
           toY: voteCount.toDouble(),
-          color: getColorFromName(boulder.gradeColour),
+          color: nameToColor(currentSettings.settingsGradeColour![boulder.gradeColour]),
           width: barWidth,
           borderRadius: BorderRadius.circular(barRoundness),
         ),

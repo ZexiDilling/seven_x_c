@@ -4,6 +4,7 @@ import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
+
 String capitalizeFirstLetter(String input) {
   if (input.isEmpty) return input;
   return input[0].toUpperCase() + input.substring(1);
@@ -240,7 +241,8 @@ DateTime calculateDateThreshold(TimePeriod timePeriod) {
   switch (timePeriod) {
     case TimePeriod.week:
       // Find the last Monday of the current week
-      DateTime lastMonday = currentTime.subtract(Duration(days: currentTime.weekday - 1));
+      DateTime lastMonday =
+          currentTime.subtract(Duration(days: currentTime.weekday - 1));
       // Find the next Sunday
       return lastMonday;
 
@@ -260,7 +262,8 @@ DateTime calculateDateThreshold(TimePeriod timePeriod) {
 
     case TimePeriod.year:
       // Return the first day of the current month 12 months ago
-      return currentTime.subtract(const Duration(days: 30 * 12)); // Assuming 30 days in a month
+      return currentTime.subtract(
+          const Duration(days: 30 * 12)); // Assuming 30 days in a month
 
     default:
       return DateTime(0); // Or handle the default case accordingly
@@ -275,7 +278,8 @@ DateTime calculateEndDate(TimePeriod selectedTimePeriod, DateTime startDate) {
 
     case TimePeriod.month:
       // Find the last day of the current month
-      return DateTime(startDate.year, startDate.month + 1, 1).subtract(const Duration(days: 1));
+      return DateTime(startDate.year, startDate.month + 1, 1)
+          .subtract(const Duration(days: 1));
 
     case TimePeriod.semester:
       // Determine the end of the semester based on the current month
@@ -377,15 +381,87 @@ List updateListOfRandomWinners(
     {required CloudComp currentComp,
     required String userDisplayName,
     List? existingData}) {
-      List randomWinners = existingData ?? [];
-      randomWinners.add(userDisplayName);
-      return randomWinners;
-    }
-
-
-List updateChallengeBoulderList({required CloudBoulder boulder, List? existingData}) {
   List randomWinners = existingData ?? [];
-      randomWinners.add(boulder.boulderID);
-      return randomWinners;
-    }
+  randomWinners.add(userDisplayName);
+  return randomWinners;
+}
 
+List updateChallengeBoulderList(
+    {required CloudBoulder boulder, List? existingData}) {
+  List randomWinners = existingData ?? [];
+  randomWinners.add(boulder.boulderID);
+  return randomWinners;
+}
+
+Map<String, dynamic> updateSettingsHoldColours(
+    {required String colourName,
+    required int alpha,
+    required int red,
+    required int green,
+    required int blue,
+    String? oldColourName,
+    Map<String, dynamic>? existingData}) {
+  Map<String, dynamic> newData = {
+    "aplha": alpha,
+    "red": red,
+    "green": green,
+    "blue": blue,
+  };
+
+  Map<String, dynamic> colourSettings = existingData ?? {};
+  if (oldColourName != null) {
+    colourSettings.remove(oldColourName);
+  }
+  colourSettings[colourName] = newData;
+
+  return colourSettings;
+}
+
+Map<String, dynamic> updateSettingsGradeColours(
+    {required String colourName,
+    required int alpha,
+    required int red,
+    required int green,
+    required int blue,
+    required int minGrade,
+    required int maxGrade,
+    String? oldColourName,
+    Map<String, dynamic>? existingData}) {
+  Map<String, dynamic> newData = {
+    "aplha": alpha,
+    "red": red,
+    "green": green,
+    "blue": blue,
+    "min": minGrade,
+    "max": maxGrade,
+  };
+
+  Map<String, dynamic> colourSettings = existingData ?? {};
+  if (oldColourName != null) {
+    colourSettings.remove(oldColourName);
+  }
+  colourSettings[colourName] = newData;
+
+  return colourSettings;
+}
+
+Map<String, dynamic> deletSubSettings(
+    {required String oldColourName,
+    required Map<String, dynamic>? existingData}) {
+  Map<String, dynamic> colourSettings = existingData ?? {};
+  colourSettings.remove(oldColourName);
+  return colourSettings;
+}
+
+int? tryParseInt(String? value) {
+  if (value == null) {
+    return null;
+  }
+
+  try {
+    return int.parse(value);
+  } catch (e) {
+    // Handle the case where the string is not a valid integer
+    return null;
+  }
+}

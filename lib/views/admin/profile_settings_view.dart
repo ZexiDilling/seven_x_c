@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/constants/routes.dart';
 import 'package:seven_x_c/services/auth/auth_service.dart';
@@ -24,18 +25,20 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
   final TextEditingController _displayNameController = TextEditingController();
   String get userEmail => AuthService.firebase().currentUser!.email;
   String get userId => AuthService.firebase().currentUser!.id;
-  late final FirebaseCloudStorage _userService;
+  late final FirebaseCloudStorage fireBaseService;
 
   bool _isSetter = false;
   bool _isAdmin = false;
   bool _isAnonymous = false;
   String _gradingSystem = 'Coloured';
   bool profileExist = false;
+  String settingsID = constSettingsID;
 
   @override
   void initState() {
     super.initState();
-    _userService = FirebaseCloudStorage();
+    fireBaseService = FirebaseCloudStorage();
+    
     // _initializeCurrentProfile();
     // Initialize the form fields with current user information
   }
@@ -50,7 +53,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
 
   Future<void> _initializeCurrentProfile() async {
     await for (final profiles
-        in _userService.getUser(userID: userId.toString())) {
+        in fireBaseService.getUser(userID: userId.toString())) {
       if (profiles.isNotEmpty) {
         setState(() {
           CloudProfile currentProfile = profiles.first;
@@ -167,7 +170,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      final profiles = await _userService
+                      final profiles = await fireBaseService
                           .getUser(userID: userId.toString())
                           .first;
                       final currentProfile =
@@ -194,7 +197,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                               ),
                               TextButton(
                                 onPressed: () async {
-                                  final profiles = await _userService
+                                  final profiles = await fireBaseService
                                       .getUser(userID: userId.toString())
                                       .first;
                                   final currentProfile = profiles.isNotEmpty
@@ -202,7 +205,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                                       : null;
                                   if (currentProfile != null) {
                                     try {
-                                      await _userService.updateUser(
+                                      await fireBaseService.updateUser(
                                         currentProfile: currentProfile,
                                         boulderPoints: 0.0,
                                         setterPoints: 0.0,
@@ -247,7 +250,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                               TextButton(
                                 onPressed: () async {
                                   try {
-                                    await _userService.deleteUser(
+                                    await fireBaseService.deleteUser(
                                         ownerUserId: userId);
                                     Navigator.of(context).pop();
                                     Navigator.of(context).pop();
@@ -284,10 +287,10 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
         showErrorDialog(context, "Missing Nick-Name");
       } else if (email.isEmpty) {
         showErrorDialog(context, "Missing E-mail");
-      } else if (await _userService.isDisplayNameUnique(displayName, userId)) {
+      } else if (await fireBaseService.isDisplayNameUnique(displayName, userId)) {
         if (profileExist) {
           // User exists, update the user profile information
-          await _userService.updateUser(
+          await fireBaseService.updateUser(
             currentProfile: currentProfile,
             displayName: _displayNameController.text,
             isSetter: _isSetter,
@@ -298,12 +301,13 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
           Navigator.of(context).pop();
         } else {
           // User does not exist, create a new user
-          await _userService.createNewUser(
+          await fireBaseService.createNewUser(
               boulderPoints: 0.0,
               setterPoints: 0.0,
               challengePoints: 0.0,
               isSetter: _isSetter,
               isAdmin: _isAdmin,
+              settingsID: settingsID,
               isAnonymous: _isAnonymous,
               email: userEmail,
               displayName: _displayNameController.text,

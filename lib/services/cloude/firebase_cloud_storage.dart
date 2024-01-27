@@ -5,6 +5,7 @@ import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 import 'package:seven_x_c/services/cloude/cloud_storage_exceptions.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
+import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 
 class FirebaseCloudStorage {
   final bouldersCollection = FirebaseFirestore.instance.collection("boulders");
@@ -12,6 +13,7 @@ class FirebaseCloudStorage {
   final compCollection = FirebaseFirestore.instance.collection("comp");
   final challengeCollection =
       FirebaseFirestore.instance.collection("challenges");
+  final settingsCollection = FirebaseFirestore.instance.collection("settings");
 
 // Boulder data
   Future<void> deleteBoulder({required String boulderID}) async {
@@ -174,15 +176,17 @@ class FirebaseCloudStorage {
             .where(FieldPath.documentId, isEqualTo: boulderID)
             .get();
     try {
-    // Extract challenges from non-null challenge field
-    final List<String> challenges = boulderSnapshots.docs
-        .where((doc) => doc['boulderChallenges'] != null)
-        .map((doc) => (doc['boulderChallenges'] as Map<String, dynamic>).keys.toList())
-        .expand((keys) => keys) // flatten the list of lists into a single list
-        .toList();
-    return challenges;} catch (e) {
+      // Extract challenges from non-null challenge field
+      final List<String> challenges = boulderSnapshots.docs
+          .where((doc) => doc['boulderChallenges'] != null)
+          .map((doc) =>
+              (doc['boulderChallenges'] as Map<String, dynamic>).keys.toList())
+          .expand(
+              (keys) => keys) // flatten the list of lists into a single list
+          .toList();
+      return challenges;
+    } catch (e) {
       return <String>[];
-      
     }
   }
 
@@ -211,6 +215,7 @@ class FirebaseCloudStorage {
     double? challengePoints,
     bool? isSetter,
     bool? isAdmin,
+    String? settingsID,
     bool? isAnonymous,
     Map<String, dynamic>? climbedBoulders,
     Map<String, dynamic>? setBoulders,
@@ -239,6 +244,7 @@ class FirebaseCloudStorage {
 
       if (isSetter != null) updatedData[isSetterFieldName] = isSetter;
       if (isAdmin != null) updatedData[isAdminFieldName] = isAdmin;
+      if (settingsID != null) updatedData[settingsIDFieldName] = settingsID;
       if (isAnonymous != null) updatedData[isAnonymousFieldName] = isAnonymous;
       if (climbedBoulders != null) {
         updatedData[climbedBouldersFieldName] = climbedBoulders;
@@ -274,6 +280,7 @@ class FirebaseCloudStorage {
     required double challengePoints,
     required bool isSetter,
     required bool isAdmin,
+    required String settingsID,
     required bool isAnonymous,
     Map<String, dynamic>? climbedBoulders,
     Map<String, dynamic>? setBoulders,
@@ -294,6 +301,7 @@ class FirebaseCloudStorage {
       challengePointsFieldName: challengePoints,
       isSetterFieldName: isSetter,
       isAdminFieldName: isAdmin,
+      settingsIDFieldName: settingsID,
       isAnonymousFieldName: isAnonymous,
       if (climbedBoulders != null) climbedBouldersFieldName: climbedBoulders,
       if (setBoulders != null) setBouldersFieldName: setBoulders,
@@ -315,6 +323,7 @@ class FirebaseCloudStorage {
       challengePoints,
       isSetter,
       isAdmin,
+      settingsID,
       isAnonymous,
       climbedBoulders,
       setBoulders,
@@ -447,7 +456,8 @@ class FirebaseCloudStorage {
         genderBased,
         bouldersComp,
         climbersComp,
-        compResults, randomWinners,
+        compResults,
+        randomWinners,
         compID: fetchComp.id);
   }
 
@@ -510,7 +520,9 @@ class FirebaseCloudStorage {
       if (compResults != null) {
         updatedData[compResultsFieldName] = compResults;
       }
-      if (randomWinners != null) {updatedData[randomWinnersFieldName] = randomWinners;}
+      if (randomWinners != null) {
+        updatedData[randomWinnersFieldName] = randomWinners;
+      }
 
       // Update the document with the non-null fields
       await compCollection.doc(compID).update(updatedData);
@@ -525,11 +537,8 @@ class FirebaseCloudStorage {
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {
-      // If there's at least one document with the specified compID
-      // Return the first document as a CloudComp instance
       return CloudComp.fromSnapshot(querySnapshot.docs.first);
     } else {
-      // If no document with the specified compID is found, return null
       return null;
     }
   }
@@ -629,7 +638,9 @@ class FirebaseCloudStorage {
       if (challengeCounter != null) {
         updatedData[challengeCounterFieldName] = challengeCounter;
       }
-      if (challengeCounterRunning != null) updatedData[challengeCounterRunningFieldName] = challengeCounterRunning;
+      if (challengeCounterRunning != null) {
+        updatedData[challengeCounterRunningFieldName] = challengeCounterRunning;
+      }
       if (challengeDifficulty != null) {
         updatedData[challengeDifficultyFieldName] = challengeDifficulty;
       }
@@ -654,16 +665,132 @@ class FirebaseCloudStorage {
     }
   }
 
-   Stream<Iterable<CloudChallenge>> getAllChallenges() {
-    final allChallenges = challengeCollection
-        
-        .snapshots()
-        .map(
-            (event) => event.docs.map((doc) => CloudChallenge.fromSnapshot(doc)));
+  Stream<Iterable<CloudChallenge>> getAllChallenges() {
+    final allChallenges = challengeCollection.snapshots().map(
+        (event) => event.docs.map((doc) => CloudChallenge.fromSnapshot(doc)));
     return allChallenges;
   }
 
+  Future<CloudSettings> createSettings({
+    required String settingsID,
+    required String settingsNameID,
+    required String settingsName,
+    required String settingsCountry,
+    required String settingsLocation,
+    required String settingsStyle,
+    required List settingsActivites,
+    required List settingsGradingSystem,
+    bool? settingsHoldsFollowsGrade,
+    Map<String, dynamic>? settingsHoldColour,
+    Map<String, dynamic>? settingsGradeColour,
+    Map<String, dynamic>? settingsColorToGrade,
+    Map<String, dynamic>? settingsWallRegions,
+  }) async {
+    final document = await settingsCollection.add({
+      settingsNameIDFieldName: settingsNameID,
+      settingsNameFieldName: settingsName,
+      settingsCountryFieldName: settingsCountry,
+      settingsLocationFieldName: settingsLocation,
+      settingsStyleFieldName: settingsStyle,
+      settingsActivitesFieldName: settingsActivites,
+      settingsGradingSystemFieldName: settingsGradingSystem,
+      settingsHoldsFollowsGradeFieldName: settingsHoldsFollowsGrade,
+      settingsHoldColourFieldName: settingsHoldColour,
+      settingsGradeColourFieldName: settingsGradeColour,
+      settingsColorToGradeFieldName: settingsColorToGrade,
+      settingsWallRegionsFieldName: settingsWallRegions,
+    });
+    final fetchChallenge = await document.get();
+    return CloudSettings(
+      settingsNameID,
+      settingsName,
+      settingsCountry,
+      settingsLocation,
+      settingsStyle,
+      settingsActivites,
+      settingsGradingSystem,
+      settingsHoldsFollowsGrade,
+      settingsHoldColour,
+      settingsGradeColour,
+      settingsColorToGrade,
+      settingsWallRegions,
+      settingsID: fetchChallenge.id,
+    );
+  }
 
+  Future<void> updateSettings({
+    required String settingsID,
+    String? settingsName,
+    String? settingsCountry,
+    String? settingsLocation,
+    String? settingsStyle,
+    List? settingsActivites,
+    List? settingsGradingSystem,
+    bool? settingsHoldsFollowsGrade,
+    Map<String, dynamic>? settingsHoldColour,
+    Map<String, dynamic>? settingsGradeColour,
+    Map<String, dynamic>? settingsColorToGrade,
+    Map<String, dynamic>? settingsWallRegions,
+  }) async {
+    try {
+      // Create a map to store non-null fields and their values
+      final Map<String, dynamic> updatedData = {};
+
+      if (settingsName != null) {
+        updatedData[settingsNameFieldName] = settingsName;
+      }
+      if (settingsCountry != null) {
+        updatedData[settingsCountryFieldName] = settingsCountry;
+      }
+      if (settingsLocation != null) {
+        updatedData[settingsLocationFieldName] = settingsLocation;
+      }
+      if (settingsStyle != null) {
+        updatedData[settingsStyleFieldName] = settingsStyle;
+      }
+      if (settingsActivites != null) {
+        updatedData[settingsActivitesFieldName] = settingsActivites;
+      }
+      if (settingsGradingSystem != null) {
+        updatedData[settingsGradingSystemFieldName] = settingsGradingSystem;
+      }
+      if (settingsHoldsFollowsGrade != null) {
+        updatedData[settingsHoldsFollowsGradeFieldName] =
+            settingsHoldsFollowsGrade;
+      }
+      if (settingsHoldColour != null) {
+        updatedData[settingsHoldColourFieldName] = settingsHoldColour;
+      }
+      if (settingsGradeColour != null) {
+        updatedData[settingsGradeColourFieldName] = settingsGradeColour;
+      }
+      if (settingsColorToGrade != null) {
+        updatedData[settingsColorToGradeFieldName] = settingsColorToGrade;
+      }
+      if (settingsWallRegions != null) {
+        updatedData[settingsWallRegionsFieldName] = settingsWallRegions;
+      }
+
+      // Add non-null fields to the map
+
+      await settingsCollection.doc(settingsID).update(updatedData);
+    } catch (e) {
+      
+      throw CouldNotUpdateSettings();
+    }
+  }
+
+Future<CloudSettings?> getSettings(String? settingsNameID) async {
+  final querySnapshot = await settingsCollection
+        .where(settingsNameIDFieldName, isEqualTo: settingsNameID)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      return CloudSettings.fromSnapshot(querySnapshot.docs.first);
+    } else {
+      return null;
+    }
+  }
 
   Future<void> deleteChallenge({required String challengeID}) async {
     try {
@@ -678,3 +805,4 @@ class FirebaseCloudStorage {
   FirebaseCloudStorage._shareIstance();
   factory FirebaseCloudStorage() => _shared;
 }
+

@@ -16,6 +16,7 @@ import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
+import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/logout_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/comp/comp_rank_dialog.dart';
@@ -53,6 +54,7 @@ class _GymViewState extends State<GymView> {
   int topCounter = 0;
   bool compView = false;
   CloudComp? currentComp;
+  late CloudSettings? currentSettings;
 
   late final FirebaseCloudStorage _fireBaseService;
 
@@ -78,52 +80,54 @@ class _GymViewState extends State<GymView> {
 
   Stream<Iterable<CloudBoulder>> getFilteredBouldersStream() {
     return _fireBaseService.getAllBoulders().map((boulders) {
-      if (showAllBouldersFilter) {return boulders;} else {
+      if (showAllBouldersFilter) {
+        return boulders;
+      } else {
+        if (selectedColors.isNotEmpty) {
+          boulders = boulders.where((boulder) =>
+              selectedColors.contains(boulder.gradeColour.toLowerCase()));
+        }
 
-      if (selectedColors.isNotEmpty) {
         boulders = boulders.where((boulder) =>
-            selectedColors.contains(boulder.gradeColour.toLowerCase()));
+            boulder.gradeNumberSetter >= gradeSliderRange.start &&
+            boulder.gradeNumberSetter <= gradeSliderRange.end);
+
+        if (missingFilter) {
+          // Filter out boulders where the current user has topped
+          boulders = boulders.where((boulder) {
+            var userClimbInfo = boulder.climberTopped?[currentProfile!.userID];
+            return (userClimbInfo?['topped'] ?? false) == false;
+          });
+        }
+
+        if (newFilter) {
+          // Filter boulders where setDate is less than 5 days ago
+          final currentDate = DateTime.now();
+          boulders = boulders.where((boulder) {
+            final setDate = (boulder.setDateBoulder).toDate();
+            return currentDate.difference(setDate).inDays < 5;
+          });
+        }
+
+        if (updateFilter) {
+          // Filter boulders where updateDate is different from setDate
+          boulders = boulders.where((boulder) {
+            final setDate = (boulder.setDateBoulder).toDate();
+            final updateDate = (boulder.updateDateBoulder)?.toDate();
+
+            // Include the boulder in the result if both dates are non-null and different
+            return updateDate != null && setDate != updateDate;
+          });
+        }
+
+        if (compFilter | compView) {
+          // Filter boulders where comp is true
+          boulders = boulders.where((boulder) => boulder.compBoulder == true);
+        }
+
+        // If no filters are applied, return the original stream
+        return boulders;
       }
-
-      boulders = boulders.where((boulder) =>
-          boulder.gradeNumberSetter >= gradeSliderRange.start &&
-          boulder.gradeNumberSetter <= gradeSliderRange.end);
-
-      if (missingFilter) {
-        // Filter out boulders where the current user has topped
-        boulders = boulders.where((boulder) {
-          var userClimbInfo = boulder.climberTopped?[currentProfile!.userID];
-          return (userClimbInfo?['topped'] ?? false) == false;
-        });
-      }
-
-      if (newFilter) {
-        // Filter boulders where setDate is less than 5 days ago
-        final currentDate = DateTime.now();
-        boulders = boulders.where((boulder) {
-          final setDate = (boulder.setDateBoulder).toDate();
-          return currentDate.difference(setDate).inDays < 5;
-        });
-      }
-
-      if (updateFilter) {
-        // Filter boulders where updateDate is different from setDate
-        boulders = boulders.where((boulder) {
-          final setDate = (boulder.setDateBoulder).toDate();
-          final updateDate = (boulder.updateDateBoulder)?.toDate();
-
-          // Include the boulder in the result if both dates are non-null and different
-          return updateDate != null && setDate != updateDate;
-        });
-      }
-
-      if (compFilter | compView) {
-        // Filter boulders where comp is true
-        boulders = boulders.where((boulder) => boulder.compBoulder == true);
-      }
-
-      // If no filters are applied, return the original stream
-      return boulders;}
     });
   }
 
@@ -131,12 +135,44 @@ class _GymViewState extends State<GymView> {
   void initState() {
     _fireBaseService = FirebaseCloudStorage();
 
-    _initializeCurrentProfile();
+    _initializeData();
     super.initState();
     filteredBouldersStream = getFilteredBouldersStream();
+    
   }
 
-  Future<void> _initializeCurrentProfile() async {
+  Future<void> _initializeData() async {
+    await _initializeCurrentProfile();
+    await _initSettings();
+    _initSettingData();
+
+  }
+
+  _initSettingData() {
+    Map<String, Map<String, int>> colorToGrade = {};
+
+    for (var entry in currentSettings!.settingsGradeColour!.entries) {
+      String name =
+          entry.key.toLowerCase(); // Convert name to lowercase for consistency
+      Map<String, dynamic> data = entry.value;
+
+      int minGrade = data["min"] ?? 0;
+      int maxGrade = data["max"] ?? 0;
+      colorToGrade[name] = {"min": minGrade, "max": maxGrade};
+
+    }
+  }
+
+  Future<CloudSettings?> _initSettings() async {
+    final CloudSettings? tempSettings =
+        await _fireBaseService.getSettings(currentProfile!.settingsID);
+    setState(() {
+      currentSettings = tempSettings;
+    });
+    return currentSettings;
+  }
+
+  Future<CloudProfile?> _initializeCurrentProfile() async {
     await for (final profiles
         in _fireBaseService.getUser(userID: userId.toString())) {
       if (profiles.isNotEmpty) {
@@ -152,7 +188,9 @@ class _GymViewState extends State<GymView> {
       } else {
         Navigator.of(context).popAndPushNamed(profileSettings);
       }
+      return currentProfile;
     }
+    return null;
   }
 
   @override
@@ -170,21 +208,24 @@ class _GymViewState extends State<GymView> {
           stream: getFilteredBouldersStream(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              // Stream is still loading
-              return const Text('DTU Climbing - ??');
+              if (currentSettings != null) {
+                return Text(currentSettings!.settingsName);
+              } else {
+                return const Text('Gym View - ??');
+              }
             }
 
             if (snapshot.hasError) {
-              // Handle error
               return Text('Error:  ${snapshot.error}');
             }
-
-            // Use the length of the boulders list to update the app bar title
             final bouldersCount = snapshot.data?.length ?? 0;
             return compView
-                ? Text(currentComp!.compName, style: compBarStyle,)
-                : Text('DTU Climbing - $bouldersCount', style: appBarStyle);
-            // : Text("$compView");
+                ? Text(
+                    currentComp!.compName,
+                    style: compBarStyle,
+                  )
+                : Text('${currentSettings!.settingsName} - $bouldersCount',
+                    style: appBarStyle);
           },
         ),
         backgroundColor: compView ? compAppBarColour : dtuClimbingAppBar,
@@ -195,13 +236,15 @@ class _GymViewState extends State<GymView> {
                     showCompRankings(context,
                         compService: _fireBaseService,
                         currentComp: currentComp!,
-                        currentProfile: currentProfile, setCompView: setCompView);
+                        currentProfile: currentProfile,
+                        setCompView: setCompView);
                   },
                   icon: const Icon(IconManager.thropy))
               : const SizedBox(),
           if (currentProfile!.isAdmin || currentProfile!.isSetter)
             IconButton(
-              icon: Icon(editing ? IconManager.edditing : IconManager.doneEdditing),
+              icon: Icon(
+                  editing ? IconManager.edditing : IconManager.doneEdditing),
               onPressed: () {
                 setState(() {
                   editing = !editing;
@@ -245,8 +288,8 @@ class _GymViewState extends State<GymView> {
                         ),
                       ),
                       child: CustomPaint(
-                        painter: GymPainter(
-                            allBoulders, currentProfile!, currentScale, compView),
+                        painter: GymPainter(allBoulders, currentProfile!, currentSettings!,
+                            currentScale, compView),
                       ),
                     ),
                   ),
@@ -263,7 +306,7 @@ class _GymViewState extends State<GymView> {
           ? currentProfile!.isAdmin
               ? compDrawer(context, setState, currentComp!, _fireBaseService)
               : null
-          : filterDrawer(context, setState, currentProfile!),
+          : filterDrawer(context, setState, currentProfile!, currentSettings!),
     );
   }
 
@@ -314,7 +357,7 @@ class _GymViewState extends State<GymView> {
               setComp: setCurrentComp,
             );
           case MenuAction.info:
-            showGradeInfo(context);
+            showGradeInfo(context, currentSettings!);
         }
       },
       itemBuilder: (context) {
@@ -358,8 +401,12 @@ class _GymViewState extends State<GymView> {
     );
   }
 
-  Future<void> _tapping(BuildContext context, TapUpDetails details,
-      Iterable<CloudBoulder> allBoulders, currentProfile, fireBaseService) async {
+  Future<void> _tapping(
+      BuildContext context,
+      TapUpDetails details,
+      Iterable<CloudBoulder> allBoulders,
+      currentProfile,
+      fireBaseService) async {
     // Only add circles when zoomed in
     final gradingSystem =
         (currentProfile.gradingSystem).toString().toLowerCase();
@@ -422,7 +469,9 @@ class _GymViewState extends State<GymView> {
               tempCenterY,
               wall!,
               gradingSystem,
+              colorToGrade,
               _fireBaseService,
+              currentSettings!,
               setters,
             );
           });
@@ -438,7 +487,7 @@ class _GymViewState extends State<GymView> {
           if (distance < minDistance) {
             List<String> challengesOverview = await _fireBaseService
                 .grabBoulderChallenges(boulderID: boulders.boulderID);
-                challengesOverview.add("create");
+            challengesOverview.add("create");
             // Tapped inside the circle, perform the desired action
             setState(() {
               showBoulderInformation(
@@ -449,6 +498,7 @@ class _GymViewState extends State<GymView> {
                   currentComp,
                   compView,
                   _fireBaseService,
+                  currentSettings!,
                   setters,
                   challengesOverview);
             });

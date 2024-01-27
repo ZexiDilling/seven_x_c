@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
+import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 
 
-void showGradeInfo(BuildContext context) {
+void showGradeInfo(BuildContext context, CloudSettings currentSettings) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -14,7 +15,7 @@ void showGradeInfo(BuildContext context) {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildGradeColorsList(context),
+                _buildGradeColorsList(context, currentSettings),
               ],
             ),
           ),
@@ -32,13 +33,19 @@ void showGradeInfo(BuildContext context) {
   );
 }
 
-Widget _buildGradeColorsList(context) {
+Widget _buildGradeColorsList(context, CloudSettings currentSettings) {
+  final settingsGradeColour = currentSettings.settingsGradeColour;
+
+  if (settingsGradeColour == null || settingsGradeColour.isEmpty) {
+    return const Text("No grade colors available.");
+  }
+
   return ListView(
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
     children: [
-      for (var entry in gradeColorMap.entries)
-        _buildColorTile(context, entry.key, entry.value),
+      for (var entry in settingsGradeColour.entries)
+        _buildColorTile(context, nameToColor(currentSettings.settingsGradeColour![entry.key]), entry.value),
     ],
   );
 }

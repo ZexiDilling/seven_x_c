@@ -6,31 +6,40 @@ double calculateDistance(double x1, double y1, double x2, double y2) {
 }
 
 // Define maps for holds and grades, where the key is the color and the value is the name
-Map<Color, String> holdColorMap = {
-  Colors.green: 'Green',
-  Colors.blue: 'Blue',
-  Colors.blue.shade900: "Dark Blue",
-  Colors.yellow: 'Yellow',
-  Colors.orange: 'Orange',
-  Colors.red: 'Red',
-  Colors.red.shade900: 'Dark Red',
-  Colors.black: 'Black',
-  Colors.white: 'White',
-  Colors.purple: "Purple",
-  Colors.grey: "Grey",
-  Colors.pink.shade200: "Pink",
-  Colors.tealAccent: "turquoise",
-};
+// Map<Color, String> holdColorMap = {
+//   Colors.green: 'Green',
+//   Colors.blue: 'Blue',
+//   Colors.blue.shade900: "Dark Blue",
+//   Colors.yellow: 'Yellow',
+//   Colors.orange: 'Orange',
+//   Colors.red: 'Red',
+//   Colors.red.shade900: 'Dark Red',
+//   Colors.black: 'Black',
+//   Colors.white: 'White',
+//   Colors.purple: "Purple",
+//   Colors.grey: "Grey",
+//   Colors.pink.shade200: "Pink",
+//   Colors.tealAccent: "turquoise",
+// };
 
-Map<Color, String> gradeColorMap = {
-  Colors.green: 'Green',
-  Colors.yellow: 'Yellow',
-  Colors.blue: 'Blue',
-  Colors.purple: 'Purple',
-  Colors.red: 'Red',
-  Colors.black: 'Black',
-  Colors.grey: 'Silver',
-};
+  Color nameToColor(Map<String, dynamic> data) {
+  return Color.fromARGB(
+    data["alpha"] ?? 255,
+    data["red"] ?? 0,
+    data["green"] ?? 0,
+    data["blue"] ?? 0,
+  );
+}
+
+// Map<Color, String> gradeColorMap = {
+//   Colors.green: 'Green',
+//   Colors.yellow: 'Yellow',
+//   Colors.blue: 'Blue',
+//   Colors.purple: 'Purple',
+//   Colors.red: 'Red',
+//   Colors.black: 'Black',
+//   Colors.grey: 'Silver',
+// };
 
 Map<String, Map<String, int>> colorToGrade = {
   "green": {"min": 0, "max": 4},
@@ -124,20 +133,6 @@ List<String> mapNumberToColors(int number) {
   }
 
   return matchingColors;
-}
-
-Color? getColorFromName(String colorName) {
-  for (var entry in holdColorMap.entries) {
-    if (entry.value == colorName) {
-      return entry.key;
-    }
-  }
-  return null;
-}
-
-Color? numberToColor(int number) {
-  List<String> colorName = mapNumberToColors(number);
-  return getColorFromName(colorName[0]);
 }
 
 int getGradeValue(
@@ -429,33 +424,6 @@ class CircleData {
     this.gradeColor,
   });
 }
-
-Map<DateTime, int> placeholder2 = {
-  DateTime.parse('2024-01-19 00:00:00.000'): 10,
-  DateTime.parse('2024-01-18 00:00:00.000'): 10,
-  DateTime.parse('2024-01-17 00:00:00.000'): 10,
-  DateTime.parse('2024-01-16 00:00:00.000'): 8,
-  DateTime.parse('2024-01-15 00:00:00.000'): 8,
-  DateTime.parse('2024-01-14 00:00:00.000'): 8,
-  DateTime.parse('2024-01-13 00:00:00.000'): 8,
-  DateTime.parse('2024-01-12 00:00:00.000'): 8,
-  DateTime.parse('2024-01-11 00:00:00.000'): 8,
-  DateTime.parse('2024-01-10 00:00:00.000'): 7,
-  DateTime.parse('2024-01-09 00:00:00.000'): 6,
-  DateTime.parse('2024-01-08 00:00:00.000'): 6,
-  DateTime.parse('2024-01-07 00:00:00.000'): 5,
-  DateTime.parse('2024-01-06 00:00:00.000'): 5,
-  DateTime.parse('2024-01-05 00:00:00.000'): 5,
-  DateTime.parse('2024-01-04 00:00:00.000'): 5,
-  DateTime.parse('2024-01-03 00:00:00.000'): 4,
-  DateTime.parse('2024-01-02 00:00:00.000'): 3,
-  DateTime.parse('2024-01-01 00:00:00.000'): 3,
-  DateTime.parse('2023-12-31 00:00:00.000'): 3,
-  DateTime.parse('2023-12-30 00:00:00.000'): 3,
-  DateTime.parse('2023-12-29 00:00:00.000'): 3,
-  DateTime.parse('2023-12-28 00:00:00.000'): 0,
-  DateTime.parse('2023-12-27 00:00:00.000'): 0,
-};
 
 int findNumberFromDate(DateTime date, Map<int, DateTime> numberToDateMap) {
   // Calculate the difference in days between the given date and the start date

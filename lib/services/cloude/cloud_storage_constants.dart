@@ -28,6 +28,7 @@ const setterPointsFieldName = "setterPoints";
 const challengePointsFieldName = "challengePoints";
 const isSetterFieldName = "isSetter";
 const isAdminFieldName = "isAdmin";
+const settingsIDFieldName = "settingsID";
 const isAnonymousFieldName = "isAnonymous";
 const climbedBouldersFieldName = "climbedBoulders";
 const setBouldersFieldName = "setBoulders";
@@ -73,3 +74,17 @@ const challengeBouldersFieldName = "challengeBoulders";
 const challengeCounterFieldName = "challengeCounter";
 const challengeCounterRunningFieldName = "challengeCounterRunning";
 const challengeDifficultyFieldName = "challengeDifficulty";
+
+//Settings
+const settingsNameIDFieldName = "settingsNameID";
+const settingsNameFieldName = "settingsName";
+const settingsCountryFieldName = "settingsCountry";
+const settingsLocationFieldName = "settingsLocation";
+const settingsStyleFieldName = "settingsStyle";
+const settingsActivitesFieldName = "settingsActivites";
+const settingsGradingSystemFieldName = "settingsGradingSystem";
+const settingsHoldsFollowsGradeFieldName = "settingsHoldsFollowsGrade";
+const settingsHoldColourFieldName = "settingsHoldColour";
+const settingsGradeColourFieldName = "settingsGradeColour";
+const settingsColorToGradeFieldName = "settingsColorToGrade";
+const settingsWallRegionsFieldName = "settingsWallRegions";

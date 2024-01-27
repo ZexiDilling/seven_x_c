@@ -2,18 +2,19 @@ import 'dart:math' show pi;
 
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
-import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
+import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 
 class GymPainter extends CustomPainter {
   final Iterable<CloudBoulder> allBoulders;
   final CloudProfile currentProfile;
+  final CloudSettings currentSettings;
   double currentScale;
   bool compView;
 
-  GymPainter(this.allBoulders, this.currentProfile, this.currentScale, this.compView);
+  GymPainter(this.allBoulders, this.currentProfile, this.currentSettings, this.currentScale, this.compView);
   DateTime currentTime = DateTime.now();
   @override
   void paint(Canvas canvas, Size size) {
@@ -30,8 +31,8 @@ class GymPainter extends CustomPainter {
 
         Color? gradeColour = boulder.hiddenGrade == true
             ? hiddenGradeColor
-            : getColorFromName(capitalizeFirstLetter(boulder.gradeColour));
-        Color? holdColour = getColorFromName(boulder.holdColour);
+            : nameToColor(currentSettings.settingsHoldColour![boulder.gradeColour]);
+        Color? holdColour = nameToColor(currentSettings.settingsHoldColour![boulder.holdColour]);
         double fadeEffect = 0.3;
 
         if (boulder.climberTopped != null &&
@@ -49,8 +50,8 @@ class GymPainter extends CustomPainter {
         // Fade if user have topped the boulder
         final Paint paint = Paint()
           ..color = (userTopped
-              ? gradeColour?.withOpacity(fadeEffect)
-              : gradeColour!)!
+              ? gradeColour.withOpacity(fadeEffect)
+              : gradeColour)
           ..style = PaintingStyle.fill;
         canvas.drawCircle(
           Offset(boulder.cordX, boulder.cordY),
@@ -105,7 +106,7 @@ class GymPainter extends CustomPainter {
         // Colour the outer ring
         final Paint outlinePaint = Paint()
           ..color =
-              (userTopped ? holdColour?.withOpacity(fadeEffect) : holdColour!)!
+              (userTopped ? holdColour.withOpacity(fadeEffect) : holdColour)
           ..strokeWidth = 1
           ..style = PaintingStyle.stroke;
 
