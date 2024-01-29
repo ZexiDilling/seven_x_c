@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
+import 'package:seven_x_c/helpters/functions.dart' show capitalize;
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 
 
@@ -40,25 +41,38 @@ Widget _buildGradeColorsList(context, CloudSettings currentSettings) {
     return const Text("No grade colors available.");
   }
 
+  // Sort entries based on the minimum grade value
+  final sortedEntries = settingsGradeColour.entries.toList()
+    ..sort((a, b) => a.value['min'].compareTo(b.value['min']));
+
   return ListView(
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
     children: [
-      for (var entry in settingsGradeColour.entries)
-        _buildColorTile(context, nameToColor(currentSettings.settingsGradeColour![entry.key]), entry.value),
+      for (var entry in sortedEntries)
+        _buildColorTile(
+          context,
+          nameToColor(currentSettings.settingsGradeColour![entry.key]),
+          entry.key,
+          entry.value,
+        ),
     ],
   );
 }
 
-Widget _buildColorTile(context, Color color, String grade) {
+Widget _buildColorTile(context, Color color, String grade, Map<String, dynamic> gradeDetails) {
   final gradeRange = colorToGrade[grade.toLowerCase()];
+
   return ListTile(
-    title: Text('$grade Grade'),
+    title: Text('${capitalize(grade)} Grade',
+    style: TextStyle(),
+    ),
     tileColor: color,
     subtitle: gradeRange != null
         ? Text(
-            'Min: ${allGrading[gradeRange['min']]!["french"]}/${allGrading[gradeRange['min']]!["v_grade"]} Max: ${allGrading[gradeRange['max']]!["french"]}/${allGrading[gradeRange['max']]!["v_grade"]}')
+            'Min: ${allGrading[gradeDetails['min']]!["french"]}/${allGrading[gradeDetails['min']]!["v_grade"]} Max: ${allGrading[gradeDetails['max']]!["french"]}/${allGrading[gradeDetails['max']]!["v_grade"]}')
         : null,
     onTap: () {},
   );
 }
+

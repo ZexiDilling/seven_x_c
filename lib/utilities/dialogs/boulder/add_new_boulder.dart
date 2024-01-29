@@ -12,19 +12,20 @@ import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/generics/yes_no.dart';
 
 Future<void> showAddNewBoulder(
-  BuildContext context,
-  CloudProfile currentProfile,
-  CloudComp? currentComp,
-  bool compView,
-  double centerX,
-  double centerY,
-  String wall,
-  String gradingSystem,
-  Map<String, Map<String, int>> colorToGrade,
-  FirebaseCloudStorage fireBaseService,
-  CloudSettings currentSettings,
-  Stream<Iterable<CloudProfile>> settersStream,
-) async {
+    BuildContext context,
+    CloudProfile currentProfile,
+    CloudComp? currentComp,
+    bool compView,
+    double centerX,
+    double centerY,
+    String wall,
+    String gradingSystem,
+    Map<String, Map<String, int>> colorToGrade,
+    FirebaseCloudStorage fireBaseService,
+    CloudSettings currentSettings,
+    Stream<Iterable<CloudProfile>> settersStream,
+    double screenRationWidth,
+    double screenRationHeight) async {
   bool setterTeam = false;
   bool guestSetterTeam = false;
   bool topOut = false;
@@ -284,8 +285,8 @@ Future<void> showAddNewBoulder(
                                           : (guestSetterTeam == true
                                               ? guestSetter
                                               : selectedSetter),
-                                      cordX: centerX,
-                                      cordY: centerY,
+                                      cordX: centerX * screenRationWidth,
+                                      cordY: centerY * screenRationHeight,
                                       wall: wall,
                                       holdColour: holdColorChoice!,
                                       gradeColour: gradeColorChoice!,

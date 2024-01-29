@@ -138,14 +138,12 @@ class _GymViewState extends State<GymView> {
     _initializeData();
     super.initState();
     filteredBouldersStream = getFilteredBouldersStream();
-    
   }
 
   Future<void> _initializeData() async {
     await _initializeCurrentProfile();
     await _initSettings();
     _initSettingData();
-
   }
 
   _initSettingData() {
@@ -159,7 +157,6 @@ class _GymViewState extends State<GymView> {
       int minGrade = data["min"] ?? 0;
       int maxGrade = data["max"] ?? 0;
       colorToGrade[name] = {"min": minGrade, "max": maxGrade};
-
     }
   }
 
@@ -288,8 +285,8 @@ class _GymViewState extends State<GymView> {
                         ),
                       ),
                       child: CustomPaint(
-                        painter: GymPainter(allBoulders, currentProfile!, currentSettings!,
-                            currentScale, compView),
+                        painter: GymPainter(context, allBoulders, currentProfile!,
+                            currentSettings!, currentScale, compView),
                       ),
                     ),
                   ),
@@ -407,6 +404,12 @@ class _GymViewState extends State<GymView> {
       Iterable<CloudBoulder> allBoulders,
       currentProfile,
       fireBaseService) async {
+    final screenSize = MediaQuery.of(context).size;
+    final double screenWidth = screenSize.width;
+    final double screenHeight = screenSize.height;
+    final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+    final double screenRationWidth = devicePixelRatio / screenWidth;
+    final double screenRationHeight = devicePixelRatio / screenHeight;
     // Only add circles when zoomed in
     final gradingSystem =
         (currentProfile.gradingSystem).toString().toLowerCase();
@@ -429,8 +432,9 @@ class _GymViewState extends State<GymView> {
       final setters = await fireBaseService.getSetters();
       if (editing) {
         // Check for existing circles and avoid overlap
-        double tempCenterX = transformedPosition.x;
-        double tempCenterY = transformedPosition.y;
+
+        double tempCenterX = transformedPosition.x * screenRationWidth;
+        double tempCenterY = transformedPosition.y * screenRationHeight;
 
         for (final existingBoulder in allBoulders) {
           double distance = calculateDistance(
@@ -473,6 +477,8 @@ class _GymViewState extends State<GymView> {
               _fireBaseService,
               currentSettings!,
               setters,
+              screenRationWidth,
+              screenRationHeight,
             );
           });
         } catch (error) {

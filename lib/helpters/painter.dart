@@ -8,16 +8,23 @@ import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 
 class GymPainter extends CustomPainter {
+  BuildContext context;
   final Iterable<CloudBoulder> allBoulders;
   final CloudProfile currentProfile;
   final CloudSettings currentSettings;
   double currentScale;
   bool compView;
 
-  GymPainter(this.allBoulders, this.currentProfile, this.currentSettings, this.currentScale, this.compView);
+  GymPainter(this.context, this.allBoulders, this.currentProfile, this.currentSettings, this.currentScale, this.compView);
   DateTime currentTime = DateTime.now();
   @override
   void paint(Canvas canvas, Size size) {
+        final screenSize = MediaQuery.of(context).size;
+    final double screenWidth = screenSize.width;
+    final double screenHeight = screenSize.height;
+    final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+    final double screenRationWidth = devicePixelRatio / screenWidth;
+    final double screenRationHeight = devicePixelRatio / screenHeight;
     Map<String, int> bouldersCountPerWall = {};
     Map<String, int> userToppedBouldersCountPerWall = {};
     Map<String, Color> glowForMapMarkings = {};
@@ -28,10 +35,9 @@ class GymPainter extends CustomPainter {
       for (final CloudBoulder boulder in allBoulders) {
         DateTime setBoulderDate = boulder.setDateBoulder.toDate();
         DateTime? updatedBoulderDate = boulder.updateDateBoulder?.toDate();
-
         Color? gradeColour = boulder.hiddenGrade == true
             ? hiddenGradeColor
-            : nameToColor(currentSettings.settingsHoldColour![boulder.gradeColour]);
+            : nameToColor(currentSettings.settingsHoldColour![boulder.gradeColour.toLowerCase()]);
         Color? holdColour = nameToColor(currentSettings.settingsHoldColour![boulder.holdColour]);
         double fadeEffect = 0.3;
 
@@ -47,6 +53,8 @@ class GymPainter extends CustomPainter {
           userTopped = false;
         }
 
+        double centerX = boulder.cordX / screenRationWidth;
+        double centerY = boulder.cordY / screenRationHeight;
         // Fade if user have topped the boulder
         final Paint paint = Paint()
           ..color = (userTopped
@@ -54,7 +62,7 @@ class GymPainter extends CustomPainter {
               : gradeColour)
           ..style = PaintingStyle.fill;
         canvas.drawCircle(
-          Offset(boulder.cordX, boulder.cordY),
+          Offset(centerX, centerY),
           userTopped | userFlashed
               ? boulderRadius * boulderRadiusTopped
               : boulderRadius,
@@ -95,7 +103,7 @@ class GymPainter extends CustomPainter {
             ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.2);
 
           canvas.drawCircle(
-            Offset(boulder.cordX, boulder.cordY),
+            Offset(centerX, centerY),
             boulderRadius +
                 boulderNewGlowRadius, // Adjust the radius to make the glow more visible
             glowPaint,
@@ -111,7 +119,7 @@ class GymPainter extends CustomPainter {
           ..style = PaintingStyle.stroke;
 
         canvas.drawCircle(
-          Offset(boulder.cordX, boulder.cordY),
+          Offset(centerX, centerY),
           userTopped | userFlashed
               ? boulderRadius * boulderRadiusTopped
               : boulderRadius,
