@@ -23,9 +23,7 @@ Future<void> showAddNewBoulder(
     Map<String, Map<String, int>> colorToGrade,
     FirebaseCloudStorage fireBaseService,
     CloudSettings currentSettings,
-    Stream<Iterable<CloudProfile>> settersStream,
-    double screenRationWidth,
-    double screenRationHeight) async {
+    Stream<Iterable<CloudProfile>> settersStream) async {
   bool setterTeam = false;
   bool guestSetterTeam = false;
   bool topOut = false;
@@ -285,8 +283,8 @@ Future<void> showAddNewBoulder(
                                           : (guestSetterTeam == true
                                               ? guestSetter
                                               : selectedSetter),
-                                      cordX: centerX * screenRationWidth,
-                                      cordY: centerY * screenRationHeight,
+                                      cordX: centerX,
+                                      cordY: centerY,
                                       wall: wall,
                                       holdColour: holdColorChoice!,
                                       gradeColour: gradeColorChoice!,

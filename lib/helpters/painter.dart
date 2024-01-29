@@ -19,12 +19,7 @@ class GymPainter extends CustomPainter {
   DateTime currentTime = DateTime.now();
   @override
   void paint(Canvas canvas, Size size) {
-        final screenSize = MediaQuery.of(context).size;
-    final double screenWidth = screenSize.width;
-    final double screenHeight = screenSize.height;
-    final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-    final double screenRationWidth = devicePixelRatio / screenWidth;
-    final double screenRationHeight = devicePixelRatio / screenHeight;
+        
     Map<String, int> bouldersCountPerWall = {};
     Map<String, int> userToppedBouldersCountPerWall = {};
     Map<String, Color> glowForMapMarkings = {};
@@ -53,8 +48,8 @@ class GymPainter extends CustomPainter {
           userTopped = false;
         }
 
-        double centerX = boulder.cordX / screenRationWidth;
-        double centerY = boulder.cordY / screenRationHeight;
+        double centerX = boulder.cordX;
+        double centerY = boulder.cordY;
         // Fade if user have topped the boulder
         final Paint paint = Paint()
           ..color = (userTopped

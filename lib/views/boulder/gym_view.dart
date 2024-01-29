@@ -404,12 +404,6 @@ class _GymViewState extends State<GymView> {
       Iterable<CloudBoulder> allBoulders,
       currentProfile,
       fireBaseService) async {
-    final screenSize = MediaQuery.of(context).size;
-    final double screenWidth = screenSize.width;
-    final double screenHeight = screenSize.height;
-    final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-    final double screenRationWidth = devicePixelRatio / screenWidth;
-    final double screenRationHeight = devicePixelRatio / screenHeight;
     // Only add circles when zoomed in
     final gradingSystem =
         (currentProfile.gradingSystem).toString().toLowerCase();
@@ -433,8 +427,8 @@ class _GymViewState extends State<GymView> {
       if (editing) {
         // Check for existing circles and avoid overlap
 
-        double tempCenterX = transformedPosition.x * screenRationWidth;
-        double tempCenterY = transformedPosition.y * screenRationHeight;
+        double tempCenterX = transformedPosition.x;
+        double tempCenterY = transformedPosition.y;
 
         for (final existingBoulder in allBoulders) {
           double distance = calculateDistance(
@@ -476,9 +470,7 @@ class _GymViewState extends State<GymView> {
               colorToGrade,
               _fireBaseService,
               currentSettings!,
-              setters,
-              screenRationWidth,
-              screenRationHeight,
+              setters
             );
           });
         } catch (error) {
