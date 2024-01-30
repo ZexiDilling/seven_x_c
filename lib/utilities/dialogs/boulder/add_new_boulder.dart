@@ -276,6 +276,9 @@ Future<void> showAddNewBoulder(
                             }
 
                             CloudBoulder? newBoulder;
+                            final screenSize = MediaQuery.of(context).size;
+                            final double screenWidth = screenSize.width;
+                            final double screenHeight = screenSize.height;
                             try {
                               newBoulder =
                                   await fireBaseService.createNewBoulder(
@@ -284,8 +287,8 @@ Future<void> showAddNewBoulder(
                                           : (guestSetterTeam == true
                                               ? guestSetter
                                               : selectedSetter),
-                                      cordX: centerX,
-                                      cordY: centerY,
+                                      cordX: centerX / screenWidth,
+                                      cordY: centerY / screenHeight,
                                       wall: wall,
                                       holdColour: holdColorChoice!,
                                       gradeColour: gradeColorChoice!,

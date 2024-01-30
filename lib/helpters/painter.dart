@@ -8,16 +8,21 @@ import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 
 class GymPainter extends CustomPainter {
+  final BuildContext context;
   final Iterable<CloudBoulder> allBoulders;
   final CloudProfile currentProfile;
   final CloudSettings currentSettings;
   double currentScale;
   bool compView;
 
-  GymPainter(this.allBoulders, this.currentProfile, this.currentSettings, this.currentScale, this.compView);
+  GymPainter(this. context, this.allBoulders, this.currentProfile, this.currentSettings,
+      this.currentScale, this.compView);
   DateTime currentTime = DateTime.now();
   @override
   void paint(Canvas canvas, Size size) {
+    final screenSize = MediaQuery.of(context).size;
+    final double screenWidth = screenSize.width;
+    final double screenHeight = screenSize.height;
     Map<String, int> bouldersCountPerWall = {};
     Map<String, int> userToppedBouldersCountPerWall = {};
     Map<String, Color> glowForMapMarkings = {};
@@ -31,8 +36,10 @@ class GymPainter extends CustomPainter {
 
         Color? gradeColour = boulder.hiddenGrade == true
             ? hiddenGradeColor
-            : nameToColor(currentSettings.settingsHoldColour![boulder.gradeColour]);
-        Color? holdColour = nameToColor(currentSettings.settingsHoldColour![boulder.holdColour]);
+            : nameToColor(
+                currentSettings.settingsHoldColour![boulder.gradeColour]);
+        Color? holdColour = nameToColor(
+            currentSettings.settingsHoldColour![boulder.holdColour]);
         double fadeEffect = 0.3;
 
         if (boulder.climberTopped != null &&
@@ -49,9 +56,8 @@ class GymPainter extends CustomPainter {
 
         // Fade if user have topped the boulder
         final Paint paint = Paint()
-          ..color = (userTopped
-              ? gradeColour.withOpacity(fadeEffect)
-              : gradeColour)
+          ..color =
+              (userTopped ? gradeColour.withOpacity(fadeEffect) : gradeColour)
           ..style = PaintingStyle.fill;
         canvas.drawCircle(
           Offset(boulder.cordX, boulder.cordY),
@@ -63,19 +69,18 @@ class GymPainter extends CustomPainter {
 
         if (compView && boulder.boulderName != null) {
           // set-up central boulder count
-        final TextPainter textPainter = TextPainter(
-          text: TextSpan(
-            text:
-                "${boulder.boulderName}}",
-            style: const TextStyle(
-              color: Colors.black, // Set your desired text color
-              fontSize: 10.0, // Set your desired font size
+          final TextPainter textPainter = TextPainter(
+            text: TextSpan(
+              text: "${boulder.boulderName}}",
+              style: const TextStyle(
+                color: Colors.black, // Set your desired text color
+                fontSize: 10.0, // Set your desired font size
+              ),
             ),
-          ),
-          textDirection: TextDirection.ltr,
-        );
+            textDirection: TextDirection.ltr,
+          );
 
-        textPainter.layout();   
+          textPainter.layout();
         }
 
         // set glowcolour depending on status of the boulder
@@ -101,7 +106,6 @@ class GymPainter extends CustomPainter {
             glowPaint,
           );
         }
-
 
         // Colour the outer ring
         final Paint outlinePaint = Paint()
