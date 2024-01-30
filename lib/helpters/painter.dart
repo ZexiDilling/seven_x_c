@@ -15,7 +15,7 @@ class GymPainter extends CustomPainter {
   double currentScale;
   bool compView;
 
-  GymPainter(this.context, this. context, this.allBoulders, this.currentProfile, this.currentSettings,
+  GymPainter(this.context, this.allBoulders, this.currentProfile, this.currentSettings,
       this.currentScale, this.compView);
   DateTime currentTime = DateTime.now();
   @override
@@ -51,8 +51,8 @@ class GymPainter extends CustomPainter {
           userTopped = false;
         }
 
-        double centerX = boulder.cordX;
-        double centerY = boulder.cordY;
+        double centerX = boulder.cordX * screenWidth;
+        double centerY = boulder.cordY * screenHeight;
         // Fade if user have topped the boulder
         final Paint paint = Paint()
           ..color =
