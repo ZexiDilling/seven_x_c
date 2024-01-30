@@ -131,6 +131,9 @@ Profile
 		deal with different time intervals
 
 
+boulders
+	update a boulder 
+		Should delete all users from the climberstopped and be showen on the map as an updated boulder
 	
 ------------------------------------------------------------------------------------------------------------------------
 

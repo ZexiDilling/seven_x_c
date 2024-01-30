@@ -1350,7 +1350,7 @@ Container gradingCirleDrawing(
         color: boulder.hiddenGrade == true
             ? hiddenGradeColor
             : nameToColor(
-                currentSettings.settingsHoldColour![boulder.holdColour])),
+                currentSettings.settingsHoldColour![boulder.gradeColour])),
     child: Center(
       child: Padding(
         padding: const EdgeInsets.only(left: 0.0),

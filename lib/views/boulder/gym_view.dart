@@ -483,7 +483,7 @@ class _GymViewState extends State<GymView> {
               colorToGrade,
               _fireBaseService,
               currentSettings!,
-              setters,
+              setters
             );
           });
         } catch (error) {
