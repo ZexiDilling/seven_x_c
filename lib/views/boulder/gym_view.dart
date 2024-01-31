@@ -281,7 +281,7 @@ class _GymViewState extends State<GymView> {
                         image: DecorationImage(
                           image:
                               AssetImage('assets/background/dtu_climbing.png'),
-                          fit: BoxFit.cover,
+                          fit: BoxFit.contain,
                         ),
                       ),
                       child: CustomPaint(
@@ -413,36 +413,46 @@ class _GymViewState extends State<GymView> {
     if (_controller.value.getMaxScaleOnAxis() >= minZoomThreshold) {
       final RenderBox referenceBox =
           _gymKey.currentContext?.findRenderObject() as RenderBox;
-      // Convert the tap position to scene coordinates considering the transformation
-      final localPosition = referenceBox.globalToLocal(details.globalPosition);
-      // Create a copy of the transformation matrix and invert it
-      final Matrix4 invertedMatrix = _controller.value.clone()..invert();
-      // Create a Vector4 from the tap position
-      final VM.Vector4 tapVector =
-          VM.Vector4(localPosition.dx, localPosition.dy, 0, 1);
 
-      // Transform the tap position using the inverted matrix
-      final VM.Vector4 transformedPosition =
-          invertedMatrix.transform(tapVector);
-      const double minDistance =
-          minBoulderDistance; // Set a minimum distance to avoid overlap
+// Get the image dimensions
+    final double imageWidth = screenWidth;
+    final double imageHeight = screenHeight;
+
+    // Convert the tap position to normalized coordinates
+    final double normalizedX =
+        (details.globalPosition.dx - referenceBox.globalToLocal(Offset.zero).dx) / imageWidth;
+    final double normalizedY =
+        (details.globalPosition.dy - referenceBox.globalToLocal(Offset.zero).dy) / imageHeight;
+
+    // Convert the normalized coordinates back to scene coordinates considering the transformation
+    double tempCenterX = normalizedX * imageWidth;
+    double tempCenterY = normalizedY * imageHeight;
+
+    final Matrix4 invertedMatrix = _controller.value.clone()..invert();
+    final VM.Vector4 tapVector = VM.Vector4(tempCenterX, tempCenterY, 0, 1);
+
+    final VM.Vector4 transformedPosition = invertedMatrix.transform(tapVector);
+    const double minDistance = minBoulderDistance;
+
+      // Convert the tap position to scene coordinates considering the transformation
+      // final localPosition = referenceBox.globalToLocal(details.globalPosition);
+      // // Create a copy of the transformation matrix and invert it
+      // final Matrix4 invertedMatrix = _controller.value.clone()..invert();
+      // // Create a Vector4 from the tap position
+      // final VM.Vector4 tapVector =
+      //     VM.Vector4(localPosition.dx, localPosition.dy, 0, 1);
+
+      // // Transform the tap position using the inverted matrix
+      // final VM.Vector4 transformedPosition =
+      //     invertedMatrix.transform(tapVector);
+      // const double minDistance =
+      //     minBoulderDistance; // Set a minimum distance to avoid overlap
       final setters = await fireBaseService.getSetters();
       if (editing) {
         // Check for existing circles and avoid overlap
-        double tempCenterX = transformedPosition.x ;
-        double tempCenterY = transformedPosition.y ;
+        // double tempCenterX = transformedPosition.x ;
+        // double tempCenterY = transformedPosition.y ;
         
-        // final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-        // final double screenRationWidth = devicePixelRatio / screenWidth;
-        // final double screenRationHeight = devicePixelRatio / screenHeight;
-        // print("screenWidth - $screenWidth");
-        // print("screenHeight - $screenHeight");
-        // print("devicePixelRatio - $devicePixelRatio");
-        // print("screenRationWidth - $screenRationWidth");
-        // print("screenRationHeight - $screenRationHeight");
-        // print(tempCenterX);
-        // print(tempCenterY);
-
         for (final existingBoulder in allBoulders) {
           double distance = calculateDistance(
             existingBoulder.cordX,
