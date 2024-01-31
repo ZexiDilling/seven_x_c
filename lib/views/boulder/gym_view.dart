@@ -55,6 +55,7 @@ class _GymViewState extends State<GymView> {
   bool compView = false;
   CloudComp? currentComp;
   late CloudSettings? currentSettings;
+  
 
   late final FirebaseCloudStorage _fireBaseService;
 
@@ -79,6 +80,7 @@ class _GymViewState extends State<GymView> {
   }
 
   Stream<Iterable<CloudBoulder>> getFilteredBouldersStream() {
+    
     return _fireBaseService.getAllBoulders().map((boulders) {
       if (showAllBouldersFilter) {
         return boulders;
@@ -281,7 +283,7 @@ class _GymViewState extends State<GymView> {
                         image: DecorationImage(
                           image:
                               AssetImage('assets/background/dtu_climbing.png'),
-                          fit: BoxFit.contain,
+                          fit: BoxFit.cover,
                         ),
                       ),
                       child: CustomPaint(
@@ -399,6 +401,7 @@ class _GymViewState extends State<GymView> {
   }
 
   Future<void> _tapping(
+    
       BuildContext context,
       TapUpDetails details,
       Iterable<CloudBoulder> allBoulders,
@@ -429,26 +432,26 @@ class _GymViewState extends State<GymView> {
       final setters = await fireBaseService.getSetters();
       if (editing) {
         // Check for existing circles and avoid overlap
-        double tempCenterX = transformedPosition.x * screenWidth;
-        double tempCenterY = transformedPosition.y * screenHeight;
+        double tempCenterX = transformedPosition.x ;
+        double tempCenterY = transformedPosition.y ;
         
-        // final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-        // final double screenRationWidth = devicePixelRatio / screenWidth;
-        // final double screenRationHeight = devicePixelRatio / screenHeight;
-        // print("screenWidth - $screenWidth");
-        // print("screenHeight - $screenHeight");
-        // print("devicePixelRatio - $devicePixelRatio");
-        // print("screenRationWidth - $screenRationWidth");
-        // print("screenRationHeight - $screenRationHeight");
-        // print(tempCenterX);
-        // print(tempCenterY);
+        final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+        final double screenRationWidth = devicePixelRatio / screenWidth;
+        final double screenRationHeight = devicePixelRatio / screenHeight;
+        print("screenWidth - $screenWidth");
+        print("screenHeight - $screenHeight");
+        print("devicePixelRatio - $devicePixelRatio");
+        print("screenRationWidth - $screenRationWidth");
+        print("screenRationHeight - $screenRationHeight");
+        print("tempCenterX - $tempCenterX");
+        print("tempCenterY - $tempCenterY");
 
         for (final existingBoulder in allBoulders) {
           double distance = calculateDistance(
             existingBoulder.cordX,
             existingBoulder.cordY,
-            tempCenterX,
-            tempCenterY,
+            tempCenterX * screenWidth,
+            tempCenterY * screenHeight,
           );
 
           if (distance < minDistance) {
@@ -493,8 +496,8 @@ class _GymViewState extends State<GymView> {
         }
       } else {
         for (final boulders in allBoulders) {
-          double distance = (boulders.cordX - transformedPosition.x).abs() +
-              (boulders.cordY - transformedPosition.y).abs();
+          double distance = (boulders.cordX - (transformedPosition.x)).abs() +
+              (boulders.cordY - (transformedPosition.y)).abs();
           if (distance < minDistance) {
             List<String> challengesOverview = await _fireBaseService
                 .grabBoulderChallenges(boulderID: boulders.boulderID);
