@@ -281,7 +281,7 @@ class _GymViewState extends State<GymView> {
                         image: DecorationImage(
                           image:
                               AssetImage('assets/background/dtu_climbing.png'),
-                          fit: BoxFit.contain,
+                          fit: BoxFit.cover,
                         ),
                       ),
                       child: CustomPaint(
@@ -429,8 +429,8 @@ class _GymViewState extends State<GymView> {
       final setters = await fireBaseService.getSetters();
       if (editing) {
         // Check for existing circles and avoid overlap
-        double tempCenterX = transformedPosition.x * screenWidth;
-        double tempCenterY = transformedPosition.y * screenHeight;
+        double tempCenterX = transformedPosition.x ;
+        double tempCenterY = transformedPosition.y ;
         
         // final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
         // final double screenRationWidth = devicePixelRatio / screenWidth;
@@ -447,8 +447,8 @@ class _GymViewState extends State<GymView> {
           double distance = calculateDistance(
             existingBoulder.cordX,
             existingBoulder.cordY,
-            tempCenterX,
-            tempCenterY,
+            tempCenterX * screenWidth,
+            tempCenterY * screenHeight,
           );
 
           if (distance < minDistance) {
@@ -493,8 +493,8 @@ class _GymViewState extends State<GymView> {
         }
       } else {
         for (final boulders in allBoulders) {
-          double distance = (boulders.cordX - transformedPosition.x).abs() +
-              (boulders.cordY - transformedPosition.y).abs();
+          double distance = (boulders.cordX - (transformedPosition.x* screenWidth)).abs() +
+              (boulders.cordY - (transformedPosition.y* screenHeight)).abs();
           if (distance < minDistance) {
             List<String> challengesOverview = await _fireBaseService
                 .grabBoulderChallenges(boulderID: boulders.boulderID);
