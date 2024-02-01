@@ -4,7 +4,6 @@ import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
-
 String capitalizeFirstLetter(String input) {
   if (input.isEmpty) return input;
   return input[0].toUpperCase() + input.substring(1);
@@ -265,6 +264,10 @@ DateTime calculateDateThreshold(TimePeriod timePeriod) {
       return currentTime.subtract(
           const Duration(days: 30 * 12)); // Assuming 30 days in a month
 
+    case TimePeriod.allTime:
+      DateTime initialDate = DateTime.parse("2024-01-01 00:00:00.000");
+      return initialDate;
+
     default:
       return DateTime(0); // Or handle the default case accordingly
   }
@@ -274,7 +277,7 @@ DateTime calculateEndDate(TimePeriod selectedTimePeriod, DateTime startDate) {
   switch (selectedTimePeriod) {
     case TimePeriod.week:
       // Find the next Sunday from the start date
-      return startDate.add(Duration(days: (7 - startDate.weekday + 1) % 7));
+      return startDate.add(const Duration(days: 7));
 
     case TimePeriod.month:
       // Find the last day of the current month
@@ -465,7 +468,6 @@ int? tryParseInt(String? value) {
     return null;
   }
 }
-
 
 String capitalize(String s) {
   return s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);

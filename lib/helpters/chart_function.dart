@@ -11,6 +11,7 @@ const Color contentColorBlue = Colors.blue;
 const Color contentColorPurple = Colors.purple;
 const Color contentColorRed = Colors.red;
 const Color contentColorBlack = Colors.black;
+const Color contentColorSilver = Colors.grey;
 const Color borderColour = Colors.black;
 const Color textColour = Colors.black;
 const double barWidth = 10;
@@ -26,7 +27,10 @@ Widget bottomTitles(
   const style = TextStyle(color: textColour, fontSize: fontChartSize);
   String text = '';
   // Format the date based on the selected time period
+  print(selectedTimePeriod);
+  print(value);
   switch (selectedTimePeriod) {
+    
     case TimePeriod.week:
       // Display the day of the week for each entry number
       switch (value.toInt()) {
@@ -58,6 +62,7 @@ Widget bottomTitles(
       break;
     case TimePeriod.year:
     case TimePeriod.semester:
+    case TimePeriod.allTime:
       int? monthIndex = numberToDateMap[value.toInt()]?.month ??
           numberToDateMap[value - 10.toInt()]?.month;
       text = monthName(monthIndex!);

@@ -13,32 +13,35 @@ class LineChartGraph extends StatelessWidget {
       {super.key,
       required this.chartSelection,
       required this.graphData,
-      required this.selectedTimePeriod, required this.gradingSystem});
+      required this.selectedTimePeriod,
+      required this.gradingSystem});
 
   final String chartSelection;
   final TimePeriod selectedTimePeriod;
   final PointsData graphData;
   final String gradingSystem;
-  
+
   @override
   Widget build(BuildContext context) {
     Map<int, DateTime> numberToDateMap = {};
-    
-      DateTime startDate = calculateDateThreshold(selectedTimePeriod);
-      DateTime endDate = calculateEndDate(selectedTimePeriod, startDate);
-      int dateCounter = 0;
-      for (DateTime date = startDate;
-          date.isBefore(endDate);
-          date = date.add(const Duration(days: 1))) {
-        DateTime entryDateWithoutTime =
-            DateTime(date.year, date.month, date.day);
+    Map<DateTime, int> dateToNumberMap = {};
 
-        numberToDateMap[dateCounter] = entryDateWithoutTime;
-        dateCounter++;
-      }
+    DateTime startDate = calculateDateThreshold(selectedTimePeriod);
+    DateTime endDate = calculateEndDate(selectedTimePeriod, startDate);
+    int dateCounter = 0;
+
+    for (DateTime date = startDate;
+        date.isBefore(endDate);
+        date = date.add(const Duration(days: 1))) {
+      DateTime entryDateWithoutTime = DateTime(date.year, date.month, date.day);
+      numberToDateMap[dateCounter] = entryDateWithoutTime;
+      dateToNumberMap[entryDateWithoutTime] = dateCounter;
+      dateCounter++;
+    }
+
     if (chartSelection == "maxGrade") {
-     
-      List<FlSpot> climbedEntries = graphData.boulderClimbedMaxClimbed.entries.map((entry) {
+      List<FlSpot> climbedEntries =
+          graphData.boulderClimbedMaxClimbed.entries.map((entry) {
         return FlSpot(
           entry.key.millisecondsSinceEpoch.toDouble(),
           entry.value.toDouble().clamp(0, 27),
@@ -55,7 +58,8 @@ class LineChartGraph extends StatelessWidget {
       double minY = (maxY - 12).clamp(0, maxY);
       double maxX = numberToDateMap.length.toDouble();
       return LineChart(
-        maxGradeChart(graphData, numberToDateMap, minY, maxY, maxX, gradingSystem),
+        maxGradeChart(
+            graphData, numberToDateMap, minY, maxY, maxX, gradingSystem),
         duration: const Duration(milliseconds: 250),
       );
     } else if (chartSelection == "climbs") {
@@ -64,21 +68,23 @@ class LineChartGraph extends StatelessWidget {
       );
     } else if (chartSelection == "SetterData") {
       final List<String> colorOrder = [
-        'Green',
-        'Yellow',
-        'Blue',
-        'Purple',
-        'Red',
-        'Black'
+        'green',
+        'yellow',
+        'blue',
+        'purple',
+        'Rrd',
+        'black',
+        "silver"
       ];
       Map<int, List<double>> cumulativeCounts = {};
 // Iterate over each entry in setColoursData and update cumulative counts
       graphData.boulderSetColours.forEach((entryDate, colors) {
-        int entryNumber = graphData.boulderSetAmount[entryDate] ?? 0;
+        int entryNumber = dateToNumberMap[entryDate] ?? 0;
         cumulativeCounts[entryNumber] =
             colorOrder.map((color) => (colors[color] ?? 0).toDouble()).toList();
         numberToDateMap[entryNumber] = entryDate;
       });
+
       return BarChart(
         barChartSetterData(colorOrder, cumulativeCounts, numberToDateMap),
       );
@@ -90,7 +96,6 @@ class LineChartGraph extends StatelessWidget {
       return const Text('Invalid chart selection');
     }
   }
-
 
   Widget leftTitles(double value, TitleMeta meta) {
     const style = TextStyle(color: textColour, fontSize: fontChartSize);
@@ -153,11 +158,11 @@ class LineChartGraph extends StatelessWidget {
       minY: 0,
       maxY: 30,
       barGroups: graphData.boulderClimbedAmount.entries
-        .where((entry) => numbersToDates.containsValue(entry.key))
-        .map((entry) {
-          final xValue = findNumberFromDate(entry.key, numbersToDates);
-          return BarChartGroupData(
-            x: xValue,
+          .where((entry) => numbersToDates.containsValue(entry.key))
+          .map((entry) {
+        final xValue = findNumberFromDate(entry.key, numbersToDates);
+        return BarChartGroupData(
+          x: xValue,
           barRods: [
             BarChartRodData(
               toY: entry.value.toDouble(),
@@ -192,10 +197,9 @@ class LineChartGraph extends StatelessWidget {
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            
             getTitlesWidget: (double value, TitleMeta meta) {
-            return getGradeLabel(value, meta, gradingSystem);
-          },
+              return getGradeLabel(value, meta, gradingSystem);
+            },
             interval: 5,
             reservedSize: 42,
           ),
@@ -413,7 +417,7 @@ class LineChartGraph extends StatelessWidget {
   }
 
   List<PieChartSectionData> showingSections(boulderSplit) {
-    return List.generate(4, (i) {
+    return List.generate(7, (i) {
       final isTouched = i == touchedIndex;
       final fontSize = isTouched ? 20.0 : 16.0;
       final radius = isTouched ? 60.0 : 50.0;
@@ -422,8 +426,8 @@ class LineChartGraph extends StatelessWidget {
         case 0:
           return PieChartSectionData(
             color: contentColorGreen,
-            value: (boulderSplit["Green"] ?? 0.0).toDouble(),
-            title: boulderSplit["Green"].toString(),
+            value: (boulderSplit["green"] ?? 0.0).toDouble(),
+            title: boulderSplit["green"].toString(),
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -435,8 +439,8 @@ class LineChartGraph extends StatelessWidget {
         case 1:
           return PieChartSectionData(
             color: contentColorYellow,
-            value: (boulderSplit["Yellow"] ?? 0.0).toDouble(),
-            title: boulderSplit["Yellow"].toString(),
+            value: (boulderSplit["yellow"] ?? 0.0).toDouble(),
+            title: boulderSplit["yellow"].toString(),
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -448,8 +452,8 @@ class LineChartGraph extends StatelessWidget {
         case 2:
           return PieChartSectionData(
             color: contentColorBlue,
-            value: (boulderSplit["Blue"] ?? 0.0).toDouble(),
-            title: boulderSplit["Blue"].toString(),
+            value: (boulderSplit["blue"] ?? 0.0).toDouble(),
+            title: boulderSplit["blue"].toString(),
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -461,8 +465,8 @@ class LineChartGraph extends StatelessWidget {
         case 3:
           return PieChartSectionData(
             color: contentColorPurple,
-            value: (boulderSplit["Purple"] ?? 0.0).toDouble(),
-            title: boulderSplit["Purple"].toString(),
+            value: (boulderSplit["purple"] ?? 0.0).toDouble(),
+            title: boulderSplit["purple"].toString(),
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -474,8 +478,8 @@ class LineChartGraph extends StatelessWidget {
         case 4:
           return PieChartSectionData(
             color: contentColorRed,
-            value: (boulderSplit["Red"] ?? 0.0).toDouble(),
-            title: boulderSplit["Red"].toString(),
+            value: (boulderSplit["red"] ?? 0.0).toDouble(),
+            title: boulderSplit["red"].toString(),
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -487,8 +491,21 @@ class LineChartGraph extends StatelessWidget {
         case 5:
           return PieChartSectionData(
             color: contentColorBlack,
-            value: (boulderSplit["Black"] ?? 0.0).toDouble(),
-            title: boulderSplit["Black"].toString(),
+            value: (boulderSplit["black"] ?? 0.0).toDouble(),
+            title: boulderSplit["black"].toString(),
+            radius: radius,
+            titleStyle: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: textColour,
+              shadows: shadows,
+            ),
+          );
+        case 6:
+          return PieChartSectionData(
+            color: contentColorSilver,
+            value: (boulderSplit["silver"] ?? 0.0).toDouble(),
+            title: boulderSplit["silver"].toString(),
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -515,4 +532,3 @@ class LineChartGraph extends StatelessWidget {
     );
   }
 }
-
