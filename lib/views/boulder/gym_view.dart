@@ -448,23 +448,23 @@ class _GymViewState extends State<GymView> {
         double tempCenterX = transformedPosition.x * screenWidth;
         double tempCenterY = transformedPosition.y * screenHeight;
         
-        // final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+        final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
         // final double screenRationWidth = devicePixelRatio / screenWidth;
         // final double screenRationHeight = devicePixelRatio / screenHeight;
-        // print("screenWidth - $screenWidth");
-        // print("screenHeight - $screenHeight");
-        // print("devicePixelRatio - $devicePixelRatio");
+        print("screenWidth - $screenWidth");
+        print("screenHeight - $screenHeight");
+        print("devicePixelRatio - $devicePixelRatio");
         // print("screenRationWidth - $screenRationWidth");
         // print("screenRationHeight - $screenRationHeight");
-        // print(tempCenterX);
-        // print(tempCenterY);
+        print(tempCenterX);
+        print(tempCenterY);
 
         for (final existingBoulder in allBoulders) {
           double distance = calculateDistance(
             existingBoulder.cordX,
             existingBoulder.cordY,
-            tempCenterX * screenWidth,
-            tempCenterY * screenHeight,
+            tempCenterX,
+            tempCenterY,
           );
 
           if (distance < minDistance) {
