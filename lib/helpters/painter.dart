@@ -36,7 +36,6 @@ class GymPainter extends CustomPainter {
             : nameToColor(currentSettings.settingsHoldColour![boulder.gradeColour.toLowerCase()]);
         Color? holdColour = nameToColor(currentSettings.settingsHoldColour![boulder.holdColour]);
         double fadeEffect = 0.3;
-
         if (boulder.climberTopped != null &&
             boulder.climberTopped is Map<String, dynamic>) {
           if (boulder.climberTopped!.containsKey(currentProfile.userID)) {
@@ -121,7 +120,7 @@ class GymPainter extends CustomPainter {
       }
 
       // setup for showing counter when zoomed out
-    } else {
+    }     else {
       for (final CloudBoulder boulder in allBoulders) {
         DateTime setBoulderDate = boulder.setDateBoulder.toDate();
         DateTime? updatedBoulderDate = boulder.updateDateBoulder?.toDate();

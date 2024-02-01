@@ -92,32 +92,37 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                 child: const Text('Change Password'),
               ),
               const SizedBox(height: 16.0),
-              // ToDo Delete / hide these boxes
-              Row(
-                children: [
-                  Checkbox(
-                    value: _isSetter,
-                    onChanged: (value) {
-                      setState(() {
-                        _isSetter = value ?? false;
-                      });
-                    },
-                  ),
-                  const Text('Setter'),
-                ],
+              Visibility(
+                visible: _isSetter,
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: _isSetter,
+                      onChanged: (value) {
+                        setState(() {
+                          _isSetter = value ?? false;
+                        });
+                      },
+                    ),
+                    const Text('Setter'),
+                  ],
+                ),
               ),
-              Row(
-                children: [
-                  Checkbox(
-                    value: _isAdmin,
-                    onChanged: (value) {
-                      setState(() {
-                        _isAdmin = value ?? false;
-                      });
-                    },
-                  ),
-                  const Text('Admin'),
-                ],
+              Visibility(
+                visible: _isAdmin,
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: _isAdmin,
+                      onChanged: (value) {
+                        setState(() {
+                          _isAdmin = value ?? false;
+                        });
+                      },
+                    ),
+                    const Text('Admin'),
+                  ],
+                ),
               ),
               Row(
                 children: [

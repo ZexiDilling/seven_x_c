@@ -416,7 +416,7 @@ class _GymViewState extends State<GymView> {
     // Only add circles when zoomed in
     final gradingSystem =
         (currentProfile.gradingSystem).toString().toLowerCase();
-    if (_controller.value.getMaxScaleOnAxis() >= 0) {
+    if (_controller.value.getMaxScaleOnAxis() >= minZoomThreshold) {
       final RenderBox referenceBox =
           _gymKey.currentContext?.findRenderObject() as RenderBox;
 
@@ -435,12 +435,7 @@ class _GymViewState extends State<GymView> {
       const double minDistance =
           minBoulderDistance; // Set a minimum distance to avoid overlap
       final setters = await fireBaseService.getSetters();
-        print("X");
-        print(transformedPosition.x);
-        print(transformedPosition.x / constraints.maxWidth);
-        print("Y");
-        print(transformedPosition.y);
-        print(transformedPosition.y / constraints.maxHeight);
+
 
       if (editing) {
         // Check for existing circles and avoid overlap
@@ -466,8 +461,7 @@ class _GymViewState extends State<GymView> {
         for (final region in wallRegions) {
           double regionTop = region.wallYMaX;
           double regionBottom = region.wallYMin;
-
-          if (tempCenterY >= regionBottom && tempCenterY <= regionTop) {
+          if (tempCenterY/constraints.maxHeight >= regionBottom && tempCenterY/constraints.maxHeight <= regionTop) {
             wall = region.wallName;
             break;
           }
@@ -491,6 +485,7 @@ class _GymViewState extends State<GymView> {
                 setters);
           });
         } catch (error) {
+          print("HEJ");
           // Handle the error
           // ignore: avoid_print
           print(error);

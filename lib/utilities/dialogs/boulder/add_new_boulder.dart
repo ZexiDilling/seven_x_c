@@ -276,9 +276,6 @@ Future<void> showAddNewBoulder(
                             }
 
                             CloudBoulder? newBoulder;
-                            final screenSize = MediaQuery.of(context).size;
-                            final double screenWidth = screenSize.width;
-                            final double screenHeight = screenSize.height;
                             try {
                               newBoulder =
                                   await fireBaseService.createNewBoulder(
