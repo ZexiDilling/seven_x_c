@@ -9,20 +9,18 @@ import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 
 class GymPainter extends CustomPainter {
   final BuildContext context;
+  final BoxConstraints constraints;
   final Iterable<CloudBoulder> allBoulders;
   final CloudProfile currentProfile;
   final CloudSettings currentSettings;
   double currentScale;
   bool compView;
 
-  GymPainter(this.context, this.allBoulders, this.currentProfile, this.currentSettings,
+  GymPainter(this.context, this.constraints, this.allBoulders, this.currentProfile, this.currentSettings,
       this.currentScale, this.compView);
   DateTime currentTime = DateTime.now();
   @override
   void paint(Canvas canvas, Size size) {
-    final screenSize = MediaQuery.of(context).size;
-    final double screenWidth = screenSize.width;
-    final double screenHeight = screenSize.height;
     Map<String, int> bouldersCountPerWall = {};
     Map<String, int> userToppedBouldersCountPerWall = {};
     Map<String, Color> glowForMapMarkings = {};
@@ -51,8 +49,8 @@ class GymPainter extends CustomPainter {
           userTopped = false;
         }
 
-        double centerX = boulder.cordX * screenWidth;
-        double centerY = boulder.cordY * screenHeight;
+        double centerX = boulder.cordX * constraints.maxWidth;
+        double centerY = boulder.cordY * constraints.maxHeight;
         // Fade if user have topped the boulder
         final Paint paint = Paint()
           ..color =
@@ -165,9 +163,10 @@ class GymPainter extends CustomPainter {
         final int boulderCountTopped =
             userToppedBouldersCountPerWall[wall.wallName] ?? 0;
 
+
         final Offset center = Offset(
-          (wall.wallXMax + wall.wallXMin) / 2,
-          (wall.wallYMaX + wall.wallYMin) / 2,
+          ((wall.wallXMax + wall.wallXMin) / 2) * constraints.maxWidth,
+          ((wall.wallYMaX + wall.wallYMin) / 2) * constraints.maxHeight,
         );
 
         // setup main circle

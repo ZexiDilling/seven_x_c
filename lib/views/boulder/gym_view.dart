@@ -55,7 +55,6 @@ class _GymViewState extends State<GymView> {
   bool compView = false;
   CloudComp? currentComp;
   late CloudSettings? currentSettings;
-  
 
   late final FirebaseCloudStorage _fireBaseService;
 
@@ -80,7 +79,6 @@ class _GymViewState extends State<GymView> {
   }
 
   Stream<Iterable<CloudBoulder>> getFilteredBouldersStream() {
-    
     return _fireBaseService.getAllBoulders().map((boulders) {
       if (showAllBouldersFilter) {
         return boulders;
@@ -284,12 +282,13 @@ class _GymViewState extends State<GymView> {
                           image: DecorationImage(
                             image: AssetImage(
                                 'assets/background/dtu_climbing.png'),
-                            fit: BoxFit.contain,
+                            fit: BoxFit.fill,
                           ),
                         ),
                         child: CustomPaint(
                           painter: GymPainter(
                               context,
+                              constraints,
                               allBoulders,
                               currentProfile!,
                               currentSettings!,
@@ -408,20 +407,16 @@ class _GymViewState extends State<GymView> {
   }
 
   Future<void> _tapping(
-    
       BuildContext context,
       constraints,
       TapUpDetails details,
       Iterable<CloudBoulder> allBoulders,
       currentProfile,
       fireBaseService) async {
-    final screenSize = MediaQuery.of(context).size;
-    final double screenWidth = screenSize.width;
-    final double screenHeight = screenSize.height;
     // Only add circles when zoomed in
     final gradingSystem =
         (currentProfile.gradingSystem).toString().toLowerCase();
-    if (_controller.value.getMaxScaleOnAxis() >= minZoomThreshold) {
+    if (_controller.value.getMaxScaleOnAxis() >= 0) {
       final RenderBox referenceBox =
           _gymKey.currentContext?.findRenderObject() as RenderBox;
 
@@ -440,31 +435,24 @@ class _GymViewState extends State<GymView> {
       const double minDistance =
           minBoulderDistance; // Set a minimum distance to avoid overlap
       final setters = await fireBaseService.getSetters();
-      print(constraints.maxWidth);
-      print(constraints.maxHeight);
+        print("X");
+        print(transformedPosition.x);
+        print(transformedPosition.x / constraints.maxWidth);
+        print("Y");
+        print(transformedPosition.y);
+        print(transformedPosition.y / constraints.maxHeight);
 
       if (editing) {
         // Check for existing circles and avoid overlap
-        double tempCenterX = transformedPosition.x * screenWidth;
-        double tempCenterY = transformedPosition.y * screenHeight;
-        
-        final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-        // final double screenRationWidth = devicePixelRatio / screenWidth;
-        // final double screenRationHeight = devicePixelRatio / screenHeight;
-        print("screenWidth - $screenWidth");
-        print("screenHeight - $screenHeight");
-        print("devicePixelRatio - $devicePixelRatio");
-        // print("screenRationWidth - $screenRationWidth");
-        // print("screenRationHeight - $screenRationHeight");
-        print(tempCenterX);
-        print(tempCenterY);
+        double tempCenterX = transformedPosition.x;
+        double tempCenterY = transformedPosition.y;
 
         for (final existingBoulder in allBoulders) {
           double distance = calculateDistance(
             existingBoulder.cordX,
             existingBoulder.cordY,
-            tempCenterX,
-            tempCenterY,
+            tempCenterX * constraints.maxWidth,
+            tempCenterY * constraints.maxHeight,
           );
 
           if (distance < minDistance) {
@@ -489,6 +477,7 @@ class _GymViewState extends State<GymView> {
           setState(() {
             showAddNewBoulder(
                 context,
+                constraints,
                 currentProfile,
                 currentComp,
                 compView,

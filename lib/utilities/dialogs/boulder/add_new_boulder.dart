@@ -13,6 +13,7 @@ import 'package:seven_x_c/utilities/dialogs/generics/yes_no.dart';
 
 Future<void> showAddNewBoulder(
     BuildContext context,
+    BoxConstraints constraints,
     CloudProfile currentProfile,
     CloudComp? currentComp,
     bool compView,
@@ -286,8 +287,8 @@ Future<void> showAddNewBoulder(
                                           : (guestSetterTeam == true
                                               ? guestSetter
                                               : selectedSetter),
-                                      cordX: centerX / screenWidth,
-                                      cordY: centerY / screenHeight,
+                                      cordX: centerX / constraints.maxWidth,
+                                      cordY: centerY / constraints.maxHeight,
                                       wall: wall,
                                       holdColour: holdColorChoice!,
                                       gradeColour: gradeColorChoice!,
