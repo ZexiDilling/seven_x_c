@@ -253,54 +253,61 @@ class _GymViewState extends State<GymView> {
           dropDownMenu(context)
         ],
       ),
-      body: StreamBuilder(
-        stream: getFilteredBouldersStream(),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-            case ConnectionState.active:
-              if (snapshot.hasData) {
-                final allBoulders = snapshot.data as Iterable<CloudBoulder>;
-                return GestureDetector(
-                  key: _gymKey,
-                  onTapUp: (details) {
-                    _tapping(context, details, allBoulders, currentProfile,
-                        _fireBaseService);
-                  },
-                  child: InteractiveViewer(
-                    transformationController: _controller,
-                    minScale: 0.5,
-                    maxScale: 5.0,
-                    onInteractionEnd: (details) {
-                      setState(() {
-                        currentScale = _controller.value.getMaxScaleOnAxis();
-                      });
+      body: LayoutBuilder(builder: (context, constraints) {
+        return StreamBuilder(
+          stream: getFilteredBouldersStream(),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+              case ConnectionState.active:
+                if (snapshot.hasData) {
+                  final allBoulders = snapshot.data as Iterable<CloudBoulder>;
+                  return GestureDetector(
+                    key: _gymKey,
+                    onTapUp: (details) {
+                      _tapping(context, constraints, details, allBoulders,
+                          currentProfile, _fireBaseService);
                     },
-                    child: Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          image:
-                              AssetImage('assets/background/dtu_climbing.png'),
-                          fit: BoxFit.cover,
+                    child: InteractiveViewer(
+                      transformationController: _controller,
+                      minScale: 0.5,
+                      maxScale: 5.0,
+                      onInteractionEnd: (details) {
+                        setState(() {
+                          currentScale = _controller.value.getMaxScaleOnAxis();
+                        });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(
+                                'assets/background/dtu_climbing.png'),
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        child: CustomPaint(
+                          painter: GymPainter(
+                              context,
+                              allBoulders,
+                              currentProfile!,
+                              currentSettings!,
+                              currentScale,
+                              compView),
                         ),
                       ),
-                      child: CustomPaint(
-                        painter: GymPainter(context, allBoulders, currentProfile!,
-                            currentSettings!, currentScale, compView),
-                      ),
                     ),
-                  ),
-                );
-              } else {
+                  );
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              default:
                 return const CircularProgressIndicator();
-              }
-            default:
-              return const CircularProgressIndicator();
-          }
-        },
-      ),
+            }
+          },
+        );
+      }),
       drawer: compView
           ? currentProfile!.isAdmin
               ? compDrawer(context, setState, currentComp!, _fireBaseService)
@@ -403,21 +410,24 @@ class _GymViewState extends State<GymView> {
   Future<void> _tapping(
     
       BuildContext context,
+      constraints,
       TapUpDetails details,
       Iterable<CloudBoulder> allBoulders,
       currentProfile,
       fireBaseService) async {
-        final screenSize = MediaQuery.of(context).size;
-        final double screenWidth = screenSize.width;
-        final double screenHeight = screenSize.height;
+    final screenSize = MediaQuery.of(context).size;
+    final double screenWidth = screenSize.width;
+    final double screenHeight = screenSize.height;
     // Only add circles when zoomed in
     final gradingSystem =
         (currentProfile.gradingSystem).toString().toLowerCase();
     if (_controller.value.getMaxScaleOnAxis() >= minZoomThreshold) {
       final RenderBox referenceBox =
           _gymKey.currentContext?.findRenderObject() as RenderBox;
+
       // Convert the tap position to scene coordinates considering the transformation
       final localPosition = referenceBox.globalToLocal(details.globalPosition);
+
       // Create a copy of the transformation matrix and invert it
       final Matrix4 invertedMatrix = _controller.value.clone()..invert();
       // Create a Vector4 from the tap position
@@ -430,21 +440,24 @@ class _GymViewState extends State<GymView> {
       const double minDistance =
           minBoulderDistance; // Set a minimum distance to avoid overlap
       final setters = await fireBaseService.getSetters();
+      print(constraints.maxWidth);
+      print(constraints.maxHeight);
+
       if (editing) {
         // Check for existing circles and avoid overlap
-        double tempCenterX = transformedPosition.x ;
-        double tempCenterY = transformedPosition.y ;
+        double tempCenterX = transformedPosition.x * screenWidth;
+        double tempCenterY = transformedPosition.y * screenHeight;
         
-        final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-        final double screenRationWidth = devicePixelRatio / screenWidth;
-        final double screenRationHeight = devicePixelRatio / screenHeight;
-        print("screenWidth - $screenWidth");
-        print("screenHeight - $screenHeight");
-        print("devicePixelRatio - $devicePixelRatio");
-        print("screenRationWidth - $screenRationWidth");
-        print("screenRationHeight - $screenRationHeight");
-        print("tempCenterX - $tempCenterX");
-        print("tempCenterY - $tempCenterY");
+        // final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+        // final double screenRationWidth = devicePixelRatio / screenWidth;
+        // final double screenRationHeight = devicePixelRatio / screenHeight;
+        // print("screenWidth - $screenWidth");
+        // print("screenHeight - $screenHeight");
+        // print("devicePixelRatio - $devicePixelRatio");
+        // print("screenRationWidth - $screenRationWidth");
+        // print("screenRationHeight - $screenRationHeight");
+        // print(tempCenterX);
+        // print(tempCenterY);
 
         for (final existingBoulder in allBoulders) {
           double distance = calculateDistance(
@@ -475,19 +488,18 @@ class _GymViewState extends State<GymView> {
         try {
           setState(() {
             showAddNewBoulder(
-              context,
-              currentProfile,
-              currentComp,
-              compView,
-              tempCenterX,
-              tempCenterY,
-              wall!,
-              gradingSystem,
-              colorToGrade,
-              _fireBaseService,
-              currentSettings!,
-              setters
-            );
+                context,
+                currentProfile,
+                currentComp,
+                compView,
+                tempCenterX,
+                tempCenterY,
+                wall!,
+                gradingSystem,
+                colorToGrade,
+                _fireBaseService,
+                currentSettings!,
+                setters);
           });
         } catch (error) {
           // Handle the error
@@ -496,8 +508,8 @@ class _GymViewState extends State<GymView> {
         }
       } else {
         for (final boulders in allBoulders) {
-          double distance = (boulders.cordX - (transformedPosition.x)).abs() +
-              (boulders.cordY - (transformedPosition.y)).abs();
+          double distance = (boulders.cordX - transformedPosition.x).abs() +
+              (boulders.cordY - transformedPosition.y).abs();
           if (distance < minDistance) {
             List<String> challengesOverview = await _fireBaseService
                 .grabBoulderChallenges(boulderID: boulders.boulderID);
