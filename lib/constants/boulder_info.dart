@@ -48,7 +48,7 @@ Map<String, Map<String, int>> colorToGrade = {
   "purple": {"min": 7, "max": 8},
   "red": {"min": 9, "max": 12},
   "black": {"min": 12, "max": 19},
-  "Silver": {"min": 18, "max": 27},
+  "silver": {"min": 18, "max": 27},
 };
 
 int difficultyLevelToArrow(int difficultyLevel, String gradeColorChoice) {

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/helpters/functions.dart' show capitalize;
+import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 
 
-void showGradeInfo(BuildContext context, CloudSettings currentSettings) {
+void showGradeInfo(BuildContext context, CloudSettings currentSettings, CloudProfile currentProfile) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -16,7 +17,7 @@ void showGradeInfo(BuildContext context, CloudSettings currentSettings) {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildGradeColorsList(context, currentSettings),
+                _buildGradeColorsList(context, currentSettings, currentProfile),
               ],
             ),
           ),
@@ -34,7 +35,7 @@ void showGradeInfo(BuildContext context, CloudSettings currentSettings) {
   );
 }
 
-Widget _buildGradeColorsList(context, CloudSettings currentSettings) {
+Widget _buildGradeColorsList(context, CloudSettings currentSettings, CloudProfile currentProfile) {
   final settingsGradeColour = currentSettings.settingsGradeColour;
 
   if (settingsGradeColour == null || settingsGradeColour.isEmpty) {
@@ -54,24 +55,25 @@ Widget _buildGradeColorsList(context, CloudSettings currentSettings) {
           context,
           nameToColor(currentSettings.settingsGradeColour![entry.key]),
           entry.key,
-          entry.value,
+          entry.value, currentProfile
         ),
     ],
   );
 }
 
-Widget _buildColorTile(context, Color color, String grade, Map<String, dynamic> gradeDetails) {
-  final gradeRange = colorToGrade[grade.toLowerCase()];
 
+Widget _buildColorTile(context, Color color, String grade, Map<String, dynamic> gradeDetails, CloudProfile currentProfile) {
+  
   return ListTile(
     title: Text('${capitalize(grade)} Grade',
-    style: TextStyle(),
+    style: const TextStyle(),
     ),
     tileColor: color,
-    subtitle: gradeRange != null
-        ? Text(
-            'Min: ${allGrading[gradeDetails['min']]!["french"]}/${allGrading[gradeDetails['min']]!["v_grade"]} Max: ${allGrading[gradeDetails['max']]!["french"]}/${allGrading[gradeDetails['max']]!["v_grade"]}')
-        : null,
+    subtitle:
+         currentProfile.gradingSystem == "V_grade" ? Text(
+            'Min: ${allGrading[gradeDetails['min']]!["v_grade"]} Max: ${allGrading[gradeDetails['max']]!["v_grade"]}')
+            : Text('Min: ${allGrading[gradeDetails['min']]!["french"]} Max: ${allGrading[gradeDetails['max']]!["french"]}'),
+        
     onTap: () {},
   );
 }

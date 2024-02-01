@@ -362,7 +362,7 @@ class _GymViewState extends State<GymView> {
               setComp: setCurrentComp,
             );
           case MenuAction.info:
-            showGradeInfo(context, currentSettings!);
+            showGradeInfo(context, currentSettings!, currentProfile!);
         }
       },
       itemBuilder: (context) {
@@ -432,10 +432,9 @@ class _GymViewState extends State<GymView> {
       // Transform the tap position using the inverted matrix
       final VM.Vector4 transformedPosition =
           invertedMatrix.transform(tapVector);
-      const double minDistance =
+      double minDistance =
           minBoulderDistance; // Set a minimum distance to avoid overlap
       final setters = await fireBaseService.getSetters();
-
 
       if (editing) {
         // Check for existing circles and avoid overlap
@@ -444,15 +443,15 @@ class _GymViewState extends State<GymView> {
 
         for (final existingBoulder in allBoulders) {
           double distance = calculateDistance(
-            existingBoulder.cordX,
-            existingBoulder.cordY,
-            tempCenterX * constraints.maxWidth,
-            tempCenterY * constraints.maxHeight,
+            existingBoulder.cordX * constraints.maxWidth,
+            existingBoulder.cordY * constraints.maxHeight,
+            tempCenterX,
+            tempCenterY,
           );
 
           if (distance < minDistance) {
             // Adjust the X position based on the number of boulders below it
-            tempCenterX += minBoulderDistance;
+            tempCenterX -= minBoulderDistance;
           }
         }
 
@@ -461,7 +460,8 @@ class _GymViewState extends State<GymView> {
         for (final region in wallRegions) {
           double regionTop = region.wallYMaX;
           double regionBottom = region.wallYMin;
-          if (tempCenterY/constraints.maxHeight >= regionBottom && tempCenterY/constraints.maxHeight <= regionTop) {
+          if (tempCenterY / constraints.maxHeight >= regionBottom &&
+              tempCenterY / constraints.maxHeight <= regionTop) {
             wall = region.wallName;
             break;
           }
@@ -485,25 +485,34 @@ class _GymViewState extends State<GymView> {
                 setters);
           });
         } catch (error) {
-          print("HEJ");
           // Handle the error
           // ignore: avoid_print
           print(error);
         }
       } else {
+        
+        CloudBoulder? closestBoulder;
         for (final boulders in allBoulders) {
-          double distance = (boulders.cordX - transformedPosition.x).abs() +
-              (boulders.cordY - transformedPosition.y).abs();
+          double distance = ((boulders.cordX * constraints.maxWidth) -
+                      transformedPosition.x)
+                  .abs() +
+              ((boulders.cordY * constraints.maxHeight) - transformedPosition.y)
+                  .abs();
+
           if (distance < minDistance) {
+            minDistance = distance;
+            closestBoulder = boulders;
+          }
+          if (closestBoulder != null) {
             List<String> challengesOverview = await _fireBaseService
-                .grabBoulderChallenges(boulderID: boulders.boulderID);
+                .grabBoulderChallenges(boulderID: closestBoulder.boulderID);
             challengesOverview.add("create");
             // Tapped inside the circle, perform the desired action
             setState(() {
               showBoulderInformation(
                   context,
                   setState,
-                  boulders,
+                  closestBoulder!,
                   currentProfile,
                   currentComp,
                   compView,

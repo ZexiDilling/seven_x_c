@@ -19,7 +19,7 @@ class LineChartGraph extends StatelessWidget {
   final TimePeriod selectedTimePeriod;
   final PointsData graphData;
   final String gradingSystem;
-
+  
   @override
   Widget build(BuildContext context) {
     Map<int, DateTime> numberToDateMap = {};
@@ -79,7 +79,6 @@ class LineChartGraph extends StatelessWidget {
             colorOrder.map((color) => (colors[color] ?? 0).toDouble()).toList();
         numberToDateMap[entryNumber] = entryDate;
       });
-
       return BarChart(
         barChartSetterData(colorOrder, cumulativeCounts, numberToDateMap),
       );

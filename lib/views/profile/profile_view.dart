@@ -357,6 +357,7 @@ Future<PointsData> getPoints(
       boulderSetColours: boulderSetColours,
       boulderSetSplit: boulderSetSplit,
     );
+
   } catch (e) {
     return PointsData(
       pointsBoulder: 0,
