@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
+import 'package:seven_x_c/helpters/bonus_functions.dart';
 import 'package:seven_x_c/helpters/functions.dart' show capitalize;
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
@@ -22,14 +23,7 @@ void showGradeInfo(BuildContext context, CloudSettings currentSettings, CloudPro
             ),
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Close'),
-          ),
-        ],
+       
       );
     },
   );
@@ -65,16 +59,26 @@ Widget _buildGradeColorsList(context, CloudSettings currentSettings, CloudProfil
 Widget _buildColorTile(context, Color color, String grade, Map<String, dynamic> gradeDetails, CloudProfile currentProfile) {
   
   return ListTile(
-    title: Text('${capitalize(grade)} Grade',
-    style: const TextStyle(),
+    title: SizedBox(width: 10, child: OutlineText(Text(
+      capitalize(grade),
+                overflow: TextOverflow.ellipsis,
+    ), strokeWidth: 3,
+            strokeColor: Colors.white54,
+            overflow: TextOverflow.ellipsis,)
+      
+      
+
     ),
     tileColor: color,
     subtitle:
-         currentProfile.gradingSystem == "V_grade" ? Text(
-            'Min: ${allGrading[gradeDetails['min']]!["v_grade"]} Max: ${allGrading[gradeDetails['max']]!["v_grade"]}')
-            : Text('Min: ${allGrading[gradeDetails['min']]!["french"]} Max: ${allGrading[gradeDetails['max']]!["french"]}'),
+         currentProfile.gradingSystem == "V_grade" ? OutlineText(Text(
+            'Min: ${allGrading[gradeDetails['min']]!["v_grade"]} Max: ${allGrading[gradeDetails['max']]!["v_grade"]}'))
+            : OutlineText(Text('Min: ${allGrading[gradeDetails['min']]!["french"]} Max: ${allGrading[gradeDetails['max']]!["french"]}'), strokeColor: Colors.grey, strokeWidth: 0.5,),
         
     onTap: () {},
   );
 }
+
+
+
 

@@ -16,8 +16,14 @@ class GymPainter extends CustomPainter {
   double currentScale;
   bool compView;
 
-  GymPainter(this.context, this.constraints, this.allBoulders, this.currentProfile, this.currentSettings,
-      this.currentScale, this.compView);
+  GymPainter(
+      this.context,
+      this.constraints,
+      this.allBoulders,
+      this.currentProfile,
+      this.currentSettings,
+      this.currentScale,
+      this.compView);
   DateTime currentTime = DateTime.now();
   @override
   void paint(Canvas canvas, Size size) {
@@ -33,8 +39,10 @@ class GymPainter extends CustomPainter {
         DateTime? updatedBoulderDate = boulder.updateDateBoulder?.toDate();
         Color? gradeColour = boulder.hiddenGrade == true
             ? hiddenGradeColor
-            : nameToColor(currentSettings.settingsHoldColour![boulder.gradeColour.toLowerCase()]);
-        Color? holdColour = nameToColor(currentSettings.settingsHoldColour![boulder.holdColour]);
+            : nameToColor(currentSettings
+                .settingsHoldColour![boulder.gradeColour.toLowerCase()]);
+        Color? holdColour = nameToColor(
+            currentSettings.settingsHoldColour![boulder.holdColour]);
         double fadeEffect = 0.3;
         if (boulder.climberTopped != null &&
             boulder.climberTopped is Map<String, dynamic>) {
@@ -117,10 +125,35 @@ class GymPainter extends CustomPainter {
               : boulderRadius,
           outlinePaint,
         );
+
+        // Draw a 'T' in the middle if boulder.topOut is true
+        if (boulder.topOut == true) {
+          final TextPainter textPainter = TextPainter(
+            text: TextSpan(
+              text: 'T',
+              style: TextStyle(
+                color: boulder.gradeColour.toLowerCase() == "black"
+                    ? Colors.white
+                    : Colors.black, 
+                fontSize: 3.0, 
+                fontWeight: FontWeight.bold, 
+              ),
+            ),
+            textDirection: TextDirection.ltr,
+          );
+
+          textPainter.layout();
+
+          textPainter.paint(
+            canvas,
+            Offset(centerX - textPainter.width / 2,
+                centerY - textPainter.height / 2),
+          );
+        }
       }
 
       // setup for showing counter when zoomed out
-    }     else {
+    } else {
       for (final CloudBoulder boulder in allBoulders) {
         DateTime setBoulderDate = boulder.setDateBoulder.toDate();
         DateTime? updatedBoulderDate = boulder.updateDateBoulder?.toDate();
@@ -161,7 +194,6 @@ class GymPainter extends CustomPainter {
         //     (userToppedBouldersCountPerWall[wall.wallName] ?? 0);
         final int boulderCountTopped =
             userToppedBouldersCountPerWall[wall.wallName] ?? 0;
-
 
         final Offset center = Offset(
           ((wall.wallXMax + wall.wallXMin) / 2) * constraints.maxWidth,

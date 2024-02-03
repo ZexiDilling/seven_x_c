@@ -86,7 +86,14 @@ Future<void> showAddNewBoulder(
                                 String holdColorName = entry.key;
                                 return DropdownMenuItem(
                                   value: holdColorName,
-                                  child: Text(holdColorName),
+                                  child: Container(
+                                    color: nameToColor(currentSettings
+                                        .settingsHoldColour![holdColorName]),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(6.0),
+                                      child: Text(capitalize(holdColorName)),
+                                    ),
+                                  ),
                                 );
                               }),
                             ],
@@ -114,7 +121,16 @@ Future<void> showAddNewBoulder(
                                           String colorName = entry.key;
                                           return DropdownMenuItem(
                                             value: colorName,
-                                            child: Text(colorName),
+                                            child: Container(
+                                                color: nameToColor(
+                                                    currentSettings
+                                                            .settingsGradeColour![
+                                                        colorName]),
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(capitalize(colorName)),
+                                                )),
                                           );
                                         }),
                                       ],

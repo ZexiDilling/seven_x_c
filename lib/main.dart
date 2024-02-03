@@ -27,7 +27,7 @@ void main() {
       debugShowCheckedModeBanner: false,
       title: "DTU Climbing",
       theme: ThemeData(
-        textTheme: GoogleFonts.ibarraRealNovaTextTheme(),
+        textTheme: GoogleFonts.notoSerifTextTheme(),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
