@@ -276,7 +276,7 @@ class _GymViewState extends State<GymView> {
                 });
               },
             ),
-          if (currentProfile!.isAdmin && !moveBoulder||
+          if (currentProfile!.isAdmin && !moveBoulder ||
               currentProfile!.isSetter && !moveBoulder)
             IconButton(
               icon: Icon(
@@ -309,11 +309,15 @@ class _GymViewState extends State<GymView> {
               case ConnectionState.active:
                 if (snapshot.hasData) {
                   final allBoulders = snapshot.data as Iterable<CloudBoulder>;
+
                   return GestureDetector(
                     key: _gymKey,
                     onTapUp: (details) {
                       _tapping(context, constraints, details, allBoulders,
                           currentProfile, _fireBaseService);
+                    },
+                    onDoubleTapDown: (details) {
+                      _doubleTapping(context, constraints, details);
                     },
                     child: InteractiveViewer(
                       transformationController: _controller,
@@ -604,5 +608,55 @@ class _GymViewState extends State<GymView> {
         }
       }
     }
+  }
+
+  Future<void> _doubleTapping(context, constraints, details) async {
+    final RenderBox referenceBox =
+        _gymKey.currentContext?.findRenderObject() as RenderBox;
+    final localPosition = referenceBox.globalToLocal(details.globalPosition);
+    final WallRegion nearestWall = findNearestWallRegion(
+      localPosition,
+      wallRegions,
+      constraints,
+    );
+
+    final Offset center = Offset(
+      ((nearestWall.wallXMax + nearestWall.wallXMin) / 2) *
+          constraints.maxWidth,
+      ((nearestWall.wallYMaX + nearestWall.wallYMin) / 2) *
+          constraints.maxHeight,
+    );
+
+    _controller.value = Matrix4.diagonal3Values(
+      _controller.value.getMaxScaleOnAxis() * 2.0,
+      _controller.value.getMaxScaleOnAxis() * 2.0,
+      1.0,
+    )..translate(center.dx, center.dy);
+  }
+
+  WallRegion findNearestWallRegion(
+    Offset localPosition,
+    List<WallRegion> wallRegions,
+    BoxConstraints constraints,
+  ) {
+    WallRegion? nearestWallRegion; // Initialize with null
+    double minDistance = double.infinity;
+
+    for (final WallRegion wall in wallRegions) {
+      final Offset center = Offset(
+        ((wall.wallXMax + wall.wallXMin) / 2) * constraints.maxWidth,
+        ((wall.wallYMaX + wall.wallYMin) / 2) * constraints.maxHeight,
+      );
+
+      final double distance =
+          calculateWallRegionDistance(localPosition, center);
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestWallRegion = wall;
+      }
+    }
+
+    return nearestWallRegion!;
   }
 }
