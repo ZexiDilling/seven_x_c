@@ -80,6 +80,7 @@ Boulders:
 Extra info:
 	Done - Make a dynamic grading explainer. 
 
+DONE - 	Add repeat counter 
 
 cleanup:
 	Done - 	change all icons to use "IconMangener" for consistency and easyer to make changes 
@@ -141,6 +142,17 @@ boulders
 ToDO:
 ------------------------------------------------------------------------------------------
 
+Sort out filter-slider colour to be based on min and max values. 
+Have a counter to show how many problems are on your filter settings (topped/total) 
+Put a checkbox for counter on the filter colours to get a count on how many there are. 
+
+Fix counter on map for toppped problems. 
+Make it possible to move problems 
+
+Make it possible to get outlines of the different sections.
+Make it possible to adjust the sections. 
+
+
 Low priority/ not sure:
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -181,8 +193,6 @@ Extra info: 	 - need to test to see if this is needed, or if the system make sen
 Filter:
 	filter on setter
 	Filter Boulders on sections / walls 
-	Mark topped / flashed on all filte boulders
-	Mark topped / flashed on all boulders in view
 	filter on "soon to be taken down"
 		To use this, I need the walls in firebase... to be able to set a strip date on the different sections.
 
@@ -196,7 +206,7 @@ rankings:
 Map changes:
 	drag boulders on "hold" gesture. 
 	Add list of all boulders (see top logger for example)
-	Add repeat counter ? 
+
 
 Settings:
 	Add a "reset points" button
