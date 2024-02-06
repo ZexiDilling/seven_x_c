@@ -14,4 +14,8 @@ class IconManager {
   static const IconData info = Icons.help_outline;
   static const IconData thropy = Icons.emoji_events;
   static const IconData calender = Icons.calendar_today;
+  static const IconData showWalls = Icons.crop_din_sharp;
+  static const IconData doNotShowWalls = Icons.border_clear_sharp;
+  static const IconData moveBoulder = Icons.swap_horiz;
+  static const IconData cancel = Icons.close; 
 }

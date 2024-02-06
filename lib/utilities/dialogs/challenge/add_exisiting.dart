@@ -195,7 +195,7 @@ void showAddExisitingChallenge(
                                   existingData:
                                       currentChallenge!.challengeBoulders));
 
-                          fireBaseService.updatBoulder(
+                          fireBaseService.updateBoulder(
                               boulderID: boulder.boulderID,
                               boulderChallenges: updateBoulderChallengeMap(
                                   currentChallenge: currentChallenge!,

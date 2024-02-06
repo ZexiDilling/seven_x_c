@@ -209,9 +209,10 @@ Map<String, dynamic> updateClimberToppedMap(
     repeats ??= existingData[userID]["repeats"];
     topped ??= existingData[userID]["topped"];
     flashed ??= existingData[userID]['flashed'];
+    if (existingData[userID] !=null){
     gradeNumberVoted ??= existingData[userID]["gradeNumber"];
     gradeColourVoted ??= existingData[userID]["gradeColour"];
-    gradeArrowVoted ??= existingData[userID]["gradeArrow"];
+    gradeArrowVoted ??= existingData[userID]["gradeArrow"];}
   } else {
     existingData = {};
   }

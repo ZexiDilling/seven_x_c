@@ -24,11 +24,11 @@ class FirebaseCloudStorage {
     }
   }
 
-  Future<void> updatBoulder({
+  Future<void> updateBoulder({
     required String boulderID,
     String? setter,
-    int? cordX,
-    int? cordY,
+    double? cordX,
+    double? cordY,
     String? wall,
     String? holdColour,
     String? gradeColour,

@@ -263,7 +263,7 @@ const double xMin = 0.18;
 List<WallRegion> wallRegions = [
   WallRegion(
     wallID: 'slap',
-    wallYMaX: 0.9926090169992609,
+    wallYMaX: 1,
     wallYMin: 0.9408721359940871,
     wallXMax: xMax,
     wallXMin: xMin,

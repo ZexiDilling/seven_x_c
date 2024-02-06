@@ -38,7 +38,7 @@ Future<void> stripping(
 
                           for (CloudBoulder boulder in boulders) {
                             if (boulder.hiddenGrade == false) {
-                              await boulderService.updatBoulder(
+                              await boulderService.updateBoulder(
                                   boulderID: boulder.boulderID,
                                   hiddenGrade: true);
                             }
@@ -55,7 +55,7 @@ Future<void> stripping(
 
                           for (CloudBoulder boulder in boulders) {
                             if (boulder.hiddenGrade == true) {
-                              await boulderService.updatBoulder(
+                              await boulderService.updateBoulder(
                                   boulderID: boulder.boulderID,
                                   hiddenGrade: false);
                             }
@@ -152,7 +152,7 @@ Future<void> stripping(
                                   for (CloudBoulder boulder in boulders) {
                                     if (wallRegionMap[boulder.wall]!
                                         .isSelected) {
-                                      await boulderService.updatBoulder(
+                                      await boulderService.updateBoulder(
                                         boulderID: boulder.boulderID,
                                         active: false,
                                       );

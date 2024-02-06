@@ -84,6 +84,10 @@ DONE - 	Add repeat counter
 
 cleanup:
 	Done - 	change all icons to use "IconMangener" for consistency and easyer to make changes 
+
+Done - Sort out filter-slider colour to be based on min and max values. 
+Done - Fix counter on map for toppped problems. 
+Done - Make it possible to get outlines of the different sections.
 ------------------------------------------------------------------------------------------------------------------------
 
 Missing testing:
@@ -142,14 +146,9 @@ boulders
 ToDO:
 ------------------------------------------------------------------------------------------
 
-Sort out filter-slider colour to be based on min and max values. 
-Have a counter to show how many problems are on your filter settings (topped/total) 
-Put a checkbox for counter on the filter colours to get a count on how many there are. 
-
-Fix counter on map for toppped problems. 
 Make it possible to move problems 
 
-Make it possible to get outlines of the different sections.
+
 Make it possible to adjust the sections. 
 
 
@@ -195,6 +194,7 @@ Filter:
 	Filter Boulders on sections / walls 
 	filter on "soon to be taken down"
 		To use this, I need the walls in firebase... to be able to set a strip date on the different sections.
+	Have a counter to show how many problems are on your filter settings (topped/total)  =??
 
 Hide/unHide - move under comp settings ? 
 

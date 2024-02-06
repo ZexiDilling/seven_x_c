@@ -21,7 +21,14 @@ List<BarChartGroupData> getGradeColourChartData(CloudBoulder boulder, CloudSetti
 
    List<String> colorNames = currentSettings.settingsGradeColour!.keys.toList();
 
-  List<BarChartGroupData> barGroups = colorVotes.entries.map((entry) {
+ List<MapEntry<String, int>> sortedColorVotes = colorVotes.entries.toList()
+    ..sort((a, b) {
+      int minA = currentSettings.settingsGradeColour![a.key]!['min'];
+      int minB = currentSettings.settingsGradeColour![b.key]!['min'];
+      return minA.compareTo(minB);
+    });
+  
+  List<BarChartGroupData> barGroups = sortedColorVotes.map((entry) {
     String gradeColour = entry.key;
     
     int voteCount = entry.value;

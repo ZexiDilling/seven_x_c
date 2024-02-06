@@ -49,6 +49,9 @@ class _GymViewState extends State<GymView> {
   late CloudProfile? currentProfile;
   bool profileLoaded = false;
   bool editing = false;
+  bool moveBoulder = false;
+  String selectedBoulder = "";
+  bool showWallRegions = false;
   bool filterEnabled = false;
   double currentScale = 1.0;
   int topCounter = 0;
@@ -216,13 +219,37 @@ class _GymViewState extends State<GymView> {
               return Text('Error:  ${snapshot.error}');
             }
             final bouldersCount = snapshot.data?.length ?? 0;
+            topCounter = 0;
+            for (CloudBoulder tempBoulder in snapshot.data!) {
+              if (tempBoulder.climberTopped != null) {
+                if (tempBoulder.climberTopped!.containsKey(userId)) {
+                  topCounter++;
+                }
+              }
+            }
+
             return compView
                 ? Text(
                     currentComp!.compName,
                     style: compBarStyle,
                   )
-                : Text('${currentSettings!.settingsName} - $bouldersCount',
-                    style: appBarStyle);
+                : moveBoulder
+                    ? const Text("MOVING A BOULDER",
+                        overflow: TextOverflow.ellipsis)
+                    : Column(
+                        children: [
+                          Text(
+                            currentSettings!.settingsName,
+                            style: appBarStyle,
+                          ),
+                          Text(
+                            '$topCounter/$bouldersCount',
+                            style: const TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
+                      );
           },
         ),
         backgroundColor: compView ? compAppBarColour : dtuClimbingAppBar,
@@ -238,13 +265,35 @@ class _GymViewState extends State<GymView> {
                   },
                   icon: const Icon(IconManager.thropy))
               : const SizedBox(),
-          if (currentProfile!.isAdmin || currentProfile!.isSetter)
+          if (editing)
+            IconButton(
+              icon: Icon(showWallRegions
+                  ? IconManager.showWalls
+                  : IconManager.doNotShowWalls),
+              onPressed: () {
+                setState(() {
+                  showWallRegions = !showWallRegions;
+                });
+              },
+            ),
+          if (currentProfile!.isAdmin && !moveBoulder||
+              currentProfile!.isSetter && !moveBoulder)
             IconButton(
               icon: Icon(
                   editing ? IconManager.edditing : IconManager.doneEdditing),
               onPressed: () {
                 setState(() {
                   editing = !editing;
+                });
+              },
+            ),
+          if (moveBoulder)
+            IconButton(
+              icon: Icon(IconManager.cancel),
+              onPressed: () {
+                setState(() {
+                  moveBoulder = false;
+                  selectedBoulder = "";
                 });
               },
             ),
@@ -293,7 +342,8 @@ class _GymViewState extends State<GymView> {
                               currentProfile!,
                               currentSettings!,
                               currentScale,
-                              compView),
+                              compView,
+                              showWallRegions),
                         ),
                       ),
                     ),
@@ -436,7 +486,7 @@ class _GymViewState extends State<GymView> {
           minBoulderDistance; // Set a minimum distance to avoid overlap
       final setters = await fireBaseService.getSetters();
 
-      if (editing) {
+      if (editing || moveBoulder) {
         // Check for existing circles and avoid overlap
         double tempCenterX = transformedPosition.x;
         double tempCenterY = transformedPosition.y;
@@ -467,30 +517,40 @@ class _GymViewState extends State<GymView> {
           }
         }
 
-        try {
+        if (moveBoulder) {
+          fireBaseService.updateBoulder(
+              boulderID: selectedBoulder,
+              cordX: tempCenterX / constraints.maxWidth,
+              cordY: tempCenterY / constraints.maxHeight);
           setState(() {
-            showAddNewBoulder(
-                context,
-                constraints,
-                currentProfile,
-                currentComp,
-                compView,
-                tempCenterX,
-                tempCenterY,
-                wall!,
-                gradingSystem,
-                colorToGrade,
-                _fireBaseService,
-                currentSettings!,
-                setters);
+            moveBoulder = false;
+            selectedBoulder = "";
           });
-        } catch (error) {
-          // Handle the error
-          // ignore: avoid_print
-          print(error);
+        } else {
+          try {
+            setState(() {
+              showAddNewBoulder(
+                  context,
+                  constraints,
+                  currentProfile,
+                  currentComp,
+                  compView,
+                  tempCenterX,
+                  tempCenterY,
+                  wall!,
+                  gradingSystem,
+                  colorToGrade,
+                  _fireBaseService,
+                  currentSettings!,
+                  setters);
+            });
+          } catch (error) {
+            // Handle the error
+            // ignore: avoid_print
+            print(error);
+          }
         }
       } else {
-        
         CloudBoulder? closestBoulder;
         for (final boulders in allBoulders) {
           double distance = ((boulders.cordX * constraints.maxWidth) -
@@ -508,20 +568,37 @@ class _GymViewState extends State<GymView> {
                 .grabBoulderChallenges(boulderID: closestBoulder.boulderID);
             challengesOverview.add("create");
             // Tapped inside the circle, perform the desired action
-            setState(() {
-              showBoulderInformation(
-                  context,
-                  setState,
-                  closestBoulder!,
-                  currentProfile,
-                  currentComp,
-                  compView,
-                  _fireBaseService,
-                  currentSettings!,
-                  setters,
-                  challengesOverview);
-            });
-
+            // ignore: use_build_context_synchronously
+            final result = await showBoulderInformation(
+                context,
+                setState,
+                closestBoulder,
+                currentProfile,
+                currentComp,
+                compView,
+                _fireBaseService,
+                currentSettings!,
+                setters,
+                challengesOverview);
+            // setState(() {
+            //   showBoulderInformation(
+            //       context,
+            //       setState,
+            //       closestBoulder!,
+            //       currentProfile,
+            //       currentComp,
+            //       compView,
+            //       _fireBaseService,
+            //       currentSettings!,
+            //       setters,
+            //       challengesOverview);
+            // });
+            if (result == true) {
+              setState(() {
+                moveBoulder = true;
+                selectedBoulder = closestBoulder!.boulderID;
+              });
+            }
             break;
           }
         }

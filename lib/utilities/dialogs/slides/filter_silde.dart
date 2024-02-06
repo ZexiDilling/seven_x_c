@@ -71,7 +71,7 @@ Drawer filterDrawer(
 
 ListTile specFilterCheck(setState) {
   return ListTile(
-    title: const Text('Checkboxes'),
+    
     subtitle: Column(
       children: [
         CheckboxListTile(
@@ -135,7 +135,6 @@ RangeSlider gradeFilterSlider(
 }
 
 Set<String> selectedColors = {};
-
 List<Widget> _createColorRows(setState, CloudSettings currentSettings) {
   List<Widget> colorRows = [];
 
@@ -145,8 +144,12 @@ List<Widget> _createColorRows(setState, CloudSettings currentSettings) {
     // Handle the case where settingsGradeColour is null or empty
     return colorRows;
   }
+
   List<MapEntry<String, dynamic>> colorEntries =
       settingsGradeColour.entries.toList(growable: false);
+
+  // Sort the color entries based on the "min" value
+  colorEntries.sort((a, b) => a.value['min'].compareTo(b.value['min']));
 
   const colorsPerRow = 4;
 
@@ -202,4 +205,5 @@ List<Widget> _createColorRows(setState, CloudSettings currentSettings) {
 
   return colorRows;
 }
+
 
