@@ -24,7 +24,8 @@ class GymPainter extends CustomPainter {
       this.currentProfile,
       this.currentSettings,
       this.currentScale,
-      this.compView, this.showWallRegions);
+      this.compView,
+      this.showWallRegions);
   DateTime currentTime = DateTime.now();
   @override
   void paint(Canvas canvas, Size size) {
@@ -159,7 +160,6 @@ class GymPainter extends CustomPainter {
             ((wall.wallXMax + wall.wallXMin) / 2) * constraints.maxWidth,
             ((wall.wallYMaX + wall.wallYMin) / 2) * constraints.maxHeight,
           );
-
           drawWallRegion(wall, center, canvas);
         }
       }
@@ -213,7 +213,6 @@ class GymPainter extends CustomPainter {
           ((wall.wallXMax + wall.wallXMin) / 2) * constraints.maxWidth,
           ((wall.wallYMaX + wall.wallYMin) / 2) * constraints.maxHeight,
         );
-
         // Draw rectangle
         if (showWallRegions) {
           drawWallRegion(wall, center, canvas);
@@ -297,37 +296,34 @@ class GymPainter extends CustomPainter {
   }
 
   void drawWallRegion(WallRegion wall, Offset center, Canvas canvas) {
-     final double rectangleWidth =
+    final double rectangleWidth =
         (wall.wallXMax - wall.wallXMin) * constraints.maxWidth;
     final double rectangleHeight =
         (wall.wallYMaX - wall.wallYMin) * constraints.maxHeight;
-    
+
     final Rect rectangle = Rect.fromCenter(
       center: center,
       width: rectangleWidth,
       height: rectangleHeight,
     );
-    
+
     final Paint rectanglePaint = Paint()
       ..color = Colors.blue // Set your desired rectangle color
       ..style = PaintingStyle.stroke // Set the style to stroke
       ..strokeCap =
           StrokeCap.round // Set the stroke cap to round for dotted effect
-      ..strokeWidth =
-          2.0; // Set the stroke width based on your preference
-    
+      ..strokeWidth = 2.0; // Set the stroke width based on your preference
+
     // Define the number of dots and the space between them
     const double dotSpacing = 7.0; // Set the space between dots
     const double dashLength = 1.0; // Set the length of each dash
-    
+
     final Path dottedPath = Path();
-    for (double x = rectangle.left;
-        x < rectangle.right;
-        x += dotSpacing) {
+    for (double x = rectangle.left; x < rectangle.right; x += dotSpacing) {
       dottedPath.moveTo(x, rectangle.top);
       dottedPath.lineTo(x + dashLength, rectangle.top);
     }
-    
+
     canvas.drawPath(dottedPath, rectanglePaint);
   }
 

@@ -5,9 +5,6 @@ double calculateDistance(double x1, double y1, double x2, double y2) {
   return ((x2 - x1).abs() + (y2 - y1).abs());
 }
 
-double calculateWallRegionDistance(tapPosition, Offset center) {
-  return (tapPosition - center).distance;
-}
 
 
 // Define maps for holds and grades, where the key is the color and the value is the name

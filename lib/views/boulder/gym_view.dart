@@ -318,6 +318,9 @@ class _GymViewState extends State<GymView> {
                     },
                     onDoubleTapDown: (details) {
                       _doubleTapping(context, constraints, details);
+                      setState(() {
+                          currentScale = _controller.value.getMaxScaleOnAxis();
+                        });
                     },
                     child: InteractiveViewer(
                       transformationController: _controller,
@@ -613,29 +616,37 @@ class _GymViewState extends State<GymView> {
   Future<void> _doubleTapping(context, constraints, details) async {
     final RenderBox referenceBox =
         _gymKey.currentContext?.findRenderObject() as RenderBox;
+
+    // Convert the tap position to scene coordinates considering the transformation
     final localPosition = referenceBox.globalToLocal(details.globalPosition);
+
+    // Create a copy of the transformation matrix and invert it
+    final Matrix4 invertedMatrix = _controller.value.clone()..invert();
+    // Create a Vector4 from the tap position
+    final VM.Vector4 tapVector =
+        VM.Vector4(localPosition.dx, localPosition.dy, 0, 1);
+
+    // Transform the tap position using the inverted matrix
+    final VM.Vector4 transformedPosition = invertedMatrix.transform(tapVector);
+
     final WallRegion nearestWall = findNearestWallRegion(
-      localPosition,
+      transformedPosition,
       wallRegions,
       constraints,
     );
-
     final Offset center = Offset(
-      ((nearestWall.wallXMax + nearestWall.wallXMin) / 2) *
-          constraints.maxWidth,
-      ((nearestWall.wallYMaX + nearestWall.wallYMin) / 2) *
-          constraints.maxHeight,
+      (((nearestWall.wallXMax + nearestWall.wallXMin) / 2) * constraints.maxWidth),
+        ((nearestWall.wallYMaX + nearestWall.wallYMin) / 2) * constraints.maxHeight,
     );
 
-    _controller.value = Matrix4.diagonal3Values(
-      _controller.value.getMaxScaleOnAxis() * 2.0,
-      _controller.value.getMaxScaleOnAxis() * 2.0,
-      1.0,
-    )..translate(center.dx, center.dy);
+    _controller.value = Matrix4.identity()
+      ..translate(-center.dx * 2.0, -center.dy * 2.0)
+      ..scale(3.0);
+
   }
 
   WallRegion findNearestWallRegion(
-    Offset localPosition,
+    localPosition,
     List<WallRegion> wallRegions,
     BoxConstraints constraints,
   ) {
@@ -644,12 +655,19 @@ class _GymViewState extends State<GymView> {
 
     for (final WallRegion wall in wallRegions) {
       final Offset center = Offset(
-        ((wall.wallXMax + wall.wallXMin) / 2) * constraints.maxWidth,
+        (((wall.wallXMax + wall.wallXMin) / 2) * constraints.maxWidth),
         ((wall.wallYMaX + wall.wallYMin) / 2) * constraints.maxHeight,
       );
 
-      final double distance =
-          calculateWallRegionDistance(localPosition, center);
+      double tempCenterX = localPosition.x;
+      double tempCenterY = localPosition.y;
+
+      double distance = calculateDistance(
+        center.dx,
+        center.dy,
+        tempCenterX,
+        tempCenterY,
+      );
 
       if (distance < minDistance) {
         minDistance = distance;
