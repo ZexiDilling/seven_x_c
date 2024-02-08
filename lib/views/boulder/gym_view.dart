@@ -50,6 +50,7 @@ class _GymViewState extends State<GymView> {
   bool profileLoaded = false;
   bool editing = false;
   bool moveBoulder = false;
+  bool moveMultipleBoulders = false;
   String selectedBoulder = "";
   bool showWallRegions = false;
   bool filterEnabled = false;
@@ -267,15 +268,28 @@ class _GymViewState extends State<GymView> {
               : const SizedBox(),
           if (editing)
             IconButton(
-              icon: Icon(showWallRegions
-                  ? IconManager.showWalls
-                  : IconManager.doNotShowWalls),
+              icon: Icon(
+                moveMultipleBoulders
+                    ? IconManager.moveMultipleBoulders
+                    : IconManager.moveMultipleBoulders,
+                color: moveMultipleBoulders ? Colors.blue : Colors.grey,
+              ),
               onPressed: () {
                 setState(() {
-                  showWallRegions = !showWallRegions;
+                  moveMultipleBoulders = !moveMultipleBoulders;
                 });
               },
             ),
+          IconButton(
+            icon: Icon(showWallRegions
+                ? IconManager.showWalls
+                : IconManager.doNotShowWalls),
+            onPressed: () {
+              setState(() {
+                showWallRegions = !showWallRegions;
+              });
+            },
+          ),
           if (currentProfile!.isAdmin && !moveBoulder ||
               currentProfile!.isSetter && !moveBoulder)
             IconButton(
@@ -289,7 +303,7 @@ class _GymViewState extends State<GymView> {
             ),
           if (moveBoulder)
             IconButton(
-              icon: Icon(IconManager.cancel),
+              icon: const Icon(IconManager.cancel),
               onPressed: () {
                 setState(() {
                   moveBoulder = false;
@@ -319,8 +333,8 @@ class _GymViewState extends State<GymView> {
                     onDoubleTapDown: (details) {
                       _doubleTapping(context, constraints, details);
                       setState(() {
-                          currentScale = _controller.value.getMaxScaleOnAxis();
-                        });
+                        currentScale = _controller.value.getMaxScaleOnAxis();
+                      });
                     },
                     child: InteractiveViewer(
                       transformationController: _controller,
@@ -533,6 +547,11 @@ class _GymViewState extends State<GymView> {
             moveBoulder = false;
             selectedBoulder = "";
           });
+        } else if (moveMultipleBoulders) {
+          setState(() {
+            moveBoulder = true;
+            selectedBoulder = selectedBoulder;
+          });
         } else {
           try {
             setState(() {
@@ -635,14 +654,15 @@ class _GymViewState extends State<GymView> {
       constraints,
     );
     final Offset center = Offset(
-      (((nearestWall.wallXMax + nearestWall.wallXMin) / 2) * constraints.maxWidth),
-        ((nearestWall.wallYMaX + nearestWall.wallYMin) / 2) * constraints.maxHeight,
+      (((nearestWall.wallXMax + nearestWall.wallXMin) / 2) *
+          constraints.maxWidth),
+      ((nearestWall.wallYMaX + nearestWall.wallYMin) / 2) *
+          constraints.maxHeight,
     );
 
     _controller.value = Matrix4.identity()
       ..translate(-center.dx * 2.0, -center.dy * 2.0)
       ..scale(3.0);
-
   }
 
   WallRegion findNearestWallRegion(

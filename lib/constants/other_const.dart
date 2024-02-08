@@ -17,5 +17,6 @@ class IconManager {
   static const IconData showWalls = Icons.crop_din_sharp;
   static const IconData doNotShowWalls = Icons.border_clear_sharp;
   static const IconData moveBoulder = Icons.swap_horiz;
+  static const IconData moveMultipleBoulders = Icons.swap_horiz;
   static const IconData cancel = Icons.close; 
 }

@@ -88,6 +88,15 @@ cleanup:
 Done - Sort out filter-slider colour to be based on min and max values. 
 Done - Fix counter on map for toppped problems. 
 Done - Make it possible to get outlines of the different sections.
+Done - Make it possible to move problems 
+Done - zoom when double tapping
+
+Admin page:
+	
+	Done - Set up / change grading system
+		Done - Change range for colours
+		Done - Add colours
+	Done - Add/remove hold Colours
 ------------------------------------------------------------------------------------------------------------------------
 
 Missing testing:
@@ -145,8 +154,7 @@ boulders
 
 ToDO:
 ------------------------------------------------------------------------------------------
-
-Make it possible to move problems 
+Fix states on profile view
 
 
 Make it possible to adjust the sections. 
@@ -183,7 +191,6 @@ Extra info: 	 - need to test to see if this is needed, or if the system make sen
 	Stuff
 	opening-closing times
 	boulder list bar graph ? 
-
 	Explain Point system
 		Boulder
 		Setter
@@ -204,8 +211,9 @@ rankings:
 	Make a ranking list per month, per semester, per year and overall. 
 
 Map changes:
-	drag boulders on "hold" gesture. 
 	Add list of all boulders (see top logger for example)
+		zoom to problem when clicked
+		show Topped/flashed on the list
 
 
 Settings:
@@ -218,21 +226,14 @@ profil:
 
 Admin page:
 	Set take-down days for boulders / sections. 
-	Set up / change grading system
-		Change range for colours
-		Add colours
-	Add/remove hold Colours
+
 
 Map changes:
-	 make it possible to toggle on and off the zoom effect
-	Make it an effect on the boulders, so they come from the center and jumps out to place and slides back in when zooming out again
-	update the number to fit with "on screen" instread of total based on filter ?
+	make it possible to toggle on and off the zoom effect
 
 setting: 
 	Keep track of DTU Setter team ?
-Keep track of Guest setters ? 
-
-make it possible to check others profile ? 
+	Keep track of Guest setters ? 
 
 Ranking View  for everything ? 
 
