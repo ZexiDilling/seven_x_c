@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
@@ -40,6 +42,17 @@ class LineChartGraph extends StatelessWidget {
     }
 
     if (chartSelection == "maxGrade") {
+      List<MapEntry<DateTime, int>> sortedListClimbed =
+          graphData.boulderClimbedMaxClimbed.entries.toList()
+            ..sort((a, b) => a.key.compareTo(b.key));
+      Map<DateTime, int> sortedMapMaxClimbed =
+          Map.fromEntries(sortedListClimbed);
+
+      List<MapEntry<DateTime, int>> sortedListFlash =
+          graphData.boulderClimbedMaxFlashed.entries.toList()
+            ..sort((a, b) => a.key.compareTo(b.key));
+      Map<DateTime, int> sortedMapMaxflashed = Map.fromEntries(sortedListFlash);
+
       List<FlSpot> climbedEntries =
           graphData.boulderClimbedMaxClimbed.entries.map((entry) {
         return FlSpot(
@@ -58,13 +71,26 @@ class LineChartGraph extends StatelessWidget {
       double minY = (maxY - 12).clamp(0, maxY);
       double maxX = numberToDateMap.length.toDouble();
       return LineChart(
-        maxGradeChart(
-            graphData, numberToDateMap, minY, maxY, maxX, gradingSystem),
+        maxGradeChart(sortedMapMaxClimbed, sortedMapMaxflashed, numberToDateMap,
+            minY, maxY, maxX, gradingSystem),
         duration: const Duration(milliseconds: 250),
       );
     } else if (chartSelection == "climbs") {
+      List<MapEntry<DateTime, int>> sortedList =
+          graphData.boulderClimbedAmount.entries.toList()
+            ..sort((a, b) => a.key.compareTo(b.key));
+      Map<DateTime, int> sortedMap = Map.fromEntries(sortedList);
+
+      List<int> graphList = sortedMap.entries
+          .where((entry) => numberToDateMap.containsValue(entry.key))
+          .map((entry) {
+        final int yValue = (entry.value).toInt();
+        return yValue;
+      }).toList();
+      double maxValue = (graphList.reduce(max)).toDouble();
+
       return BarChart(
-        climbsBarChart(graphData, numberToDateMap),
+        climbsBarChart(sortedMap, numberToDateMap, maxValue),
       );
     } else if (chartSelection == "SetterData") {
       final List<String> colorOrder = [
@@ -77,6 +103,8 @@ class LineChartGraph extends StatelessWidget {
         "silver"
       ];
       Map<int, List<double>> cumulativeCounts = {};
+      double maxYValue = 0.0;
+
 // Iterate over each entry in setColoursData and update cumulative counts
       graphData.boulderSetColours.forEach((entryDate, colors) {
         int entryNumber = dateToNumberMap[entryDate] ?? 0;
@@ -85,8 +113,33 @@ class LineChartGraph extends StatelessWidget {
         numberToDateMap[entryNumber] = entryDate;
       });
 
+      Map<int, double> totalCounts = {};
+
+// Iterate over each entry in cumulativeCounts and calculate total counts
+      cumulativeCounts.forEach((entryNumber, counts) {
+        double totalCount = counts.reduce((value, element) => value + element);
+        totalCounts[entryNumber] = totalCount;
+      });
+
+// Convert the map to a list of entries and sort it by keys (entryNumber in this case)
+      List<MapEntry<int, List<double>>> sortedList = cumulativeCounts.entries
+          .toList()
+        ..sort((a, b) => a.key.compareTo(b.key));
+
+// Create a new sorted map from the sorted list
+      Map<int, List<double>> sortedMap = Map.fromEntries(sortedList);
+
+// Print the sorted map
+
+// Find the maximum total count
+      if (totalCounts.isNotEmpty) {
+        int maxEntryNumber = totalCounts.keys
+            .reduce((a, b) => totalCounts[a]! > totalCounts[b]! ? a : b);
+        maxYValue = totalCounts[maxEntryNumber]!;
+      }
+
       return BarChart(
-        barChartSetterData(colorOrder, cumulativeCounts, numberToDateMap),
+        barChartSetterData(colorOrder, sortedMap, numberToDateMap, maxYValue),
       );
     } else if (chartSelection == "SetterDataPie") {
       return PieChart(
@@ -116,8 +169,8 @@ class LineChartGraph extends StatelessWidget {
     );
   }
 
-  BarChartData climbsBarChart(
-      PointsData graphData, Map<int, DateTime> numbersToDates) {
+  BarChartData climbsBarChart(Map<DateTime, int> graphData,
+      Map<int, DateTime> numbersToDates, double maxYValue) {
     return BarChartData(
       titlesData: FlTitlesData(
         show: true,
@@ -156,8 +209,8 @@ class LineChartGraph extends StatelessWidget {
         show: false,
       ),
       minY: 0,
-      maxY: 30,
-      barGroups: graphData.boulderClimbedAmount.entries
+      maxY: maxYValue,
+      barGroups: graphData.entries
           .where((entry) => numbersToDates.containsValue(entry.key))
           .map((entry) {
         final xValue = findNumberFromDate(entry.key, numbersToDates);
@@ -175,8 +228,14 @@ class LineChartGraph extends StatelessWidget {
     );
   }
 
-  LineChartData maxGradeChart(PointsData graphData, numbersToDates, double minY,
-      double maxY, double maxX, String gradingSystem) {
+  LineChartData maxGradeChart(
+      Map<DateTime, int> sortedMapMaxClimbed,
+      Map<DateTime, int> sortedMapMaxflashed,
+      numbersToDates,
+      double minY,
+      double maxY,
+      double maxX,
+      String gradingSystem) {
     return LineChartData(
       titlesData: FlTitlesData(
         show: true,
@@ -222,7 +281,7 @@ class LineChartGraph extends StatelessWidget {
       maxX: maxX,
       lineBarsData: [
         LineChartBarData(
-          spots: graphData.boulderClimbedMaxClimbed.entries
+          spots: sortedMapMaxClimbed.entries
               .where((entry) => numbersToDates.containsValue(entry.key))
               .map((entry) {
             return FlSpot(
@@ -239,7 +298,7 @@ class LineChartGraph extends StatelessWidget {
           isStrokeJoinRound: true,
         ),
         LineChartBarData(
-          spots: graphData.boulderClimbedMaxFlashed.entries
+          spots: sortedMapMaxflashed.entries
               .where((entry) => numbersToDates.containsValue(entry.key))
               .map((entry) {
             return FlSpot(
@@ -364,11 +423,14 @@ class LineChartGraph extends StatelessWidget {
     );
   }
 
-  BarChartData barChartSetterData(List<String> colorOrder,
-      Map<int, List<double>> cumulativeCounts, numberToDateMap) {
+  BarChartData barChartSetterData(
+      List<String> colorOrder,
+      Map<int, List<double>> cumulativeCounts,
+      numberToDateMap,
+      double maxYValue) {
     return BarChartData(
       alignment: BarChartAlignment.center,
-      maxY: 20,
+      maxY: maxYValue,
       minY: 0,
       groupsSpace: 12,
       titlesData: FlTitlesData(

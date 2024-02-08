@@ -27,8 +27,6 @@ Widget bottomTitles(
   const style = TextStyle(color: textColour, fontSize: fontChartSize);
   String text = '';
   // Format the date based on the selected time period
-  print(selectedTimePeriod);
-  print(value);
   switch (selectedTimePeriod) {
     
     case TimePeriod.week:

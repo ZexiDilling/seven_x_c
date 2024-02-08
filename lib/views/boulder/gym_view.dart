@@ -382,7 +382,10 @@ class _GymViewState extends State<GymView> {
           ? currentProfile!.isAdmin
               ? compDrawer(context, setState, currentComp!, _fireBaseService)
               : null
-          : currentSettings == null ? const CircularProgressIndicator() : filterDrawer(context, setState, currentProfile!, currentSettings!),
+          : currentSettings == null
+              ? const CircularProgressIndicator()
+              : filterDrawer(
+                  context, setState, currentProfile!, currentSettings!),
     );
   }
 
@@ -548,10 +551,26 @@ class _GymViewState extends State<GymView> {
             selectedBoulder = "";
           });
         } else if (moveMultipleBoulders) {
-          setState(() {
-            moveBoulder = true;
-            selectedBoulder = selectedBoulder;
-          });
+          CloudBoulder? closestBoulder;
+          for (final boulders in allBoulders) {
+            double distance = ((boulders.cordX * constraints.maxWidth) -
+                        transformedPosition.x)
+                    .abs() +
+                ((boulders.cordY * constraints.maxHeight) -
+                        transformedPosition.y)
+                    .abs();
+
+            if (distance < minDistance) {
+              minDistance = distance;
+              closestBoulder = boulders;
+            }
+            if (closestBoulder != null) {
+              setState(() {
+                moveBoulder = true;
+                selectedBoulder = closestBoulder!.boulderID;
+              });
+            }
+          }
         } else {
           try {
             setState(() {
