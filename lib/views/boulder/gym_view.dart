@@ -57,7 +57,7 @@ class _GymViewState extends State<GymView> {
   int topCounter = 0;
   bool compView = false;
   CloudComp? currentComp;
-  late CloudSettings? currentSettings;
+  CloudSettings? currentSettings;
 
   late final FirebaseCloudStorage _fireBaseService;
 
@@ -368,7 +368,7 @@ class _GymViewState extends State<GymView> {
           ? currentProfile!.isAdmin
               ? compDrawer(context, setState, currentComp!, _fireBaseService)
               : null
-          : filterDrawer(context, setState, currentProfile!, currentSettings!),
+          : currentSettings == null ? const CircularProgressIndicator() : filterDrawer(context, setState, currentProfile!, currentSettings!),
     );
   }
 
