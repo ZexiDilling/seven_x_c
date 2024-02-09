@@ -32,6 +32,8 @@ class LineChartGraph extends StatelessWidget {
     DateTime endDate = calculateEndDate(selectedTimePeriod, startDate);
     int dateCounter = 0;
 
+    
+
     for (DateTime date = startDate;
         date.isBefore(endDate);
         date = date.add(const Duration(days: 1))) {
@@ -87,7 +89,10 @@ class LineChartGraph extends StatelessWidget {
         final int yValue = (entry.value).toInt();
         return yValue;
       }).toList();
-      double maxValue = (graphList.reduce(max)).toDouble();
+      double maxValue = 0;
+      if (graphList.isNotEmpty) {
+      maxValue = (graphList.reduce(max)).toDouble();}
+      
 
       return BarChart(
         climbsBarChart(sortedMap, numberToDateMap, maxValue),
