@@ -21,13 +21,12 @@ class LineChartGraph extends StatelessWidget {
     required this.gradingSystem,
     required this.gradeNumberToColour,
   });
-final CloudSettings currentSettings;
+  final CloudSettings currentSettings;
   final String chartSelection;
   final TimePeriod selectedTimePeriod;
   final PointsData graphData;
   final String gradingSystem;
   final Map<int, String> gradeNumberToColour;
-  
 
   @override
   Widget build(BuildContext context) {
@@ -97,12 +96,17 @@ final CloudSettings currentSettings;
         duration: const Duration(milliseconds: 250),
       );
     } else if (chartSelection == "climbs") {
-      List<MapEntry<DateTime, int>> sortedList =
-          graphData.boulderClimbedAmount.entries.toList()
-            ..sort((a, b) => a.key.compareTo(b.key));
-      Map<DateTime, int> sortedClimbedAmount = Map.fromEntries(sortedList);
+      List<MapEntry<DateTime, Map<String, int>>> entries =
+          graphData.boulderClimbedColours.entries.toList();
+      ;
+      // Sort the list by date
+      entries.sort((a, b) => a.key.compareTo(b.key));
 
-      List<int> graphList = sortedClimbedAmount.entries
+      // Convert the sorted list back to a map
+      Map<DateTime, Map<String, int>> sortedBoulderClimbedColours =
+          Map.fromEntries(entries);
+
+      List<int> graphList = graphData.boulderClimbedAmount.entries
           .where((entry) => numberToDateMap.containsValue(entry.key))
           .map((entry) {
         final int yValue = (entry.value).toInt();
@@ -112,24 +116,31 @@ final CloudSettings currentSettings;
       if (graphList.isNotEmpty) {
         maxValue = (graphList.reduce(max)).toDouble();
       }
-      print(sortedMap);
+
+      Map<int, List<double>> listColorsClimbed = {};
+
+      for (DateTime date in sortedBoulderClimbedColours.keys) {
+        int dateCounter = dateToNumberMap[date] ?? 0;
+        for (var colour in colorOrder) {
+          double colourCount =
+              (sortedBoulderClimbedColours[date]![colour])?.toDouble() ?? 0.0;
+          if (listColorsClimbed[dateCounter] == null) {
+            listColorsClimbed[dateCounter] = [colourCount];
+          } else {
+            listColorsClimbed[dateCounter]!
+                .add(colourCount); // Use add to append to the list
+          }
+        }
+      }
+
       return BarChart(
-        climbsBarChart(sortedMap, numberToDateMap, maxValue, colorOrder),
+        climbsBarChart(currentSettings, listColorsClimbed, numberToDateMap,
+            maxValue, colorOrder),
       );
     } else if (chartSelection == "SetterData") {
-      final List<String> colorOrder = [
-        'green',
-        'yellow',
-        'blue',
-        'purple',
-        'Rrd',
-        'black',
-        "silver"
-      ];
       Map<int, List<double>> cumulativeCounts = {};
       double maxYValue = 0.0;
 
-// Iterate over each entry in setColoursData and update cumulative counts
       graphData.boulderSetColours.forEach((entryDate, colors) {
         int entryNumber = dateToNumberMap[entryDate] ?? 0;
         cumulativeCounts[entryNumber] =
@@ -139,35 +150,29 @@ final CloudSettings currentSettings;
 
       Map<int, double> totalCounts = {};
 
-// Iterate over each entry in cumulativeCounts and calculate total counts
       cumulativeCounts.forEach((entryNumber, counts) {
         double totalCount = counts.reduce((value, element) => value + element);
         totalCounts[entryNumber] = totalCount;
       });
 
-// Convert the map to a list of entries and sort it by keys (entryNumber in this case)
       List<MapEntry<int, List<double>>> sortedList = cumulativeCounts.entries
           .toList()
         ..sort((a, b) => a.key.compareTo(b.key));
 
-// Create a new sorted map from the sorted list
       Map<int, List<double>> sortedColorSet = Map.fromEntries(sortedList);
 
-// Print the sorted map
-
-// Find the maximum total count
       if (totalCounts.isNotEmpty) {
         int maxEntryNumber = totalCounts.keys
             .reduce((a, b) => totalCounts[a]! > totalCounts[b]! ? a : b);
         maxYValue = totalCounts[maxEntryNumber]!;
       }
-      print(sortedMap);
       return BarChart(
-        barChartSetterData(colorOrder, sortedMap, numberToDateMap, maxYValue),
+        barChartSetterData(currentSettings, colorOrder, sortedColorSet,
+            numberToDateMap, maxYValue),
       );
     } else if (chartSelection == "SetterDataPie") {
       return PieChart(
-        pirChartSetter(graphData.boulderSetSplit),
+        pirChartSetter(currentSettings, graphData.boulderSetSplit, colorOrder),
       );
     } else {
       return const Text('Invalid chart selection');
@@ -193,8 +198,12 @@ final CloudSettings currentSettings;
     );
   }
 
-  BarChartData climbsBarChart(Map<DateTime, int> graphData,
-      Map<int, DateTime> numbersToDates, double maxYValue, List<String> colorOrder) {
+  BarChartData climbsBarChart(
+      CloudSettings currentSettings,
+      Map<int, List<double>> graphData,
+      Map<int, DateTime> numbersToDates,
+      double maxYValue,
+      List<String> colorOrder) {
     return BarChartData(
       titlesData: FlTitlesData(
         show: true,
@@ -234,28 +243,12 @@ final CloudSettings currentSettings;
       ),
       minY: 0,
       maxY: maxYValue,
-
-      // barGroups: cumulativeCounts.entries
-      //     .map(
-      //       (e) => generateGroup(e.key, e.value, colorOrder),
-      //     )
-      //     .toList(),
-
       barGroups: graphData.entries
-          .where((entry) => numbersToDates.containsValue(entry.key))
-          .map((entry) {
-        final xValue = findNumberFromDate(entry.key, numbersToDates);
-        return BarChartGroupData(
-          x: xValue,
-          barRods: [
-            BarChartRodData(
-              toY: entry.value.toDouble(),
-              color: Colors.blue,
-              width: 16,
-            ),
-          ],
-        );
-      }).toList(),
+          .map(
+            (entries) => generateGroup(
+                currentSettings, entries.key, entries.value, colorOrder),
+          )
+          .toList(),
     );
   }
 
@@ -357,17 +350,16 @@ final CloudSettings currentSettings;
   ) {
     final sum = values.reduce((a, b) => a + b);
     final isTouched = touchedIndex == x;
-    final isTop = values[0] > 0;
-
+    final isTop = findTopIndex(values);
     return BarChartGroupData(
       x: x,
       groupVertically: true,
       showingTooltipIndicators: isTouched ? [0] : [],
       barRods: [
         BarChartRodData(
-          toY: isTop ? sum : -sum,
+          toY: isTop >= 0 ? sum : -sum,
           width: barWidth,
-          borderRadius: isTop
+          borderRadius: isTop >= 0
               ? const BorderRadius.only(
                   topLeft: Radius.circular(6),
                   topRight: Radius.circular(6),
@@ -376,13 +368,14 @@ final CloudSettings currentSettings;
                   bottomLeft: Radius.circular(6),
                   bottomRight: Radius.circular(6),
                 ),
-          rodStackItems: generateRodStackItems(currentSettings, values, colorOrder, isTouched),
+          rodStackItems: generateRodStackItems(
+              currentSettings, values, colorOrder, isTouched),
         ),
         BarChartRodData(
-          toY: isTop ? -sum : sum,
+          toY: isTop >= 0 ? -sum : sum,
           width: barWidth,
           color: Colors.transparent,
-          borderRadius: isTop
+          borderRadius: isTop >= 0
               ? const BorderRadius.only(
                   bottomLeft: Radius.circular(6),
                   bottomRight: Radius.circular(6),
@@ -397,7 +390,10 @@ final CloudSettings currentSettings;
   }
 
   List<BarChartRodStackItem> generateRodStackItems(
-      CloudSettings currentSettings, List<double> values, List<String> colorOrder, bool isTouched) {
+      CloudSettings currentSettings,
+      List<double> values,
+      List<String> colorOrder,
+      bool isTouched) {
     List<BarChartRodStackItem> rodStackItems = [];
     double startValue = 0;
 
@@ -407,8 +403,8 @@ final CloudSettings currentSettings;
         BarChartRodStackItem(
           startValue,
           endValue,
-          nameToColor(currentSettings.settingsGradeColour![colorOrder[
-              counter]] ), // Assuming contentColors is a list of your content colors
+          nameToColor(
+              currentSettings.settingsGradeColour![colorOrder[counter]]),
           BorderSide(
             color: borderColour,
             width: isTouched ? 2 : 0,
@@ -423,7 +419,7 @@ final CloudSettings currentSettings;
   }
 
   BarChartData barChartSetterData(
-    CloudSettings currentSettings,
+      CloudSettings currentSettings,
       List<String> colorOrder,
       Map<int, List<double>> cumulativeCounts,
       numberToDateMap,
@@ -471,117 +467,42 @@ final CloudSettings currentSettings;
       ),
       barGroups: cumulativeCounts.entries
           .map(
-            (e) => generateGroup(currentSettings, e.key, e.value, colorOrder),
+            (entries) => generateGroup(
+                currentSettings, entries.key, entries.value, colorOrder),
           )
           .toList(),
     );
   }
 
-  List<PieChartSectionData> showingSections(boulderSplit) {
-    return List.generate(7, (i) {
-      final isTouched = i == touchedIndex;
+  List<PieChartSectionData> showingSections(CloudSettings currentSettings,
+      Map<String, int> boulderSplit, List<String> colorOrder) {
+    return List.generate(boulderSplit.length, (counter) {
+      final isTouched = counter == touchedIndex;
       final fontSize = isTouched ? 20.0 : 16.0;
       final radius = isTouched ? 60.0 : 50.0;
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
-      switch (i) {
-        case 0:
-          return PieChartSectionData(
-            color: contentColorGreen,
-            value: (boulderSplit["green"] ?? 0.0).toDouble(),
-            title: boulderSplit["green"].toString(),
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: textColour,
-              shadows: shadows,
-            ),
-          );
-        case 1:
-          return PieChartSectionData(
-            color: contentColorYellow,
-            value: (boulderSplit["yellow"] ?? 0.0).toDouble(),
-            title: boulderSplit["yellow"].toString(),
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: textColour,
-              shadows: shadows,
-            ),
-          );
-        case 2:
-          return PieChartSectionData(
-            color: contentColorBlue,
-            value: (boulderSplit["blue"] ?? 0.0).toDouble(),
-            title: boulderSplit["blue"].toString(),
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: textColour,
-              shadows: shadows,
-            ),
-          );
-        case 3:
-          return PieChartSectionData(
-            color: contentColorPurple,
-            value: (boulderSplit["purple"] ?? 0.0).toDouble(),
-            title: boulderSplit["purple"].toString(),
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: textColour,
-              shadows: shadows,
-            ),
-          );
-        case 4:
-          return PieChartSectionData(
-            color: contentColorRed,
-            value: (boulderSplit["red"] ?? 0.0).toDouble(),
-            title: boulderSplit["red"].toString(),
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: textColour,
-              shadows: shadows,
-            ),
-          );
-        case 5:
-          return PieChartSectionData(
-            color: contentColorBlack,
-            value: (boulderSplit["black"] ?? 0.0).toDouble(),
-            title: boulderSplit["black"].toString(),
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: textColour,
-              shadows: shadows,
-            ),
-          );
-        case 6:
-          return PieChartSectionData(
-            color: contentColorSilver,
-            value: (boulderSplit["silver"] ?? 0.0).toDouble(),
-            title: boulderSplit["silver"].toString(),
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: textColour,
-              shadows: shadows,
-            ),
-          );
-        default:
-          throw Error();
-      }
+
+      final colorKey = boulderSplit.keys.elementAt(counter);
+      final colorValue = boulderSplit[colorKey];
+
+      return PieChartSectionData(
+        color: nameToColor(
+            currentSettings.settingsGradeColour![colorOrder[counter]]),
+        value: (colorValue ?? 0.0).toDouble(),
+        title: colorValue?.toString() ?? "",
+        radius: radius,
+        titleStyle: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.bold,
+          color: textColour,
+          shadows: shadows,
+        ),
+      );
     });
   }
 
-  PieChartData pirChartSetter(boulderSplit) {
+  PieChartData pirChartSetter(CloudSettings currentSettings,
+      Map<String, int> boulderSplit, List<String> colorOrder) {
     return PieChartData(
       pieTouchData: PieTouchData(),
       borderData: FlBorderData(
@@ -589,7 +510,16 @@ final CloudSettings currentSettings;
       ),
       sectionsSpace: 0,
       centerSpaceRadius: 40,
-      sections: showingSections(boulderSplit),
+      sections: showingSections(currentSettings, boulderSplit, colorOrder),
     );
   }
+}
+
+findTopIndex(List<double> values) {
+  for (int i = values.length - 1; i >= 0; i--) {
+    if (values[i] > 0) {
+      return i;
+    }
+  }
+  return -1;
 }

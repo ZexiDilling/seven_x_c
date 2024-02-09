@@ -240,12 +240,13 @@ class _ProfileViewState extends State<ProfileView> {
                                   const EdgeInsets.only(right: 16, left: 6),
                               child: SizedBox(
                                 height: 500,
-                                child: LineChartGraph(currentSettings: currentSettings!,
+                                child: 
+                                currentSettings != null ? LineChartGraph(currentSettings: currentSettings!,
                                     chartSelection: chartSelection,
                                     graphData: pointsData,
                                     selectedTimePeriod: selectedTimePeriod,
                                     gradingSystem: currentProfile.gradingSystem,
-                                    gradeNumberToColour: gradeNumberToColour),
+                                    gradeNumberToColour: gradeNumberToColour) : const Text("Loading"),
                               ),
                             ),
                             const SizedBox(
@@ -304,6 +305,7 @@ Future<PointsData> getPoints(
             amountBoulder += 1;
             boulderClimbedAmount[entryDateWithoutTime] =
                 (boulderClimbedAmount[entryDateWithoutTime] ?? 0) + 1;
+                
             if (boulderClimbedColours.containsKey(entryDateWithoutTime)) {
               if (boulderClimbedColours[entryDateWithoutTime]!
                   .containsKey(boulderGradeColour)) {
@@ -320,7 +322,9 @@ Future<PointsData> getPoints(
               boulderClimbedColours[entryDateWithoutTime] = {
                 boulderGradeColour!: 1
               };
+              
             }
+
 
             int boulderGrade = entry.value["gradeNumber"];
 
@@ -335,8 +339,10 @@ Future<PointsData> getPoints(
               }
             }
             if (boulderClimbedMaxClimbed.containsKey(entryDateWithoutTime)) {
-              boulderClimbedAmount[entryDateWithoutTime] =
-                  (boulderClimbedAmount[entryDateWithoutTime] ?? 0) + 1;
+              if (boulderClimbedMaxClimbed[entryDateWithoutTime]! <
+                    boulderGrade) {
+                  boulderClimbedMaxClimbed[entryDateWithoutTime] = boulderGrade;
+                }
             } else {
               boulderClimbedMaxClimbed[entryDateWithoutTime] = boulderGrade;
             }

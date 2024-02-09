@@ -24,6 +24,7 @@ Widget bottomTitles(
   Map<int, DateTime> numberToDateMap,
   TimePeriod selectedTimePeriod,
 ) {
+  print(value);
   const style = TextStyle(color: textColour, fontSize: fontChartSize);
   String text = '';
   // Format the date based on the selected time period
