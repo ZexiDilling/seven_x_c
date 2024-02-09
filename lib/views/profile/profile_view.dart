@@ -24,7 +24,7 @@ class _ProfileViewState extends State<ProfileView> {
   TimePeriod selectedTimePeriod = TimePeriod.week;
   String get userId => AuthService.firebase().currentUser!.id;
   late bool isShowingMainData;
-Map<int, String> gradeNumberToColour = {};
+  Map<int, String> gradeNumberToColour = {};
   String chartSelection = "maxGrade";
 
   @override
@@ -32,7 +32,7 @@ Map<int, String> gradeNumberToColour = {};
     firebaseService = FirebaseCloudStorage();
     _initializeData();
     super.initState();
-    
+
     isShowingMainData = true;
   }
 
@@ -43,7 +43,6 @@ Map<int, String> gradeNumberToColour = {};
   }
 
   _initSettingData() {
-    
     if (currentSettings!.settingsGradeColour != null) {
       for (var entry in currentSettings!.settingsGradeColour!.entries) {
         String name = entry.key
@@ -66,10 +65,10 @@ Map<int, String> gradeNumberToColour = {};
         iteration++;
       }
     }
-     gradeNumberToColour = Map.fromEntries(
-    gradeNumberToColour.entries.toList()
-      ..sort((a, b) => a.key.compareTo(b.key)),
-  );
+    gradeNumberToColour = Map.fromEntries(
+      gradeNumberToColour.entries.toList()
+        ..sort((a, b) => a.key.compareTo(b.key)),
+    );
     return gradeNumberToColour;
   }
 
@@ -155,7 +154,10 @@ Map<int, String> gradeNumberToColour = {};
                   // Get points data using the getPoints function
                   return FutureBuilder<PointsData>(
                     future: getPoints(
-                        currentProfile, selectedTimePeriod, gradeNumberToColour,),
+                      currentProfile,
+                      selectedTimePeriod,
+                      gradeNumberToColour,
+                    ),
                     builder: (BuildContext context,
                         AsyncSnapshot<PointsData> pointsSnapshot) {
                       if (pointsSnapshot.connectionState ==
@@ -238,12 +240,12 @@ Map<int, String> gradeNumberToColour = {};
                                   const EdgeInsets.only(right: 16, left: 6),
                               child: SizedBox(
                                 height: 500,
-                                child: LineChartGraph(
+                                child: LineChartGraph(currentSettings: currentSettings!,
                                     chartSelection: chartSelection,
                                     graphData: pointsData,
                                     selectedTimePeriod: selectedTimePeriod,
-                                    gradingSystem:
-                                        currentProfile.gradingSystem),
+                                    gradingSystem: currentProfile.gradingSystem,
+                                    gradeNumberToColour: gradeNumberToColour),
                               ),
                             ),
                             const SizedBox(
@@ -282,13 +284,14 @@ Future<PointsData> getPoints(
   LinkedHashMap<DateTime, int> boulderSetAmount = LinkedHashMap();
   LinkedHashMap<DateTime, Map<String, int>> boulderSetColours = LinkedHashMap();
   LinkedHashMap<String, int> boulderSetSplit = LinkedHashMap();
-  print("gradeNumberToColour - $gradeNumberToColour");
+  
   try {
     if (currentProfile.climbedBoulders != null) {
       if (selectedTimePeriod != TimePeriod.allTime) {
         for (var entry in currentProfile.climbedBoulders!.entries) {
           int boulderGradeNumber = entry.value["gradeNumber"];
-          String? boulderGradeColour = findGradeColour(gradeNumberToColour, boulderGradeNumber);
+          String? boulderGradeColour =
+              findGradeColour(gradeNumberToColour, boulderGradeNumber);
           // String? boulderGradeColour = gradeNumberToColour[boulderGradeNumber];
           // String? boulderGradeColour = boulderGradeNumber.toString();
           DateTime entryDate = entry.value['date'].toDate();
@@ -482,7 +485,7 @@ String? findGradeColour(Map<int, String> gradeNumberToColour, int gradeNumber) {
       return gradeNumberToColour[key];
     }
   }
-  return null;  // Return null if no match is found
+  return null; // Return null if no match is found
 }
 
 class PointsData {
