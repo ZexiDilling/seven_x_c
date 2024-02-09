@@ -79,9 +79,9 @@ class LineChartGraph extends StatelessWidget {
       List<MapEntry<DateTime, int>> sortedList =
           graphData.boulderClimbedAmount.entries.toList()
             ..sort((a, b) => a.key.compareTo(b.key));
-      Map<DateTime, int> sortedMap = Map.fromEntries(sortedList);
+      Map<DateTime, int> sortedClimbedAmount = Map.fromEntries(sortedList);
 
-      List<int> graphList = sortedMap.entries
+      List<int> graphList = sortedClimbedAmount.entries
           .where((entry) => numberToDateMap.containsValue(entry.key))
           .map((entry) {
         final int yValue = (entry.value).toInt();
@@ -90,15 +90,17 @@ class LineChartGraph extends StatelessWidget {
       double maxValue = (graphList.reduce(max)).toDouble();
 
       return BarChart(
-        climbsBarChart(sortedMap, numberToDateMap, maxValue),
+        climbsBarChart(sortedClimbedAmount, numberToDateMap, maxValue),
       );
     } else if (chartSelection == "SetterData") {
+
+      // todo Change this to depend on the grading colour
       final List<String> colorOrder = [
         'green',
         'yellow',
         'blue',
         'purple',
-        'Rrd',
+        'Red',
         'black',
         "silver"
       ];
@@ -127,7 +129,7 @@ class LineChartGraph extends StatelessWidget {
         ..sort((a, b) => a.key.compareTo(b.key));
 
 // Create a new sorted map from the sorted list
-      Map<int, List<double>> sortedMap = Map.fromEntries(sortedList);
+      Map<int, List<double>> sortedColorSet = Map.fromEntries(sortedList);
 
 // Print the sorted map
 
@@ -139,7 +141,8 @@ class LineChartGraph extends StatelessWidget {
       }
 
       return BarChart(
-        barChartSetterData(colorOrder, sortedMap, numberToDateMap, maxYValue),
+        barChartSetterData(
+            colorOrder, sortedColorSet, numberToDateMap, maxYValue),
       );
     } else if (chartSelection == "SetterDataPie") {
       return PieChart(
