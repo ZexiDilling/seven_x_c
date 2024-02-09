@@ -5,23 +5,29 @@ import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/helpters/chart_function.dart';
 import 'package:seven_x_c/helpters/functions.dart';
+import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 import 'package:seven_x_c/views/profile/profile_view.dart';
 
 const double fontChartSize = 10;
 const double chartHeight = 150;
 
 class LineChartGraph extends StatelessWidget {
-  const LineChartGraph(
-      {super.key,
-      required this.chartSelection,
-      required this.graphData,
-      required this.selectedTimePeriod,
-      required this.gradingSystem});
-
+  const LineChartGraph({
+    super.key,
+    required this.currentSettings,
+    required this.chartSelection,
+    required this.graphData,
+    required this.selectedTimePeriod,
+    required this.gradingSystem,
+    required this.gradeNumberToColour,
+  });
+final CloudSettings currentSettings;
   final String chartSelection;
   final TimePeriod selectedTimePeriod;
   final PointsData graphData;
   final String gradingSystem;
+  final Map<int, String> gradeNumberToColour;
+  
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +45,21 @@ class LineChartGraph extends StatelessWidget {
       numberToDateMap[dateCounter] = entryDateWithoutTime;
       dateToNumberMap[entryDateWithoutTime] = dateCounter;
       dateCounter++;
+    }
+
+    List<String> colorOrder = [];
+    if (gradeNumberToColour.length > 1) {
+      colorOrder = gradeNumberToColour.values.toList();
+    } else {
+      colorOrder = [
+        'green',
+        'yellow',
+        'blue',
+        'purple',
+        'Rrd',
+        'black',
+        "silver"
+      ];
     }
 
     if (chartSelection == "maxGrade") {
@@ -87,20 +108,21 @@ class LineChartGraph extends StatelessWidget {
         final int yValue = (entry.value).toInt();
         return yValue;
       }).toList();
-      double maxValue = (graphList.reduce(max)).toDouble();
-
+      double maxValue = 0;
+      if (graphList.isNotEmpty) {
+        maxValue = (graphList.reduce(max)).toDouble();
+      }
+      print(sortedMap);
       return BarChart(
-        climbsBarChart(sortedClimbedAmount, numberToDateMap, maxValue),
+        climbsBarChart(sortedMap, numberToDateMap, maxValue, colorOrder),
       );
     } else if (chartSelection == "SetterData") {
-
-      // todo Change this to depend on the grading colour
       final List<String> colorOrder = [
         'green',
         'yellow',
         'blue',
         'purple',
-        'Red',
+        'Rrd',
         'black',
         "silver"
       ];
@@ -139,10 +161,9 @@ class LineChartGraph extends StatelessWidget {
             .reduce((a, b) => totalCounts[a]! > totalCounts[b]! ? a : b);
         maxYValue = totalCounts[maxEntryNumber]!;
       }
-
+      print(sortedMap);
       return BarChart(
-        barChartSetterData(
-            colorOrder, sortedColorSet, numberToDateMap, maxYValue),
+        barChartSetterData(colorOrder, sortedMap, numberToDateMap, maxYValue),
       );
     } else if (chartSelection == "SetterDataPie") {
       return PieChart(
@@ -173,7 +194,7 @@ class LineChartGraph extends StatelessWidget {
   }
 
   BarChartData climbsBarChart(Map<DateTime, int> graphData,
-      Map<int, DateTime> numbersToDates, double maxYValue) {
+      Map<int, DateTime> numbersToDates, double maxYValue, List<String> colorOrder) {
     return BarChartData(
       titlesData: FlTitlesData(
         show: true,
@@ -213,6 +234,13 @@ class LineChartGraph extends StatelessWidget {
       ),
       minY: 0,
       maxY: maxYValue,
+
+      // barGroups: cumulativeCounts.entries
+      //     .map(
+      //       (e) => generateGroup(e.key, e.value, colorOrder),
+      //     )
+      //     .toList(),
+
       barGroups: graphData.entries
           .where((entry) => numbersToDates.containsValue(entry.key))
           .map((entry) {
@@ -322,17 +350,14 @@ class LineChartGraph extends StatelessWidget {
   }
 
   BarChartGroupData generateGroup(
+    CloudSettings currentSettings,
     int x,
-    double value1,
-    double value2,
-    double value3,
-    double value4,
-    double value5,
-    double value6,
+    List<double> values,
+    List<String> colorOrder,
   ) {
-    final isTop = value1 > 0;
-    final sum = value1 + value2 + value3 + value4;
+    final sum = values.reduce((a, b) => a + b);
     final isTouched = touchedIndex == x;
+    final isTop = values[0] > 0;
 
     return BarChartGroupData(
       x: x,
@@ -340,7 +365,7 @@ class LineChartGraph extends StatelessWidget {
       showingTooltipIndicators: isTouched ? [0] : [],
       barRods: [
         BarChartRodData(
-          toY: sum,
+          toY: isTop ? sum : -sum,
           width: barWidth,
           borderRadius: isTop
               ? const BorderRadius.only(
@@ -351,65 +376,10 @@ class LineChartGraph extends StatelessWidget {
                   bottomLeft: Radius.circular(6),
                   bottomRight: Radius.circular(6),
                 ),
-          rodStackItems: [
-            BarChartRodStackItem(
-              0,
-              value1,
-              contentColorGreen,
-              BorderSide(
-                color: borderColour,
-                width: isTouched ? 2 : 0,
-              ),
-            ),
-            BarChartRodStackItem(
-              value1,
-              value1 + value2,
-              contentColorYellow,
-              BorderSide(
-                color: borderColour,
-                width: isTouched ? 2 : 0,
-              ),
-            ),
-            BarChartRodStackItem(
-              value1 + value2,
-              value1 + value2 + value3,
-              contentColorBlue,
-              BorderSide(
-                color: borderColour,
-                width: isTouched ? 2 : 0,
-              ),
-            ),
-            BarChartRodStackItem(
-              value1 + value2 + value3,
-              value1 + value2 + value3 + value4,
-              contentColorPurple,
-              BorderSide(
-                color: borderColour,
-                width: isTouched ? 2 : 0,
-              ),
-            ),
-            BarChartRodStackItem(
-              value1 + value2 + value3 + value4,
-              value1 + value2 + value3 + value4 + value5,
-              contentColorRed,
-              BorderSide(
-                color: borderColour,
-                width: isTouched ? 2 : 0,
-              ),
-            ),
-            BarChartRodStackItem(
-              value1 + value2 + value3 + value4 + value5,
-              value1 + value2 + value3 + value4 + value5 + value6,
-              contentColorBlack,
-              BorderSide(
-                color: borderColour,
-                width: isTouched ? 2 : 0,
-              ),
-            ),
-          ],
+          rodStackItems: generateRodStackItems(currentSettings, values, colorOrder, isTouched),
         ),
         BarChartRodData(
-          toY: -sum,
+          toY: isTop ? -sum : sum,
           width: barWidth,
           color: Colors.transparent,
           borderRadius: isTop
@@ -426,7 +396,34 @@ class LineChartGraph extends StatelessWidget {
     );
   }
 
+  List<BarChartRodStackItem> generateRodStackItems(
+      CloudSettings currentSettings, List<double> values, List<String> colorOrder, bool isTouched) {
+    List<BarChartRodStackItem> rodStackItems = [];
+    double startValue = 0;
+
+    for (int counter = 0; counter < values.length; counter++) {
+      double endValue = startValue + values[counter];
+      rodStackItems.add(
+        BarChartRodStackItem(
+          startValue,
+          endValue,
+          nameToColor(currentSettings.settingsGradeColour![colorOrder[
+              counter]] ), // Assuming contentColors is a list of your content colors
+          BorderSide(
+            color: borderColour,
+            width: isTouched ? 2 : 0,
+          ),
+        ),
+      );
+
+      startValue = endValue;
+    }
+
+    return rodStackItems;
+  }
+
   BarChartData barChartSetterData(
+    CloudSettings currentSettings,
       List<String> colorOrder,
       Map<int, List<double>> cumulativeCounts,
       numberToDateMap,
@@ -474,8 +471,7 @@ class LineChartGraph extends StatelessWidget {
       ),
       barGroups: cumulativeCounts.entries
           .map(
-            (e) => generateGroup(e.key, e.value[0], e.value[1], e.value[2],
-                e.value[3], e.value[4], e.value[5]),
+            (e) => generateGroup(currentSettings, e.key, e.value, colorOrder),
           )
           .toList(),
     );

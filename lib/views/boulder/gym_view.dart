@@ -240,7 +240,9 @@ class _GymViewState extends State<GymView> {
                     : Column(
                         children: [
                           Text(
-                            currentSettings!.settingsName,
+                            currentSettings != null
+                                ? "ARG"
+                                : currentSettings!.settingsName,
                             style: appBarStyle,
                           ),
                           Text(
@@ -311,7 +313,7 @@ class _GymViewState extends State<GymView> {
                 });
               },
             ),
-          dropDownMenu(context)
+          dropDownMenu(context, currentSettings)
         ],
       ),
       body: LayoutBuilder(builder: (context, constraints) {
@@ -355,17 +357,19 @@ class _GymViewState extends State<GymView> {
                             fit: BoxFit.fill,
                           ),
                         ),
-                        child: CustomPaint(
-                          painter: GymPainter(
-                              context,
-                              constraints,
-                              allBoulders,
-                              currentProfile!,
-                              currentSettings!,
-                              currentScale,
-                              compView,
-                              showWallRegions),
-                        ),
+                        child: currentSettings == null
+                            ? null
+                            : CustomPaint(
+                                painter: GymPainter(
+                                    context,
+                                    constraints,
+                                    allBoulders,
+                                    currentProfile!,
+                                    currentSettings!,
+                                    currentScale,
+                                    compView,
+                                    showWallRegions),
+                              ),
                       ),
                     ),
                   );
@@ -389,7 +393,8 @@ class _GymViewState extends State<GymView> {
     );
   }
 
-  PopupMenuButton<MenuAction> dropDownMenu(BuildContext context) {
+  PopupMenuButton<MenuAction> dropDownMenu(
+      BuildContext context, CloudSettings? currentSettings) {
     return PopupMenuButton<MenuAction>(
       onSelected: (value) async {
         switch (value) {
@@ -425,7 +430,10 @@ class _GymViewState extends State<GymView> {
           case MenuAction.rankings:
             Navigator.of(context).pushNamed(rankView);
           case MenuAction.profile:
-            Navigator.of(context).pushNamed(profileView);
+            Navigator.of(context).pushNamed(
+              profileView,
+              arguments: currentSettings!,
+            );
           case MenuAction.comp:
             showComp(
               context,

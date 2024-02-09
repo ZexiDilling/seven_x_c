@@ -1,11 +1,13 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/constants/colours_thems.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
+import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 import 'package:seven_x_c/utilities/charts/profile_charts.dart';
 
 class ProfileView extends StatefulWidget {
@@ -16,27 +18,98 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  late final FirebaseCloudStorage _userService;
+  late CloudProfile? currentProfile;
+  CloudSettings? currentSettings;
+  late final FirebaseCloudStorage firebaseService;
   TimePeriod selectedTimePeriod = TimePeriod.week;
   String get userId => AuthService.firebase().currentUser!.id;
   late bool isShowingMainData;
-
+  Map<int, String> gradeNumberToColour = {};
   String chartSelection = "maxGrade";
 
   @override
   void initState() {
+    firebaseService = FirebaseCloudStorage();
+    _initializeData();
     super.initState();
-    _userService = FirebaseCloudStorage();
+
     isShowingMainData = true;
+  }
+
+  Future<void> _initializeData() async {
+    await _initializeCurrentProfile();
+    await _initSettings();
+    _initSettingData();
+  }
+
+  _initSettingData() {
+    if (currentSettings!.settingsGradeColour != null) {
+      for (var entry in currentSettings!.settingsGradeColour!.entries) {
+        String name = entry.key
+            .toLowerCase(); // Convert name to lowercase for consistency
+        Map<String, dynamic> data = entry.value;
+        int maxGrade = data["max"] ?? 0;
+
+        gradeNumberToColour[maxGrade] = name;
+      }
+    } else {
+      String currentColour = getNextColor(null);
+      int iteration = 0;
+      for (int gradeCounter in allGrading.keys) {
+        gradeNumberToColour[gradeCounter] = currentColour;
+
+        if (iteration % 3 == 2) {
+          currentColour = getNextColor(currentColour);
+        }
+
+        iteration++;
+      }
+    }
+    gradeNumberToColour = Map.fromEntries(
+      gradeNumberToColour.entries.toList()
+        ..sort((a, b) => a.key.compareTo(b.key)),
+    );
+    return gradeNumberToColour;
+  }
+
+  String getNextColor(String? currentColour) {
+    if (currentColour != null) {
+      return "blue";
+    } else {
+      return "blue";
+    }
+  }
+
+  Future<CloudSettings?> _initSettings() async {
+    final CloudSettings? tempSettings =
+        await firebaseService.getSettings(currentProfile!.settingsID);
+    setState(() {
+      currentSettings = tempSettings;
+    });
+    return currentSettings;
+  }
+
+  Future<CloudProfile?> _initializeCurrentProfile() async {
+    await for (final profiles
+        in firebaseService.getUser(userID: userId.toString())) {
+      final CloudProfile profile = profiles.first;
+      setState(() {
+        currentProfile = profile;
+      });
+      return currentProfile;
+    }
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile', style: appBarStyle,), 
+        title: const Text(
+          'Profile',
+          style: appBarStyle,
+        ),
         backgroundColor: profileAppBar,
-        
       ),
       body: Column(
         children: [
@@ -60,7 +133,7 @@ class _ProfileViewState extends State<ProfileView> {
           // Your StreamBuilder
           Expanded(
             child: StreamBuilder<Iterable<CloudProfile>>(
-                stream: _userService.getUser(userID: userId),
+                stream: firebaseService.getUser(userID: userId),
                 builder: (BuildContext context,
                     AsyncSnapshot<Iterable<CloudProfile>> snapshot) {
                   if (snapshot.hasError) {
@@ -80,7 +153,11 @@ class _ProfileViewState extends State<ProfileView> {
 
                   // Get points data using the getPoints function
                   return FutureBuilder<PointsData>(
-                    future: getPoints(currentProfile, selectedTimePeriod),
+                    future: getPoints(
+                      currentProfile,
+                      selectedTimePeriod,
+                      gradeNumberToColour,
+                    ),
                     builder: (BuildContext context,
                         AsyncSnapshot<PointsData> pointsSnapshot) {
                       if (pointsSnapshot.connectionState ==
@@ -163,10 +240,12 @@ class _ProfileViewState extends State<ProfileView> {
                                   const EdgeInsets.only(right: 16, left: 6),
                               child: SizedBox(
                                 height: 500,
-                                child: LineChartGraph(
+                                child: LineChartGraph(currentSettings: currentSettings!,
                                     chartSelection: chartSelection,
                                     graphData: pointsData,
-                                    selectedTimePeriod: selectedTimePeriod, gradingSystem: currentProfile.gradingSystem),
+                                    selectedTimePeriod: selectedTimePeriod,
+                                    gradingSystem: currentProfile.gradingSystem,
+                                    gradeNumberToColour: gradeNumberToColour),
                               ),
                             ),
                             const SizedBox(
@@ -188,6 +267,7 @@ class _ProfileViewState extends State<ProfileView> {
 Future<PointsData> getPoints(
   CloudProfile currentProfile,
   TimePeriod selectedTimePeriod,
+  Map<int, String> gradeNumberToColour,
 ) async {
   DateTime dateThreshold = calculateDateThreshold(selectedTimePeriod);
   double pointsBoulder = 0;
@@ -199,27 +279,48 @@ Future<PointsData> getPoints(
   LinkedHashMap<DateTime, int> boulderClimbedAmount = LinkedHashMap();
   LinkedHashMap<DateTime, int> boulderClimbedMaxClimbed = LinkedHashMap();
   LinkedHashMap<DateTime, int> boulderClimbedMaxFlashed = LinkedHashMap();
+  LinkedHashMap<DateTime, Map<String, int>> boulderClimbedColours =
+      LinkedHashMap();
   LinkedHashMap<DateTime, int> boulderSetAmount = LinkedHashMap();
   LinkedHashMap<DateTime, Map<String, int>> boulderSetColours = LinkedHashMap();
   LinkedHashMap<String, int> boulderSetSplit = LinkedHashMap();
-
+  
   try {
     if (currentProfile.climbedBoulders != null) {
       if (selectedTimePeriod != TimePeriod.allTime) {
-        
         for (var entry in currentProfile.climbedBoulders!.entries) {
-          
+          int boulderGradeNumber = entry.value["gradeNumber"];
+          String? boulderGradeColour =
+              findGradeColour(gradeNumberToColour, boulderGradeNumber);
+          // String? boulderGradeColour = gradeNumberToColour[boulderGradeNumber];
+          // String? boulderGradeColour = boulderGradeNumber.toString();
           DateTime entryDate = entry.value['date'].toDate();
-          
+
           DateTime entryDateWithoutTime =
               DateTime(entryDate.year, entryDate.month, entryDate.day);
-              
+
           if (entryDateWithoutTime.isAfter(dateThreshold)) {
             pointsBoulder += entry.value["boulderPoints"];
             amountBoulder += 1;
             boulderClimbedAmount[entryDateWithoutTime] =
                 (boulderClimbedAmount[entryDateWithoutTime] ?? 0) + 1;
-
+            if (boulderClimbedColours.containsKey(entryDateWithoutTime)) {
+              if (boulderClimbedColours[entryDateWithoutTime]!
+                  .containsKey(boulderGradeColour)) {
+                boulderClimbedColours[entryDateWithoutTime]![
+                    boulderGradeColour!] = (boulderClimbedColours[
+                            entryDateWithoutTime]![boulderGradeColour] ??
+                        0) +
+                    1;
+              } else {
+                boulderClimbedColours[entryDateWithoutTime]![
+                    boulderGradeColour!] = 1;
+              }
+            } else {
+              boulderClimbedColours[entryDateWithoutTime] = {
+                boulderGradeColour!: 1
+              };
+            }
 
             int boulderGrade = entry.value["gradeNumber"];
 
@@ -353,11 +454,11 @@ Future<PointsData> getPoints(
       boulderClimbedAmount: boulderClimbedAmount,
       boulderClimbedMaxClimbed: boulderClimbedMaxClimbed,
       boulderClimbedMaxFlashed: boulderClimbedMaxFlashed,
+      boulderClimbedColours: boulderClimbedColours,
       boulderSetAmount: boulderSetAmount,
       boulderSetColours: boulderSetColours,
       boulderSetSplit: boulderSetSplit,
     );
-
   } catch (e) {
     return PointsData(
       pointsBoulder: 0,
@@ -369,11 +470,22 @@ Future<PointsData> getPoints(
       boulderClimbedAmount: boulderClimbedAmount,
       boulderClimbedMaxClimbed: boulderClimbedMaxClimbed,
       boulderClimbedMaxFlashed: boulderClimbedMaxFlashed,
+      boulderClimbedColours: boulderClimbedColours,
       boulderSetAmount: boulderSetAmount,
       boulderSetColours: boulderSetColours,
       boulderSetSplit: boulderSetSplit,
     );
   }
+}
+
+String? findGradeColour(Map<int, String> gradeNumberToColour, int gradeNumber) {
+  // Iterate through the sorted keys in gradeNumberToColour
+  for (int key in gradeNumberToColour.keys.toList()..sort()) {
+    if (gradeNumber <= key) {
+      return gradeNumberToColour[key];
+    }
+  }
+  return null; // Return null if no match is found
 }
 
 class PointsData {
@@ -386,6 +498,8 @@ class PointsData {
   LinkedHashMap<DateTime, int> boulderClimbedAmount = LinkedHashMap();
   LinkedHashMap<DateTime, int> boulderClimbedMaxClimbed = LinkedHashMap();
   LinkedHashMap<DateTime, int> boulderClimbedMaxFlashed = LinkedHashMap();
+  LinkedHashMap<DateTime, Map<String, int>> boulderClimbedColours =
+      LinkedHashMap();
   LinkedHashMap<DateTime, int> boulderSetAmount = LinkedHashMap();
   LinkedHashMap<DateTime, Map<String, int>> boulderSetColours = LinkedHashMap();
   LinkedHashMap<String, int> boulderSetSplit = LinkedHashMap();
@@ -400,6 +514,7 @@ class PointsData {
     required this.boulderClimbedAmount,
     required this.boulderClimbedMaxClimbed,
     required this.boulderClimbedMaxFlashed,
+    required this.boulderClimbedColours,
     required this.boulderSetAmount,
     required this.boulderSetColours,
     required this.boulderSetSplit,
