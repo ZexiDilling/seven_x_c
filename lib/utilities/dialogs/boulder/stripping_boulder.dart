@@ -1,5 +1,3 @@
-
-
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
@@ -7,12 +5,11 @@ import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 
-
 Future<void> stripping(
     context,
     setState,
     Stream<Iterable<CloudBoulder>> filteredBouldersStream,
-    FirebaseCloudStorage boulderService,
+    FirebaseCloudStorage firebaseService,
     wallRegionMap) async {
   List<bool> sectionCheckboxes =
       List.generate(wallSections.length, (index) => false);
@@ -38,7 +35,7 @@ Future<void> stripping(
 
                           for (CloudBoulder boulder in boulders) {
                             if (boulder.hiddenGrade == false) {
-                              await boulderService.updateBoulder(
+                              await firebaseService.updateBoulder(
                                   boulderID: boulder.boulderID,
                                   hiddenGrade: true);
                             }
@@ -55,7 +52,7 @@ Future<void> stripping(
 
                           for (CloudBoulder boulder in boulders) {
                             if (boulder.hiddenGrade == true) {
-                              await boulderService.updateBoulder(
+                              await firebaseService.updateBoulder(
                                   boulderID: boulder.boulderID,
                                   hiddenGrade: false);
                             }
@@ -67,17 +64,17 @@ Future<void> stripping(
                     ],
                   ),
                   // Section checkboxes
-                  for (int i = 0; i < 3; i++)
+                  for (int counter = 0; counter < 3; counter++)
                     Row(
                       children: [
                         Checkbox(
-                          value: sectionCheckboxes[i],
+                          value: sectionCheckboxes[counter],
                           onChanged: (value) {
                             setState(() {
-                              sectionCheckboxes[i] = value!;
+                              sectionCheckboxes[counter] = value!;
                               // Set all walls in the section to the same status
                               for (WallRegion wall in wallRegions) {
-                                if (wall.section == i + 1) {
+                                if (wall.section == counter + 1) {
                                   wallRegionMap[wall.wallID]!.isSelected =
                                       value;
                                 }
@@ -85,7 +82,7 @@ Future<void> stripping(
                             });
                           },
                         ),
-                        Text('Section ${i + 1}'),
+                        Text('Section ${counter + 1}'),
                       ],
                     ),
                   const Divider(
@@ -146,15 +143,25 @@ Future<void> stripping(
                               TextButton(
                                 onPressed: () async {
                                   // Access the data from the StreamBuilder
+                                  Stream<Iterable<CloudBoulder>>
+                                      allBouldersStream =
+                                      firebaseService.getAllBoulders(true);
                                   Iterable<CloudBoulder>? boulders =
-                                      await filteredBouldersStream.first;
+                                      await allBouldersStream.first;
                                   for (CloudBoulder boulder in boulders) {
-                                    if (wallRegionMap[(boulder.wall).toLowerCase()]!
+                                    if (wallRegionMap[
+                                            (boulder.wall).toLowerCase()]!
                                         .isSelected) {
-                                      await boulderService.updateBoulder(
-                                        boulderID: boulder.boulderID,
-                                        active: false,
-                                      );
+                                      // Deletes old boulders from the database
+                                      if (!boulder.active) {
+                                        await firebaseService.deleteBoulder(
+                                            boulderID: boulder.boulderID);
+                                      } else {
+                                        await firebaseService.updateBoulder(
+                                          boulderID: boulder.boulderID,
+                                          active: false,
+                                        );
+                                      }
                                     }
                                   }
                                   for (WallRegion wall in wallRegions) {
@@ -198,7 +205,7 @@ Future<void> stripping(
                                   for (CloudBoulder boulder in boulders) {
                                     if (wallRegionMap[boulder.wall]!
                                         .isSelected) {
-                                      await boulderService.deleteBoulder(
+                                      await firebaseService.deleteBoulder(
                                         boulderID: boulder.boulderID,
                                       );
                                     }

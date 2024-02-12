@@ -132,7 +132,6 @@ class LineChartGraph extends StatelessWidget {
           }
         }
       }
-
       return BarChart(
         climbsBarChart(currentSettings, listColorsClimbed, numberToDateMap,
             maxValue, colorOrder),
@@ -204,6 +203,7 @@ class LineChartGraph extends StatelessWidget {
       Map<int, DateTime> numbersToDates,
       double maxYValue,
       List<String> colorOrder) {
+        
     return BarChartData(
       titlesData: FlTitlesData(
         show: true,
@@ -218,7 +218,7 @@ class LineChartGraph extends StatelessWidget {
               reservedSize: 32,
               getTitlesWidget: (double value, TitleMeta meta) {
                 return bottomTitles(
-                    value, meta, numbersToDates, selectedTimePeriod);
+                    value, meta, numbersToDates, selectedTimePeriod, chartSelection);
               }),
         ),
         leftTitles: AxisTitles(
@@ -244,12 +244,21 @@ class LineChartGraph extends StatelessWidget {
       minY: 0,
       maxY: maxYValue,
       barGroups: graphData.entries
-          .map(
-            (entries) => generateGroup(
-                currentSettings, entries.key, entries.value, colorOrder),
-          )
-          .toList(),
-    );
+      .map((entry) => generateGroup(
+        currentSettings,
+        entry.key,
+        entry.value,
+        colorOrder,
+      ))
+      .toList(),
+  );
+    //   barGroups: graphData.entries
+    //       .map(
+    //         (entries) => generateGroup(
+    //             currentSettings, entries.key, entries.value, colorOrder),
+    //       )
+    //       .toList(),
+    // );
   }
 
   LineChartData maxGradeChart(
@@ -274,7 +283,7 @@ class LineChartGraph extends StatelessWidget {
               reservedSize: 32,
               getTitlesWidget: (double value, TitleMeta meta) {
                 return bottomTitles(
-                    value, meta, numbersToDates, selectedTimePeriod);
+                    value, meta, numbersToDates, selectedTimePeriod, chartSelection);
               }),
         ),
         leftTitles: AxisTitles(
@@ -442,7 +451,7 @@ class LineChartGraph extends StatelessWidget {
               reservedSize: 32,
               getTitlesWidget: (double value, TitleMeta meta) {
                 return bottomTitles(
-                    value, meta, numberToDateMap, selectedTimePeriod);
+                    value, meta, numberToDateMap, selectedTimePeriod, chartSelection);
               }),
         ),
         leftTitles: AxisTitles(

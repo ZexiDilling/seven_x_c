@@ -85,7 +85,7 @@ class FirebaseCloudStorage {
   }
 
   Stream<Iterable<CloudBoulder>> getAllBoulders(bool showDeactivatedBoulders) {
-    final allBoulders;
+    final Stream<Iterable<CloudBoulder>> allBoulders;
     if (showDeactivatedBoulders) {
       allBoulders = bouldersCollection.snapshots().map(
           (event) => event.docs.map((doc) => CloudBoulder.fromSnapshot(doc)));

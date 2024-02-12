@@ -123,10 +123,10 @@ class _ProfileViewState extends State<ProfileView> {
                 });
               }
             },
-            items: TimePeriod.values.map((TimePeriod timePeriod) {
+            items: TimePeriod.values.map((TimePeriod value) {
               return DropdownMenuItem<TimePeriod>(
-                value: timePeriod,
-                child: Text(timePeriod.toString()),
+                value: value,
+                child: Text(timePeriodStrings[value]!),
               );
             }).toList(),
           ),
@@ -240,13 +240,17 @@ class _ProfileViewState extends State<ProfileView> {
                                   const EdgeInsets.only(right: 16, left: 6),
                               child: SizedBox(
                                 height: 500,
-                                child: 
-                                currentSettings != null ? LineChartGraph(currentSettings: currentSettings!,
-                                    chartSelection: chartSelection,
-                                    graphData: pointsData,
-                                    selectedTimePeriod: selectedTimePeriod,
-                                    gradingSystem: currentProfile.gradingSystem,
-                                    gradeNumberToColour: gradeNumberToColour) : const Text("Loading"),
+                                child: currentSettings != null
+                                    ? LineChartGraph(
+                                        currentSettings: currentSettings!,
+                                        chartSelection: chartSelection,
+                                        graphData: pointsData,
+                                        selectedTimePeriod: selectedTimePeriod,
+                                        gradingSystem:
+                                            currentProfile.gradingSystem,
+                                        gradeNumberToColour:
+                                            gradeNumberToColour)
+                                    : const Text("Loading"),
                               ),
                             ),
                             const SizedBox(
@@ -285,7 +289,7 @@ Future<PointsData> getPoints(
   LinkedHashMap<DateTime, int> boulderSetAmount = LinkedHashMap();
   LinkedHashMap<DateTime, Map<String, int>> boulderSetColours = LinkedHashMap();
   LinkedHashMap<String, int> boulderSetSplit = LinkedHashMap();
-  
+
   try {
     if (currentProfile.climbedBoulders != null) {
       if (selectedTimePeriod != TimePeriod.allTime) {
@@ -305,7 +309,7 @@ Future<PointsData> getPoints(
             amountBoulder += 1;
             boulderClimbedAmount[entryDateWithoutTime] =
                 (boulderClimbedAmount[entryDateWithoutTime] ?? 0) + 1;
-                
+
             if (boulderClimbedColours.containsKey(entryDateWithoutTime)) {
               if (boulderClimbedColours[entryDateWithoutTime]!
                   .containsKey(boulderGradeColour)) {
@@ -322,9 +326,7 @@ Future<PointsData> getPoints(
               boulderClimbedColours[entryDateWithoutTime] = {
                 boulderGradeColour!: 1
               };
-              
             }
-
 
             int boulderGrade = entry.value["gradeNumber"];
 
@@ -340,9 +342,9 @@ Future<PointsData> getPoints(
             }
             if (boulderClimbedMaxClimbed.containsKey(entryDateWithoutTime)) {
               if (boulderClimbedMaxClimbed[entryDateWithoutTime]! <
-                    boulderGrade) {
-                  boulderClimbedMaxClimbed[entryDateWithoutTime] = boulderGrade;
-                }
+                  boulderGrade) {
+                boulderClimbedMaxClimbed[entryDateWithoutTime] = boulderGrade;
+              }
             } else {
               boulderClimbedMaxClimbed[entryDateWithoutTime] = boulderGrade;
             }

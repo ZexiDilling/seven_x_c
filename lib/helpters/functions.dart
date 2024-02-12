@@ -235,6 +235,15 @@ Map<String, dynamic> updateClimberToppedMap(
 
 enum TimePeriod { week, month, semester, year, allTime }
 
+// Map enum values to display strings
+  final Map<TimePeriod, String> timePeriodStrings = {
+    TimePeriod.week: 'Week',
+    TimePeriod.month: 'Month',
+    TimePeriod.semester: 'Semester',
+    TimePeriod.year: 'Year',
+    TimePeriod.allTime: 'All Time',
+  };
+
 DateTime calculateDateThreshold(TimePeriod timePeriod) {
   DateTime currentTime = DateTime.now();
 

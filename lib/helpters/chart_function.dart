@@ -23,6 +23,7 @@ Widget bottomTitles(
   TitleMeta meta,
   Map<int, DateTime> numberToDateMap,
   TimePeriod selectedTimePeriod,
+  String chartSelection,
 ) {
   const style = TextStyle(color: textColour, fontSize: fontChartSize);
   String text = '';
@@ -56,15 +57,23 @@ Widget bottomTitles(
       }
       break;
     case TimePeriod.month:
-      text = value.toInt().toString(); // Display the day of the month
+    if (chartSelection == "maxGrade") {
+       int? monthIndex = numberToDateMap[value.toInt()]?.month ??
+          numberToDateMap[value - 10.toInt()]?.month;
+      text = monthName(monthIndex!);} else 
+      // Display month names and date numbers
+      {DateTime date = numberToDateMap[value.toInt()]!;
+      text = '${monthName(date.month)} ${date.day}';}
       break;
     case TimePeriod.year:
     case TimePeriod.semester:
     case TimePeriod.allTime:
-      int? monthIndex = numberToDateMap[value.toInt()]?.month ??
+    if (chartSelection == "maxGrade") {
+       int? monthIndex = numberToDateMap[value.toInt()]?.month ??
           numberToDateMap[value - 10.toInt()]?.month;
-      text = monthName(monthIndex!);
-
+      text = monthName(monthIndex!);} else {
+      DateTime date = numberToDateMap[value.toInt()]!; 
+      text = '${date.day} ${monthName(date.month)}';}
       break;
     default:
       break;
@@ -72,9 +81,13 @@ Widget bottomTitles(
 
   return SideTitleWidget(
     axisSide: meta.axisSide,
-    child: Text(text, style: style),
+    child: Transform.rotate(
+      angle: -45 * (3.1415926535 / 180), // Rotate text by -45 degrees
+      child: Text(text, style: style),
+    ),
   );
 }
+
 
 String monthName(int monthIndex) {
   const monthNames = [
@@ -139,3 +152,5 @@ Color getNameFromColour(String colorName) {
       return Colors.grey;
   }
 }
+
+

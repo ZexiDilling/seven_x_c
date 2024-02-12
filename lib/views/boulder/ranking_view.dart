@@ -23,12 +23,12 @@ class _RankViewState extends State<RankView> with TickerProviderStateMixin {
     TimePeriod.allTime,
   ];
   TimePeriod selectedTimePeriod = TimePeriod.week;
-  late final FirebaseCloudStorage _userService;
+  late final FirebaseCloudStorage firebaseService;
 
   @override
   void initState() {
     super.initState();
-    _userService = FirebaseCloudStorage();
+    firebaseService = FirebaseCloudStorage();
     _tabController = TabController(length: 5, vsync: this);
   }
 
@@ -79,23 +79,23 @@ class _RankViewState extends State<RankView> with TickerProviderStateMixin {
           RankingTab(
               criteria: 'boulderRankingsByPoints',
               timePeriod: selectedTimePeriod,
-              userService: _userService),
+              firebaseService: firebaseService),
           RankingTab(
               criteria: 'boulderRankingsByAmount',
               timePeriod: selectedTimePeriod,
-              userService: _userService),
+              firebaseService: firebaseService),
           RankingTab(
               criteria: 'challengeRankings',
               timePeriod: selectedTimePeriod,
-              userService: _userService),
+              firebaseService: firebaseService),
           RankingTab(
               criteria: 'setterRankingsByAmount',
               timePeriod: selectedTimePeriod,
-              userService: _userService),
+              firebaseService: firebaseService),
           RankingTab(
               criteria: 'setterRankingsByPoints',
               timePeriod: selectedTimePeriod,
-              userService: _userService),
+              firebaseService: firebaseService),
         ],
       ),
     );
@@ -105,28 +105,29 @@ class _RankViewState extends State<RankView> with TickerProviderStateMixin {
 class RankingTab extends StatelessWidget {
   final String criteria;
   final TimePeriod timePeriod;
-  final FirebaseCloudStorage userService;
+  final FirebaseCloudStorage firebaseService;
 
-  const RankingTab(
-      {super.key,
-      required this.criteria,
-      required this.timePeriod,
-      required this.userService});
+  const RankingTab({
+    required this.criteria,
+    required this.timePeriod,
+    required this.firebaseService,
+  });
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<String>>(
-      future: getRankingsBasedOnCriteria(userService, timePeriod, criteria),
+      future: getRankingsBasedOnCriteria(firebaseService, timePeriod, criteria),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // Return a loading indicator while waiting for the data
           return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
-          // Handle error
+          // Handle error gracefully
           return Text('Error: ${snapshot.error}');
+        } else if (!snapshot.hasData) {
+          // Handle case where data is not available
+          return Text('No data available.');
         } else {
-          // Use the data to build the widget
-          List<String> rankings = snapshot.data ?? [];
+          List<String> rankings = snapshot.data!;
           return SizedBox(
             height: 100,
             width: 100,
@@ -145,28 +146,31 @@ class RankingTab extends StatelessWidget {
   }
 
   Future<List<String>> getRankingsBasedOnCriteria(
-      FirebaseCloudStorage userService,
-      TimePeriod selectedTimePeriod,
-      String criteria) async {
-
+    FirebaseCloudStorage userService,
+    TimePeriod selectedTimePeriod,
+    String criteria,
+  ) async {
     try {
       // Fetch all users
       Iterable<CloudProfile> users = await userService.getAllUsers().first;
-
+      print(criteria);
       // Filter users based on different criteria
       Map<String, dynamic> filteredRankings = {};
+
       if (users.isNotEmpty) {
         DateTime dateThreshold = calculateDateThreshold(selectedTimePeriod);
         double points = 0;
         int amount = 0;
+
         for (var user in users) {
           if (user.climbedBoulders != null) {
             switch (criteria) {
               case 'boulderRankingsByPoints':
+
                 for (var entry in user.climbedBoulders!.entries) {
                   DateTime entryDate = entry.value['date'].toDate();
                   if (entryDate.isAfter(dateThreshold)) {
-                    points += entry.value["points"];
+                    points += entry.value["boulderPoints"];
                   }
                 }
                 user.isAnonymous == true
@@ -192,18 +196,23 @@ class RankingTab extends StatelessWidget {
                 break;
 
               case 'setterRankingsByAmount':
+              if (user.setBoulders !=null){
                 for (var entry in user.setBoulders!.entries) {
                   DateTime entryDate = entry.value['setDateBoulder'].toDate();
+                  
                   if (entryDate.isAfter(dateThreshold)) {
+                  
                     points += entry.value["setterPoints"];
+                    
                   }
                 }
                 user.isAnonymous == true
                     ? filteredRankings["Anonymous"] = points
                     : filteredRankings[user.displayName] = points;
-
+}
                 break;
               case "setterRankingsByPoints":
+              if (user.setBoulders !=null){
                 for (var entry in user.setBoulders!.entries) {
                   DateTime entryDate = entry.value['setDateBoulder'].toDate();
                   if (entryDate.isAfter(dateThreshold)) {
@@ -213,14 +222,15 @@ class RankingTab extends StatelessWidget {
                 user.isAnonymous == true
                     ? filteredRankings["Anonymous"] = amount
                     : filteredRankings[user.displayName] = amount;
+              }
                 break;
             }
           }
         }
       }
-
       return mapSorter(filteredRankings);
     } catch (e) {
+      print(e);
       return [];
     }
   }
