@@ -84,12 +84,18 @@ class FirebaseCloudStorage {
     }
   }
 
-  Stream<Iterable<CloudBoulder>> getAllBoulders() {
-    final allBoulders = bouldersCollection
-        .where(activeFieldName, isEqualTo: true)
-        .snapshots()
-        .map(
-            (event) => event.docs.map((doc) => CloudBoulder.fromSnapshot(doc)));
+  Stream<Iterable<CloudBoulder>> getAllBoulders(bool showDeactivatedBoulders) {
+    final allBoulders;
+    if (showDeactivatedBoulders) {
+      allBoulders = bouldersCollection.snapshots().map(
+          (event) => event.docs.map((doc) => CloudBoulder.fromSnapshot(doc)));
+    } else {
+      allBoulders = bouldersCollection
+          .where(activeFieldName, isEqualTo: true)
+          .snapshots()
+          .map((event) =>
+              event.docs.map((doc) => CloudBoulder.fromSnapshot(doc)));
+    }
     return allBoulders;
   }
 
@@ -775,13 +781,12 @@ class FirebaseCloudStorage {
 
       await settingsCollection.doc(settingsID).update(updatedData);
     } catch (e) {
-      
       throw CouldNotUpdateSettings();
     }
   }
 
-Future<CloudSettings?> getSettings(String? settingsNameID) async {
-  final querySnapshot = await settingsCollection
+  Future<CloudSettings?> getSettings(String? settingsNameID) async {
+    final querySnapshot = await settingsCollection
         .where(settingsNameIDFieldName, isEqualTo: settingsNameID)
         .get();
 
@@ -805,4 +810,3 @@ Future<CloudSettings?> getSettings(String? settingsNameID) async {
   FirebaseCloudStorage._shareIstance();
   factory FirebaseCloudStorage() => _shared;
 }
-

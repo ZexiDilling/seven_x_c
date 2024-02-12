@@ -216,7 +216,7 @@ void showAddExisitingChallenge(
                       },
                       icon: Icon(editing
                           ? IconManager.doneEdditing
-                          : IconManager.edditing),
+                          : IconManager.editing),
                     ),
                   ),
                 ],

@@ -98,7 +98,7 @@ class LineChartGraph extends StatelessWidget {
     } else if (chartSelection == "climbs") {
       List<MapEntry<DateTime, Map<String, int>>> entries =
           graphData.boulderClimbedColours.entries.toList();
-      ;
+      
       // Sort the list by date
       entries.sort((a, b) => a.key.compareTo(b.key));
 

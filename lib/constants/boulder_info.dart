@@ -324,7 +324,7 @@ List<WallRegion> wallRegions = [
     isSelected: false,
   ),
   WallRegion(
-    wallID: 'Onyd',
+    wallID: 'onyd',
     wallYMaX: 0.5314116777531411,
     wallYMin: 0.376940133037694,
     wallXMax: xMax,
@@ -344,7 +344,7 @@ List<WallRegion> wallRegions = [
     isSelected: false,
   ),  
   WallRegion(
-    wallID: 'ARG',
+    wallID: 'arg',
     wallYMaX: 0.3444198078344419,
     wallYMin: 0.2845528455284552,
     wallXMax: xMax,
@@ -354,7 +354,7 @@ List<WallRegion> wallRegions = [
     isSelected: false,
   ),
   WallRegion(
-    wallID: 'Roof',
+    wallID: 'roof',
     wallYMaX: 0.2845528455284552,
     wallYMin: 0.2121212121212121,
     wallXMax: xMax,
@@ -364,13 +364,13 @@ List<WallRegion> wallRegions = [
     isSelected: false,
   ),
     WallRegion(
-    wallID: 'topOut',
+    wallID: 'top out',
     wallYMaX: 0.2121212121212121,
     wallYMin: 0.1507760532150776,
     wallXMax: xMax,
     wallXMin: xMin,
     wallName: 'Top Out',
-    section: 2,
+    section: 3,
     isSelected: false,
     
   ),

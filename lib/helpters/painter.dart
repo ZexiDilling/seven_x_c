@@ -46,6 +46,9 @@ class GymPainter extends CustomPainter {
         Color? holdColour = nameToColor(
             currentSettings.settingsHoldColour![boulder.holdColour]);
         double fadeEffect = 0.3;
+        double centerX = boulder.cordX * constraints.maxWidth;
+        double centerY = boulder.cordY * constraints.maxHeight;
+
         if (boulder.climberTopped != null &&
             boulder.climberTopped is Map<String, dynamic>) {
           if (boulder.climberTopped!.containsKey(currentProfile.userID)) {
@@ -58,8 +61,6 @@ class GymPainter extends CustomPainter {
           userTopped = false;
         }
 
-        double centerX = boulder.cordX * constraints.maxWidth;
-        double centerY = boulder.cordY * constraints.maxHeight;
         // Fade if user have topped the boulder
         final Paint paint = Paint()
           ..color =
@@ -150,6 +151,20 @@ class GymPainter extends CustomPainter {
             canvas,
             Offset(centerX - textPainter.width / 2,
                 centerY - textPainter.height / 2),
+          );
+
+          
+        }
+        if (!boulder.active) {
+                    final Paint glowPaint = Paint()
+            ..color = deactivateBoulderColor.withOpacity(0.2);
+            // ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.2);
+
+          canvas.drawCircle(
+            Offset(centerX, centerY),
+            boulderRadius +
+                boulderNewGlowRadius, // Adjust the radius to make the glow more visible
+            glowPaint,
           );
         }
       }

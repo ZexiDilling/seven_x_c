@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class IconManager {
   static const IconData doneEdditing = Icons.done;
-  static const IconData edditing = Icons.edit;
+  static const IconData editing = Icons.edit;
   static const IconData topOut = Icons.arrow_upward;
   static const IconData decreaseNumber = Icons.arrow_downward;
   static const IconData increaseNumber = Icons.arrow_upward;
@@ -19,4 +19,10 @@ class IconManager {
   static const IconData moveBoulder = Icons.swap_horiz;
   static const IconData moveMultipleBoulders = Icons.swap_horiz;
   static const IconData cancel = Icons.close; 
+  static const IconData showDeactivatedBoulders = Icons.search; 
+}
+
+class IconManagerColours {
+  static const Color inActive = Colors.grey;
+  static const Color active = Colors.blue;
 }

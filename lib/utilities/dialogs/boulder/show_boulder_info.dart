@@ -37,13 +37,11 @@ Future<bool> showBoulderInformation(
   int repeats = 0;
   bool flashed = false;
   bool topped = false;
-  // const gradingSystem = "coloured";
-  // const gradingSystem = "v_grade";
-  // const gradingSystem = "french";
   String gradingSystem = currentProfile.gradingSystem.toString().toLowerCase();
   String? gradingShow = "";
   bool editing = false;
   bool moveBoulder = false;
+  // ignore: unused_local_variable
   String selectedBoulder = "";
   int difficultyLevel = 1;
   String? holdColorChoice;
@@ -189,7 +187,7 @@ Future<bool> showBoulderInformation(
                                       currentProfile.isSetter,
                                   child: IconButton(
                                     icon: Icon(editing
-                                        ? IconManager.edditing
+                                        ? IconManager.editing
                                         : IconManager.doneEdditing),
                                     onPressed: () {
                                       labelText = editing

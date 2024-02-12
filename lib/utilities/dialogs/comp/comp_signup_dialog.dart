@@ -96,7 +96,7 @@ void showComp(
                                   ),
                                   if (currentProfile!.isAdmin)
                                     IconButton(
-                                      icon: const Icon(IconManager.edditing),
+                                      icon: const Icon(IconManager.editing),
                                       onPressed: () {
                                         setCompView(!compView);
                                         setComp(currentComp);

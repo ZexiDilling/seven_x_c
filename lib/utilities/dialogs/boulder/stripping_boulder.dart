@@ -45,7 +45,7 @@ Future<void> stripping(
                           }
                           Navigator.of(context).pop();
                         },
-                        child: const Text("Hide all"),
+                        child: const Text("Hide Grade"),
                       ),
                       ElevatedButton(
                         onPressed: () async {
@@ -62,7 +62,7 @@ Future<void> stripping(
                           }
                           Navigator.of(context).pop();
                         },
-                        child: const Text("UnHide all"),
+                        child: const Text("Show Grade"),
                       ),
                     ],
                   ),
@@ -148,9 +148,8 @@ Future<void> stripping(
                                   // Access the data from the StreamBuilder
                                   Iterable<CloudBoulder>? boulders =
                                       await filteredBouldersStream.first;
-
                                   for (CloudBoulder boulder in boulders) {
-                                    if (wallRegionMap[boulder.wall]!
+                                    if (wallRegionMap[(boulder.wall).toLowerCase()]!
                                         .isSelected) {
                                       await boulderService.updateBoulder(
                                         boulderID: boulder.boulderID,

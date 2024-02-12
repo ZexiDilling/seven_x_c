@@ -15,6 +15,7 @@ const double boulderUpdatedGlowRadius = boulderNewGlowRadius;
 const Color hiddenGradeColor = Colors.white;
 const Color newBoulderColour = Colors.purple;
 const Color updatedBoulderColour = Colors.yellow;
+const Color deactivateBoulderColor = Colors.red;
 // const Color soonToBeStrippedColour = Colors.red;   Not used yet
 const double minBoulderDistance = 10.0;
 

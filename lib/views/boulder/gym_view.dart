@@ -51,6 +51,7 @@ class _GymViewState extends State<GymView> {
   bool editing = false;
   bool moveBoulder = false;
   bool moveMultipleBoulders = false;
+  bool showDeactivatedBoulders = false;
   String selectedBoulder = "";
   bool showWallRegions = false;
   bool filterEnabled = false;
@@ -83,7 +84,7 @@ class _GymViewState extends State<GymView> {
   }
 
   Stream<Iterable<CloudBoulder>> getFilteredBouldersStream() {
-    return _fireBaseService.getAllBoulders().map((boulders) {
+    return _fireBaseService.getAllBoulders(showDeactivatedBoulders).map((boulders) {
       if (showAllBouldersFilter) {
         return boulders;
       } else {
@@ -237,25 +238,31 @@ class _GymViewState extends State<GymView> {
                 : moveBoulder
                     ? const Text("MOVING A BOULDER",
                         overflow: TextOverflow.ellipsis)
-                    : Column(
-                        children: [
-                          Text(
-                            currentSettings != null
-                                ? "ARG"
-                                : currentSettings!.settingsName,
-                            style: appBarStyle,
-                          ),
-                          Text(
-                            '$topCounter/$bouldersCount',
-                            style: const TextStyle(
-                              fontSize: 20,
-                            ),
-                          ),
-                        ],
-                      );
+                    : editing
+                        ? const Text("X")
+                        : Column(
+                            children: [
+                              Text(
+                                currentSettings != null
+                                    ? currentSettings!.settingsName
+                                    : "Loading...",
+                                style: appBarStyle,
+                              ),
+                              Text(
+                                '$topCounter/$bouldersCount',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ],
+                          );
           },
         ),
-        backgroundColor: compView ? compAppBarColour : dtuClimbingAppBar,
+        backgroundColor: compView
+            ? compAppBarColour
+            : editing
+                ? editingAppBarColors
+                : dtuClimbingAppBar,
         actions: [
           compView
               ? IconButton(
@@ -271,10 +278,28 @@ class _GymViewState extends State<GymView> {
           if (editing)
             IconButton(
               icon: Icon(
+                showDeactivatedBoulders
+                    ? IconManager.showDeactivatedBoulders
+                    : IconManager.showDeactivatedBoulders,
+                color: showDeactivatedBoulders
+                    ? IconManagerColours.active
+                    : IconManagerColours.inActive,
+              ),
+              onPressed: () {
+                setState(() {
+                  showDeactivatedBoulders = !showDeactivatedBoulders;
+                });
+              },
+            ),
+          if (editing)
+            IconButton(
+              icon: Icon(
                 moveMultipleBoulders
                     ? IconManager.moveMultipleBoulders
                     : IconManager.moveMultipleBoulders,
-                color: moveMultipleBoulders ? Colors.blue : Colors.grey,
+                color: moveMultipleBoulders
+                    ? IconManagerColours.active
+                    : IconManagerColours.inActive,
               ),
               onPressed: () {
                 setState(() {
@@ -282,21 +307,29 @@ class _GymViewState extends State<GymView> {
                 });
               },
             ),
-          IconButton(
-            icon: Icon(showWallRegions
-                ? IconManager.showWalls
-                : IconManager.doNotShowWalls),
-            onPressed: () {
-              setState(() {
-                showWallRegions = !showWallRegions;
-              });
-            },
-          ),
+          if (editing)
+            IconButton(
+              icon: Icon(
+                showWallRegions ? IconManager.showWalls : IconManager.showWalls,
+                color: showWallRegions
+                    ? IconManagerColours.active
+                    : IconManagerColours.inActive,
+              ),
+              onPressed: () {
+                setState(() {
+                  showWallRegions = !showWallRegions;
+                });
+              },
+            ),
           if (currentProfile!.isAdmin && !moveBoulder ||
               currentProfile!.isSetter && !moveBoulder)
             IconButton(
               icon: Icon(
-                  editing ? IconManager.edditing : IconManager.doneEdditing),
+                editing ? IconManager.editing : IconManager.editing,
+                color: editing
+                    ? IconManagerColours.active
+                    : IconManagerColours.inActive,
+              ),
               onPressed: () {
                 setState(() {
                   editing = !editing;
@@ -518,7 +551,7 @@ class _GymViewState extends State<GymView> {
           minBoulderDistance; // Set a minimum distance to avoid overlap
       final setters = await fireBaseService.getSetters();
 
-      if (editing || moveBoulder) {
+      if (editing && !showDeactivatedBoulders || moveBoulder) {
         // Check for existing circles and avoid overlap
         double tempCenterX = transformedPosition.x;
         double tempCenterY = transformedPosition.y;
