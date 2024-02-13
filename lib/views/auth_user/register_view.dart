@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:seven_x_c/services/auth/auth_exceptions.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
@@ -67,16 +68,26 @@ class _ReisterViewState extends State<ReisterView> {
                   autocorrect: false,
                   autofocus: true,
                   keyboardType: TextInputType.emailAddress,
-                  decoration:
-                      const InputDecoration(hintText: "Enter your E-mail here"),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                        RegExp("[a-zA-Z0-9!@#\$%^&*(),.?\":{}|<>]")),
+                  ],
+                  decoration: const InputDecoration(
+                      labelText: "Email Field",
+                      hintText: "Enter your E-mail here"),
                 ),
                 TextField(
                   controller: _password,
                   obscureText: true,
                   enableSuggestions: false,
                   autocorrect: false,
-                  decoration:
-                      const InputDecoration(hintText: "Enter your password here"),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                        RegExp("[a-zA-Z0-9!@#\$%^&*(),.?\":{}|<>]")),
+                  ],
+                  decoration: const InputDecoration(
+                      labelText: "Password Field",
+                      hintText: "Enter your password here"),
                 ),
                 TextButton(
                   onPressed: () async {

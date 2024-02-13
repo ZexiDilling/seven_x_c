@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart' show BlocListener, ReadContext;
 import 'package:seven_x_c/services/auth/auth_exceptions.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
@@ -46,8 +47,8 @@ class _LoginView extends State<LoginView> {
             await showErrorDialog(
                 context, "That is not an E-mail... try again");
           } else if (state.exception is InvalidCredentialAuthException) {
-            await showErrorDialog(
-                context, "Those are some Invalided Credential you got there...");
+            await showErrorDialog(context,
+                "Those are some Invalided Credential you got there...");
           } else if (state.exception is GenericAuthException) {
             await showErrorDialog(context, "Generic Error!!!");
           }
@@ -68,7 +69,12 @@ class _LoginView extends State<LoginView> {
                   autocorrect: false,
                   autofocus: true,
                   keyboardType: TextInputType.emailAddress,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                        RegExp("[a-zA-Z0-9@._-]")),
+                  ],
                   decoration: const InputDecoration(
+                    labelText: "Email",
                     hintText: "Enter your E-mail here",
                   ),
                 ),
@@ -77,7 +83,12 @@ class _LoginView extends State<LoginView> {
                   obscureText: true,
                   enableSuggestions: false,
                   autocorrect: false,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                        RegExp("[a-zA-Z0-9!@#\$%^&*(),.?\":{}|<>]")),
+                  ],
                   decoration: const InputDecoration(
+                    labelText: "Password",
                     hintText: "Enter your password here",
                   ),
                 ),
