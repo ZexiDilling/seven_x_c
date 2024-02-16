@@ -154,7 +154,13 @@ boulders
 
 ToDO:
 ------------------------------------------------------------------------------------------
+Fix transparentcy on boulders, so that only the current users topped boulder are less transparentcy
+Fix colour on "grade" in the grading circles
+Fix challenges to work.
+
+
 Fix states on profile view
+
 
 
 Make it possible to adjust the sections. 
