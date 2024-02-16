@@ -198,6 +198,7 @@ void showAddExisitingChallenge(
                           fireBaseService.updateBoulder(
                               boulderID: boulder.boulderID,
                               boulderChallenges: updateBoulderChallengeMap(
+                                removeUser: false,
                                   currentChallenge: currentChallenge!,
                                   completed: false,
                                   existingData: boulder.boulderChallenges));

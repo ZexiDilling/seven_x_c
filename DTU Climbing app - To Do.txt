@@ -97,6 +97,9 @@ Admin page:
 		Done - Change range for colours
 		Done - Add colours
 	Done - Add/remove hold Colours
+
+Done - Fix transparentcy on boulders, so that only the current users topped boulder are less transparentcy
+Done - Fix colour on "grade" in the grading circles
 ------------------------------------------------------------------------------------------------------------------------
 
 Missing testing:
@@ -154,8 +157,7 @@ boulders
 
 ToDO:
 ------------------------------------------------------------------------------------------
-Fix transparentcy on boulders, so that only the current users topped boulder are less transparentcy
-Fix colour on "grade" in the grading circles
+
 Fix challenges to work.
 
 

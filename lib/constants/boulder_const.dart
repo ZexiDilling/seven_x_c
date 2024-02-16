@@ -8,7 +8,7 @@ const String guestSetter = "Guest Setter";
 // drawing Constants
 const double boulderRadius = 2.5;
 const double boulderRadiusDrawing = 15;
-const double boulderRadiusTopped = 0.80;
+const double boulderRadiusTopped = 0.50;
 const double boulderSingleShow = 2.5;
 const double boulderNewGlowRadius = 5.0;
 const double boulderUpdatedGlowRadius = boulderNewGlowRadius;

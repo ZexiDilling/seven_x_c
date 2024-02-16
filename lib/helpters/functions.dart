@@ -58,7 +58,6 @@ Map<String, dynamic> updateClimbedBouldersMap(
     Map<String, dynamic>? existingData}) {
   String? boulderID = boulder.boulderID;
   int? gradeNumberBoulder = boulder.gradeNumberSetter;
-
   Map<String, dynamic> newData = {
     "gradeNumber": gradeNumberBoulder,
     'attempts': attempts,
@@ -69,7 +68,7 @@ Map<String, dynamic> updateClimbedBouldersMap(
     "repeatPoints": repeatPoints,
     "date": DateTime.now()
   };
-
+  
   Map<String, dynamic> bouldersClimbedData = existingData ?? {};
   bouldersClimbedData[boulderID.toString()] = newData;
 
@@ -357,17 +356,23 @@ Map<String, dynamic> updateCompBoulderMap(
 Map<String, dynamic> updateBoulderChallengeMap(
     {required CloudChallenge currentChallenge,
     required bool completed,
+    required bool removeUser,
     CloudProfile? currentProfile,
-    bool? removeUser,
     Map<String, dynamic>? existingData}) {
   String challengeID = currentChallenge.challengeID;
   List completedList;
 
+  if (existingData == null) {
+    completedList = [];
+  } else {
+    completedList = existingData["completed"];
+  }
+
   if (completed) {
-    if (removeUser!) {
-      completedList = existingData!["completed"].remove(currentProfile);
+    if (removeUser) {
+      completedList.remove(currentProfile?.displayName);
     } else {
-      completedList = existingData!["completed"].add(currentProfile);
+      completedList.add(currentProfile?.displayName);
     }
   } else {
     completedList = [];

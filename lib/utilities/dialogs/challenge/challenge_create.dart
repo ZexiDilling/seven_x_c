@@ -137,6 +137,7 @@ Future<void> createChallengeDialog(
                     fireBaseService.updateBoulder(
                         boulderID: boulder.boulderID,
                         boulderChallenges: updateBoulderChallengeMap(
+                          removeUser: false,
                             currentChallenge: currentChallenge,
                             completed: false));
 

@@ -6,6 +6,7 @@ import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/constants/challenge_const.dart';
 import 'package:seven_x_c/constants/other_const.dart';
+import 'package:seven_x_c/helpters/bonus_functions.dart';
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 import 'package:seven_x_c/utilities/dialogs/challenge/challenge_create.dart';
 import 'package:seven_x_c/helpters/comp/comp_calculations.dart';
@@ -53,6 +54,10 @@ Future<bool> showBoulderInformation(
   String labelText = "Vote a Grade";
   bool expandPanelState = false;
 
+  // size of grading circle:
+  double circleWidth = 40;
+  double circleHeight = 40;
+
   Map<String, bool> expandedStates = {};
 
   bool active = boulder.active;
@@ -87,6 +92,10 @@ Future<bool> showBoulderInformation(
         }
       },
     );
+
+    if (currentProfile.climbedBoulders!.containsKey(boulder.boulderID)) {
+      attempts = currentProfile.climbedBoulders![boulder.boulderID]["attempts"];
+    }
 
     if (boulder.climberTopped!.containsKey(currentProfile.userID)) {
       var userClimbInfo = boulder.climberTopped![currentProfile.userID];
@@ -144,9 +153,14 @@ Future<bool> showBoulderInformation(
                           width: MediaQuery.of(context).size.width - 150,
                           child: Card(
                             child: ListTile(
+                              tileColor: const Color.fromARGB(111, 80, 94, 100),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    10.0), // Adjust the radius as needed
+                              ),
                               leading: Container(
-                                width: 30,
-                                height: 30,
+                                width: circleWidth,
+                                height: circleHeight,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: nameToColor(
@@ -154,14 +168,18 @@ Future<bool> showBoulderInformation(
                                           boulder.holdColour]), // Outline color
                                 ),
                                 child: Center(
-                                  child: gradingCirleDrawing(
-                                      boulder, currentSettings, gradingShow),
+                                  child: gradingInnerCirleDrawing(
+                                      circleWidth,
+                                      circleHeight,
+                                      boulder,
+                                      currentSettings,
+                                      gradingShow),
                                 ),
                               ),
-                              title: Text("Setter ${boulder.setter}",
+                              title: Text("Setter: ${boulder.setter}",
                                   style: TextStyle(
                                     fontSize: (boulder.setter.length > 10)
-                                        ? 20.0
+                                        ? 15.0
                                         : 15.0,
                                   )),
                               subtitle: Text(boulder.boulderName ?? ""),
@@ -414,6 +432,19 @@ Future<bool> showBoulderInformation(
                                                         .clamp(
                                                             0, double.infinity)
                                                         .toInt();
+
+                                                    fireBaseService.updateUser(
+                                                        currentProfile:
+                                                            currentProfile,
+                                                        climbedBoulders:
+                                                            updateClimbedBouldersMap(
+                                                                boulder:
+                                                                    boulder,
+                                                                attempts:
+                                                                    attempts,
+                                                                existingData:
+                                                                    currentProfile
+                                                                        .climbedBoulders));
                                                   });
                                                 },
                                               ),
@@ -424,6 +455,18 @@ Future<bool> showBoulderInformation(
                                                 onPressed: () {
                                                   setState(() {
                                                     attempts++;
+                                                    fireBaseService.updateUser(
+                                                        currentProfile:
+                                                            currentProfile,
+                                                        climbedBoulders:
+                                                            updateClimbedBouldersMap(
+                                                                boulder:
+                                                                    boulder,
+                                                                attempts:
+                                                                    attempts,
+                                                                existingData:
+                                                                    currentProfile
+                                                                        .climbedBoulders));
                                                     if (attempts > 1) {
                                                       flashed = false;
                                                     }
@@ -787,8 +830,8 @@ Future<bool> showBoulderInformation(
                                         challengeCompleted = false;
                                       } else {
                                         challengeCompleted = (challengeMap[
-                                                "completed"] as List<String>)
-                                            .contains(currentProfile.userID);
+                                                "completed"] )
+                                            .contains(currentProfile.displayName);
                                       }
 
                                       return ExpansionPanelList(
@@ -922,6 +965,7 @@ Future<bool> showBoulderInformation(
                                                                         boulderChallenges: updateBoulderChallengeMap(
                                                                             currentChallenge:
                                                                                 currentChallenge!,
+                                                                                removeUser: false,
                                                                             completed:
                                                                                 true,
                                                                             currentProfile:
@@ -933,6 +977,7 @@ Future<bool> showBoulderInformation(
                                                                             points:
                                                                                 challengeMap["points"],
                                                                             existingData: currentProfile.challengePoints));
+                                                                            challengeCompleted = true;
                                                                   }
                                                                 },
                                                                 child: Text(
@@ -990,7 +1035,7 @@ Future<bool> showBoulderInformation(
                                                       )
                                               ],
                                             ),
-                                            isExpanded: isExpanded,
+                                             isExpanded: (challenge != "create") ? isExpanded : true,
                                           ),
                                         ],
                                         expansionCallback:
@@ -1276,7 +1321,7 @@ void updateUserUndoTop(
 }
 
 void updateUserTopped(
-    FirebaseCloudStorage userService,
+    FirebaseCloudStorage firebaseService,
     CloudProfile currentProfile,
     CloudBoulder boulder,
     bool flashed,
@@ -1312,7 +1357,7 @@ void updateUserTopped(
       ? currentProfile.climbedBoulders![boulder.boulderID]!['boulderPoints']
       : boulderPoints;
 
-  userService.updateUser(
+  firebaseService.updateUser(
       boulderPoints: updatePoints(
           points: boulderPoints, existingData: currentProfile.boulderPoints),
       currentProfile: currentProfile,
@@ -1349,11 +1394,11 @@ SizedBox climberTopList(List<Map<String, dynamic>> toppersList) {
   );
 }
 
-Container gradingCirleDrawing(
+Container gradingInnerCirleDrawing(double circleWidth, double circleHeight,
     CloudBoulder boulder, CloudSettings currentSettings, String? gradingShow) {
   return Container(
-    width: 26,
-    height: 26,
+    width: circleWidth * 0.8,
+    height: circleHeight * 0.8,
     decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: boulder.hiddenGrade == true
@@ -1362,18 +1407,25 @@ Container gradingCirleDrawing(
                 currentSettings.settingsHoldColour![boulder.gradeColour])),
     child: Center(
       child: Padding(
-        padding: const EdgeInsets.only(left: 0.0),
-        child: Text(
-          gradingShow!,
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: (gradingShow.length > 3 || gradingShow.contains('/'))
-                ? 10 // Font size for the text in the grading cirle. Changes size depending on text length
-                : 15,
-          ),
-        ),
-      ),
+          padding: const EdgeInsets.only(left: 0.0),
+          child: OutlineText(
+            Text(
+              capitalize(gradingShow!),
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: boulder.gradeColour != "black"
+                    ? Colors.black
+                    : Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: (gradingShow.length > 3 || gradingShow.contains('/'))
+                    ? 10 // Font size for the text in the grading cirle. Changes size depending on text length
+                    : 15,
+              ),
+            ),
+            strokeWidth: 3,
+            strokeColor: Colors.white54,
+            overflow: TextOverflow.ellipsis,
+          )),
     ),
   );
 }

@@ -76,14 +76,13 @@ class FirebaseCloudStorage {
       if (climberTopped != null) {
         updatedData[climberToppedFieldName] = climberTopped;
       }
-
       // Update the document with the non-null fields
       await bouldersCollection.doc(boulderID).update(updatedData);
     } catch (e) {
       throw CouldNotUpdateBoulderException();
     }
   }
-
+  
   Stream<Iterable<CloudBoulder>> getAllBoulders(bool showDeactivatedBoulders) {
     final Stream<Iterable<CloudBoulder>> allBoulders;
     if (showDeactivatedBoulders) {
@@ -233,6 +232,7 @@ class FirebaseCloudStorage {
     int? maxFlahsedGrade,
     int? maxToppedGrade,
   }) async {
+    print(climbedBoulders);
     try {
       // Create a map to store non-null fields and their values
       final Map<String, dynamic> updatedData = {};

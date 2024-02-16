@@ -55,6 +55,9 @@ class GymPainter extends CustomPainter {
             var userClimbInfo = boulder.climberTopped?[currentProfile.userID];
             userFlashed = userClimbInfo['flashed'] ?? false;
             userTopped = userClimbInfo['topped'] ?? false;
+          } else {
+            userFlashed = false;
+            userTopped = false;
           }
         } else {
           userFlashed = false;
@@ -152,13 +155,11 @@ class GymPainter extends CustomPainter {
             Offset(centerX - textPainter.width / 2,
                 centerY - textPainter.height / 2),
           );
-
-          
         }
         if (!boulder.active) {
-                    final Paint glowPaint = Paint()
+          final Paint glowPaint = Paint()
             ..color = deactivateBoulderColor.withOpacity(0.2);
-            // ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.2);
+          // ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.2);
 
           canvas.drawCircle(
             Offset(centerX, centerY),
