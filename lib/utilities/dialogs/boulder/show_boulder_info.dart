@@ -92,11 +92,6 @@ Future<bool> showBoulderInformation(
         }
       },
     );
-
-    if (currentProfile.climbedBoulders!.containsKey(boulder.boulderID)) {
-      attempts = currentProfile.climbedBoulders![boulder.boulderID]["attempts"];
-    }
-
     if (boulder.climberTopped!.containsKey(currentProfile.userID)) {
       var userClimbInfo = boulder.climberTopped![currentProfile.userID];
       attempts = userClimbInfo['attempts'] ?? 0;
@@ -108,9 +103,8 @@ Future<bool> showBoulderInformation(
       if (userClimbInfo["gradeColour"] != "" &&
           userClimbInfo["gradeColour"] != null) {}
       gradeColorChoice = userClimbInfo["gradeColour"] ?? boulder.gradeColour;
-      difficultyLevel = userClimbInfo["gradeArrow"] ?? 1;
+      difficultyLevel = userClimbInfo["gradeArrow"] ?? 3;
       selectedGrade = allGrading[gradeValue]![gradingSystem];
-      // difficultyLevel = userClimbInfo["gradeArrowVoted"] ?? 0;
     }
   }
 
@@ -265,18 +259,6 @@ Future<bool> showBoulderInformation(
                                             }
                                           }
                                           if (topped) {
-                                            fireBaseService.updateBoulder(
-                                                boulderID: boulder.boulderID,
-                                                climberTopped:
-                                                    updateClimberToppedMap(
-                                                        currentProfile:
-                                                            currentProfile,
-                                                        attempts: attempts,
-                                                        repeats: repeats,
-                                                        flashed: flashed,
-                                                        topped: topped,
-                                                        existingData: boulder
-                                                            .climberTopped));
                                             updateUserTopped(
                                                 fireBaseService,
                                                 currentProfile,
@@ -287,18 +269,7 @@ Future<bool> showBoulderInformation(
                                                 repeats);
                                           } else {
                                             flashed = false;
-                                            fireBaseService.updateBoulder(
-                                                boulderID: boulder.boulderID,
-                                                climberTopped:
-                                                    updateClimberToppedMap(
-                                                        currentProfile:
-                                                            currentProfile,
-                                                        attempts: 0,
-                                                        flashed: flashed,
-                                                        topped: topped,
-                                                        repeats: 0,
-                                                        existingData: boulder
-                                                            .climberTopped));
+
                                             updateUserUndoTop(fireBaseService,
                                                 currentProfile, boulder);
                                           }
@@ -329,18 +300,6 @@ Future<bool> showBoulderInformation(
                                             }
                                           }
                                           if (flashed) {
-                                            fireBaseService.updateBoulder(
-                                                boulderID: boulder.boulderID,
-                                                climberTopped:
-                                                    updateClimberToppedMap(
-                                                        currentProfile:
-                                                            currentProfile,
-                                                        attempts: attempts,
-                                                        repeats: repeats,
-                                                        flashed: flashed,
-                                                        topped: topped,
-                                                        existingData: boulder
-                                                            .climberTopped));
                                             updateUserTopped(
                                                 fireBaseService,
                                                 currentProfile,
@@ -350,18 +309,6 @@ Future<bool> showBoulderInformation(
                                                 attempts,
                                                 repeats);
                                           } else {
-                                            fireBaseService.updateBoulder(
-                                                boulderID: boulder.boulderID,
-                                                climberTopped:
-                                                    updateClimberToppedMap(
-                                                        currentProfile:
-                                                            currentProfile,
-                                                        attempts: attempts,
-                                                        repeats: repeats,
-                                                        flashed: flashed,
-                                                        topped: topped,
-                                                        existingData: boulder
-                                                            .climberTopped));
                                             updateUserRemovedFlashed(
                                                 fireBaseService,
                                                 currentProfile,
@@ -392,6 +339,18 @@ Future<bool> showBoulderInformation(
                                                         .clamp(
                                                             0, double.infinity)
                                                         .toInt();
+                                                    fireBaseService.updateBoulder(
+                                                        boulderID:
+                                                            boulder.boulderID,
+                                                        climberTopped:
+                                                            updateClimberToppedMap(
+                                                                currentProfile:
+                                                                    currentProfile,
+                                                                repeats:
+                                                                    repeats,
+                                                                existingData:
+                                                                    boulder
+                                                                        .climberTopped));
                                                     updateUserReapet(
                                                         fireBaseService,
                                                         currentProfile,
@@ -407,6 +366,18 @@ Future<bool> showBoulderInformation(
                                                 onPressed: () {
                                                   setState(() {
                                                     repeats++;
+                                                    fireBaseService.updateBoulder(
+                                                        boulderID:
+                                                            boulder.boulderID,
+                                                        climberTopped:
+                                                            updateClimberToppedMap(
+                                                                currentProfile:
+                                                                    currentProfile,
+                                                                repeats:
+                                                                    repeats,
+                                                                existingData:
+                                                                    boulder
+                                                                        .climberTopped));
                                                     updateUserReapet(
                                                         fireBaseService,
                                                         currentProfile,
@@ -432,19 +403,18 @@ Future<bool> showBoulderInformation(
                                                         .clamp(
                                                             0, double.infinity)
                                                         .toInt();
-
-                                                    fireBaseService.updateUser(
-                                                        currentProfile:
-                                                            currentProfile,
-                                                        climbedBoulders:
-                                                            updateClimbedBouldersMap(
-                                                                boulder:
-                                                                    boulder,
+                                                    fireBaseService.updateBoulder(
+                                                        boulderID: boulder
+                                                            .boulderID,
+                                                        climberTopped:
+                                                            updateClimberToppedMap(
+                                                                currentProfile:
+                                                                    currentProfile,
                                                                 attempts:
                                                                     attempts,
                                                                 existingData:
-                                                                    currentProfile
-                                                                        .climbedBoulders));
+                                                                    boulder
+                                                                        .climberTopped));
                                                   });
                                                 },
                                               ),
@@ -455,18 +425,19 @@ Future<bool> showBoulderInformation(
                                                 onPressed: () {
                                                   setState(() {
                                                     attempts++;
-                                                    fireBaseService.updateUser(
-                                                        currentProfile:
-                                                            currentProfile,
-                                                        climbedBoulders:
-                                                            updateClimbedBouldersMap(
-                                                                boulder:
-                                                                    boulder,
+
+                                                    fireBaseService.updateBoulder(
+                                                        boulderID: boulder
+                                                            .boulderID,
+                                                        climberTopped:
+                                                            updateClimberToppedMap(
+                                                                currentProfile:
+                                                                    currentProfile,
                                                                 attempts:
                                                                     attempts,
                                                                 existingData:
-                                                                    currentProfile
-                                                                        .climbedBoulders));
+                                                                    boulder
+                                                                        .climberTopped));
                                                     if (attempts > 1) {
                                                       flashed = false;
                                                     }
@@ -829,9 +800,10 @@ Future<bool> showBoulderInformation(
                                       if (challengeMap == null) {
                                         challengeCompleted = false;
                                       } else {
-                                        challengeCompleted = (challengeMap[
-                                                "completed"] )
-                                            .contains(currentProfile.displayName);
+                                        challengeCompleted =
+                                            (challengeMap["completed"])
+                                                .contains(
+                                                    currentProfile.displayName);
                                       }
 
                                       return ExpansionPanelList(
@@ -965,7 +937,8 @@ Future<bool> showBoulderInformation(
                                                                         boulderChallenges: updateBoulderChallengeMap(
                                                                             currentChallenge:
                                                                                 currentChallenge!,
-                                                                                removeUser: false,
+                                                                            removeUser:
+                                                                                false,
                                                                             completed:
                                                                                 true,
                                                                             currentProfile:
@@ -977,7 +950,8 @@ Future<bool> showBoulderInformation(
                                                                             points:
                                                                                 challengeMap["points"],
                                                                             existingData: currentProfile.challengePoints));
-                                                                            challengeCompleted = true;
+                                                                    challengeCompleted =
+                                                                        true;
                                                                   }
                                                                 },
                                                                 child: Text(
@@ -1035,7 +1009,9 @@ Future<bool> showBoulderInformation(
                                                       )
                                               ],
                                             ),
-                                             isExpanded: (challenge != "create") ? isExpanded : true,
+                                            isExpanded: (challenge != "create")
+                                                ? isExpanded
+                                                : true,
                                           ),
                                         ],
                                         expansionCallback:
@@ -1140,11 +1116,11 @@ Map<String, dynamic>? updateUsersVotedForGrade(
 void updateUserReapet(FirebaseCloudStorage userService,
     CloudProfile currentProfile, CloudBoulder boulder, int newRepeats) {
   int currentRepeats =
-      currentProfile.climbedBoulders![boulder.boulderID]["newRepeats"];
+      boulder.climberTopped![currentProfile.userID]["newRepeats"];
   double orgBoulderPoints =
-      currentProfile.climbedBoulders![boulder.boulderID]["boulderPoints"];
+      boulder.climberTopped![currentProfile.userID]["boulderPoints"];
   double orgRepeatPoints =
-      currentProfile.climbedBoulders![boulder.boulderID]["boulderPoints"] ?? 0;
+      boulder.climberTopped![currentProfile.userID]["boulderPoints"] ?? 0;
   double repeatPoints;
 
   if (newRepeats > currentRepeats) {
@@ -1158,13 +1134,8 @@ void updateUserReapet(FirebaseCloudStorage userService,
   double newRepeatPoints = orgRepeatPoints + repeatPoints;
   userService.updateUser(
       boulderPoints: updatePoints(
-          points: repeatPoints, existingData: currentProfile.boulderPoints),
-      currentProfile: currentProfile,
-      climbedBoulders: updateClimbedBouldersMap(
-          boulder: boulder,
-          repeats: newRepeats,
-          repeatPoints: newRepeatPoints,
-          existingData: currentProfile.climbedBoulders));
+          points: newRepeatPoints, existingData: currentProfile.boulderPoints),
+      currentProfile: currentProfile);
 }
 
 double calculateRepeatPoints(CloudProfile currentProfile, CloudBoulder boulder,
@@ -1180,11 +1151,23 @@ double calculateRepeatPoints(CloudProfile currentProfile, CloudBoulder boulder,
 
 int checkGrade(CloudProfile currentProfile, String boulderID, String style) {
   int maxValue = 0;
-  for (String boulder in currentProfile.climbedBoulders!.keys) {
-    if (boulderID != boulder) {
-      int gradeForBoulder = currentProfile.climbedBoulders![boulder][style];
-      if (maxValue < gradeForBoulder) {
-        maxValue = gradeForBoulder;
+  DateTime currentDate = DateTime.now();
+  int year = currentDate.year.toInt();
+  int currentMonth = currentDate.month.toInt();
+  int boulderGrade = 0;
+  for (var month in currentProfile.dateBoulderTopped![year]!) {
+    for (var week in currentProfile.dateBoulderTopped![year]![month]) {
+      if (currentMonth - month < 2) {
+        for (var day in currentProfile.dateBoulderTopped![year]![month][week]) {
+          for (var boulder in currentProfile.dateBoulderTopped![year]![month]
+              [week][day]) {
+            boulderGrade = currentProfile.dateBoulderTopped![year]![month][week]
+                [day][boulder]["gradeSetter"];
+            if (maxValue < boulderGrade) {
+              maxValue = boulderGrade;
+            }
+          }
+        }
       }
     }
   }
@@ -1227,9 +1210,9 @@ double calculateboulderPoints(CloudProfile currentProfile, CloudBoulder boulder,
         flashed,
       );
   // Check if the user have points from this boulder
-  if (currentProfile.climbedBoulders != null) {
-    if (currentProfile.climbedBoulders!.containsKey((boulder.boulderID))) {
-      if (currentProfile.climbedBoulders![boulder.boulderID]["topped"]) {
+  if (boulder.climberTopped != null) {
+    if (boulder.climberTopped!.containsKey((currentProfile.userID))) {
+      if (boulder.climberTopped![boulder.boulderID]["topped"]) {
         boulderPoints = boulderPoints *
             (repeats > 0
                 ? repeatsMultiplier - (repeats - 1) * repeatsDecrement
@@ -1241,7 +1224,7 @@ double calculateboulderPoints(CloudProfile currentProfile, CloudBoulder boulder,
 }
 
 void updateUserRemovedFlashed(
-    FirebaseCloudStorage userService,
+    FirebaseCloudStorage firebaseService,
     CloudProfile currentProfile,
     CloudBoulder boulder,
     bool flashed,
@@ -1251,7 +1234,6 @@ void updateUserRemovedFlashed(
   int maxFlahsedGrade;
   double pointsForTop;
   double pointsForFlash;
-  double orgBoulderPoints;
   double boulderPoints;
   if (boulder.gradeNumberSetter == currentProfile.maxFlahsedGrade) {
     maxFlahsedGrade = checkGrade(currentProfile, boulder.boulderID, "flashed");
@@ -1259,31 +1241,39 @@ void updateUserRemovedFlashed(
     maxFlahsedGrade = currentProfile.maxFlahsedGrade;
   }
   pointsForFlash =
-      -currentProfile.climbedBoulders![boulder.boulderID]["boulderPoints"];
+      -boulder.climberTopped![currentProfile.userID]["boulderPoints"];
 
   pointsForTop =
       calculateboulderPoints(currentProfile, boulder, repeats, flashed);
 
   boulderPoints = pointsForTop - pointsForFlash;
-  orgBoulderPoints = pointsForTop;
 
-  userService.updateUser(
+  firebaseService.updateBoulder(
+    boulderID: boulder.boulderID,
+    climberTopped: updateClimberToppedMap(
+        currentProfile: currentProfile,
+        attempts: attempts,
+        repeats: repeats,
+        flashed: flashed,
+        topped: topped,
+        existingData: boulder.climberTopped),
+  );
+
+  firebaseService.updateUser(
       boulderPoints: updatePoints(
           points: boulderPoints, existingData: currentProfile.boulderPoints),
       currentProfile: currentProfile,
       maxFlahsedGrade: maxFlahsedGrade,
-      climbedBoulders: updateClimbedBouldersMap(
+      dateBoulderTopped: updateDateBoulderToppedMap(
           boulder: boulder,
-          topped: topped,
+          userID: currentProfile.userID,
           flashed: flashed,
-          attempts: attempts,
-          repeats: repeats,
-          boulderPoints: orgBoulderPoints,
-          existingData: currentProfile.climbedBoulders));
+          maxFlahsedGrade: maxFlahsedGrade,
+          existingData: currentProfile.dateBoulderTopped));
 }
 
 void updateUserUndoTop(
-  FirebaseCloudStorage userService,
+  FirebaseCloudStorage firebaseService,
   CloudProfile currentProfile,
   CloudBoulder boulder,
 ) {
@@ -1300,24 +1290,38 @@ void updateUserUndoTop(
   } else {
     maxToppedGrade = currentProfile.maxToppedGrade;
   }
-  if (currentProfile.climbedBoulders![boulder.boulderID] != null) {
-    orgBoulderPoints = -(currentProfile.climbedBoulders![boulder.boulderID]
+  if (boulder.climberTopped![currentProfile.userID] != null) {
+    orgBoulderPoints = -(boulder.climberTopped![currentProfile.userID]
                 ["boulderPoints"] ??
             0.0) -
-        (currentProfile.climbedBoulders![boulder.boulderID]["repeatPoints"] ??
-            0.0);
+        (boulder.climberTopped![currentProfile.userID]["repeatPoints"] ?? 0.0);
   } else {
     orgBoulderPoints = defaultBoulderPoints;
   }
 
-  userService.updateUser(
+  firebaseService.updateBoulder(
+      boulderID: boulder.boulderID,
+      climberTopped: updateClimberToppedMap(
+          currentProfile: currentProfile,
+          attempts: 0,
+          flashed: false,
+          topped: false,
+          repeats: 0,
+          boulderPoints: orgBoulderPoints,
+          existingData: boulder.climberTopped));
+
+  firebaseService.updateUser(
       currentProfile: currentProfile,
       boulderPoints: updatePoints(
           points: orgBoulderPoints, existingData: currentProfile.boulderPoints),
       maxFlahsedGrade: maxFlahsedGrade,
       maxToppedGrade: maxToppedGrade,
-      climbedBoulders: removeClimbedBouldersMap(
-          boulder: boulder, existingData: currentProfile.climbedBoulders));
+      dateBoulderTopped: removeDateBoulderToppedMap(
+          boulder: boulder,
+          userID: currentProfile.userID,
+          maxFlahsedGrade: maxFlahsedGrade,
+          maxToppedGrade: maxToppedGrade,
+          existingData: currentProfile.dateBoulderTopped));
 }
 
 void updateUserTopped(
@@ -1328,7 +1332,6 @@ void updateUserTopped(
     bool topped,
     int attempts,
     int repeats) {
-  double orgBoulderPoints;
   double boulderPoints;
   int maxFlahsedGrade;
   int maxToppedGrade;
@@ -1346,16 +1349,17 @@ void updateUserTopped(
   boulderPoints =
       calculateboulderPoints(currentProfile, boulder, repeats, flashed);
 
-  orgBoulderPoints = currentProfile.climbedBoulders?[boulder.boulderID]
-                  ?.containsKey('topped') ==
-              true &&
-          currentProfile.climbedBoulders![boulder.boulderID]!['topped'] ==
-              true &&
-          currentProfile.climbedBoulders![boulder.boulderID]
-                  ?['boulderPoints'] !=
-              null
-      ? currentProfile.climbedBoulders![boulder.boulderID]!['boulderPoints']
-      : boulderPoints;
+  firebaseService.updateBoulder(
+      boulderID: boulder.boulderID,
+      climberTopped: updateClimberToppedMap(
+          currentProfile: currentProfile,
+          attempts: attempts,
+          repeats: repeats,
+          flashed: flashed,
+          topped: topped,
+          toppedDate: DateTime.now(),
+          boulderPoints: boulderPoints,
+          existingData: boulder.climberTopped));
 
   firebaseService.updateUser(
       boulderPoints: updatePoints(
@@ -1363,14 +1367,13 @@ void updateUserTopped(
       currentProfile: currentProfile,
       maxFlahsedGrade: maxFlahsedGrade,
       maxToppedGrade: maxToppedGrade,
-      climbedBoulders: updateClimbedBouldersMap(
+      dateBoulderTopped: updateDateBoulderToppedMap(
           boulder: boulder,
-          topped: topped,
+          userID: currentProfile.userID,
           flashed: flashed,
-          attempts: attempts,
-          repeats: repeats,
-          boulderPoints: orgBoulderPoints,
-          existingData: currentProfile.climbedBoulders));
+          maxFlahsedGrade: maxFlahsedGrade,
+          maxToppedGrade: maxToppedGrade,
+          existingData: currentProfile.dateBoulderTopped));
 }
 
 SizedBox climberTopList(List<Map<String, dynamic>> toppersList) {

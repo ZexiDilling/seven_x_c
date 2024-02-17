@@ -11,6 +11,7 @@ const holdColourFieledName = "holdColour";
 const gradeColourFieledName = "gradeColour";
 const gradingSetterFieldName = "gradeNumberSetter";
 const gradingClimbersFieldName = "gradeNumberClimbers";
+
 const topOutFieldName = "topOut";
 const boulderChallengesFieldName = "boulderChallenges";
 const activeFieldName = "active";
@@ -31,6 +32,7 @@ const isAdminFieldName = "isAdmin";
 const settingsIDFieldName = "settingsID";
 const isAnonymousFieldName = "isAnonymous";
 const climbedBouldersFieldName = "climbedBoulders";
+const dateBoulderToppedFieldName = "dateBoulderTopped";
 const setBouldersFieldName = "setBoulders";
 const challengeProfileFieldName = "challengeProfile";
 const compProfileFieldName = "compProfile";

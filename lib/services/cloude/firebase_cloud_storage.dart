@@ -82,7 +82,7 @@ class FirebaseCloudStorage {
       throw CouldNotUpdateBoulderException();
     }
   }
-  
+
   Stream<Iterable<CloudBoulder>> getAllBoulders(bool showDeactivatedBoulders) {
     final Stream<Iterable<CloudBoulder>> allBoulders;
     if (showDeactivatedBoulders) {
@@ -223,6 +223,7 @@ class FirebaseCloudStorage {
     String? settingsID,
     bool? isAnonymous,
     Map<String, dynamic>? climbedBoulders,
+    Map<int, dynamic>? dateBoulderTopped,
     Map<String, dynamic>? setBoulders,
     Map<String, dynamic>? challengeProfile,
     Map<String, dynamic>? compProfile,
@@ -232,7 +233,6 @@ class FirebaseCloudStorage {
     int? maxFlahsedGrade,
     int? maxToppedGrade,
   }) async {
-    print(climbedBoulders);
     try {
       // Create a map to store non-null fields and their values
       final Map<String, dynamic> updatedData = {};
@@ -254,6 +254,9 @@ class FirebaseCloudStorage {
       if (isAnonymous != null) updatedData[isAnonymousFieldName] = isAnonymous;
       if (climbedBoulders != null) {
         updatedData[climbedBouldersFieldName] = climbedBoulders;
+      }
+      if (dateBoulderTopped != null) {
+        updatedData[dateBoulderToppedFieldName] = dateBoulderTopped;
       }
       if (setBoulders != null) updatedData[setBouldersFieldName] = setBoulders;
       if (challengeProfile != null) {
@@ -289,6 +292,7 @@ class FirebaseCloudStorage {
     required String settingsID,
     required bool isAnonymous,
     Map<String, dynamic>? climbedBoulders,
+    Map<int, dynamic>? dateBoulderTopped,
     Map<String, dynamic>? setBoulders,
     Map<String, dynamic>? challengeProfile,
     Map<String, dynamic>? comp,
@@ -310,6 +314,8 @@ class FirebaseCloudStorage {
       settingsIDFieldName: settingsID,
       isAnonymousFieldName: isAnonymous,
       if (climbedBoulders != null) climbedBouldersFieldName: climbedBoulders,
+      if (dateBoulderTopped != null)
+        dateBoulderToppedFieldName: dateBoulderTopped,
       if (setBoulders != null) setBouldersFieldName: setBoulders,
       if (challengeProfile != null) challengeProfileFieldName: challengeProfile,
       if (comp != null) compBoulderFieldName: comp,
@@ -332,6 +338,7 @@ class FirebaseCloudStorage {
       settingsID,
       isAnonymous,
       climbedBoulders,
+      dateBoulderTopped,
       setBoulders,
       challengeProfile,
       comp,

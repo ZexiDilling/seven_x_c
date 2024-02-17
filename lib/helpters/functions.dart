@@ -36,43 +36,98 @@ Map<String, dynamic> updateClimberBoulderSetMap(
   return bouldersClimbedData;
 }
 
-Map<String, dynamic> removeClimbedBouldersMap(
+Map<int, dynamic> removeDateBoulderToppedMap(
     {required CloudBoulder boulder,
-    required Map<String, dynamic>? existingData}) {
-  String? boulderID = boulder.boulderID;
-  Map<String, dynamic> bouldersClimbedData = existingData ?? {};
-  bouldersClimbedData.remove(boulderID.toString());
-  return bouldersClimbedData;
+    required userID,
+    required int maxFlahsedGrade,
+    required int maxToppedGrade,
+    required Map<int, dynamic>? existingData}) {
+  String boulderID = boulder.boulderID;
+  Map<int, dynamic> dateBoulder = existingData ?? {};
+
+  DateTime boulderDate = boulder.climberTopped![userID]["dateTopped"];
+
+  int boulderYear = boulderDate.year.toInt();
+  int boulderMonth = boulderDate.month.toInt();
+  int boulderWeek = getIsoWeekNumber(boulderDate);
+  int boulderDay = boulderDate.day.toInt();
+
+  dateBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
+      .remove(boulderID.toString());
+
+  dateBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
+      ["maxFlahsedGrade"] = maxFlahsedGrade;
+  dateBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
+      ["maxToppedGrade"] = maxToppedGrade;
+
+  return dateBoulder;
 }
 
-Map<String, dynamic> updateClimbedBouldersMap(
-    {required CloudBoulder boulder,
-    int? attempts,
-    bool? flashed,
-    int? repeats,
-    bool? topped,
-    String? gradeColour,
-    int? gradeArrow,
-    double? boulderPoints,
-    double? repeatPoints,
-    Map<String, dynamic>? existingData}) {
-  String? boulderID = boulder.boulderID;
-  int? gradeNumberBoulder = boulder.gradeNumberSetter;
-  Map<String, dynamic> newData = {
-    "gradeNumber": gradeNumberBoulder,
-    'attempts': attempts,
-    "repeats": repeats,
-    "topped": topped,
-    'flashed': flashed,
-    "boulderPoints": boulderPoints,
-    "repeatPoints": repeatPoints,
-    "date": DateTime.now()
-  };
-  
-  Map<String, dynamic> bouldersClimbedData = existingData ?? {};
-  bouldersClimbedData[boulderID.toString()] = newData;
+Map<int, dynamic> updateDateBoulderToppedMap({
+  required CloudBoulder boulder,
+  required String userID,
+  required bool flashed,
+  int? maxFlahsedGrade,
+  int? maxToppedGrade,
+  Map<int, dynamic>? existingData,
+}) {
+  String gradeColour = boulder.gradeColour;
+  int gradeNumberSetter = boulder.gradeNumberSetter;
 
-  return bouldersClimbedData;
+  DateTime boulderDate = boulder.climberTopped![userID]["dateTopped"];
+
+  int boulderYear = boulderDate.year.toInt();
+  int boulderMonth = boulderDate.month.toInt();
+  int boulderWeek = getIsoWeekNumber(boulderDate);
+  int boulderDay = boulderDate.day.toInt();
+
+  Map<String, dynamic> newData = {
+    "gradeColour": gradeColour,
+    "gradeNumber": gradeNumberSetter,
+    "flashed": flashed,
+  };
+
+  Map<int, dynamic> dateBoulder = existingData ?? {};
+
+  dateBoulder[boulderYear] ??= {};
+  dateBoulder[boulderYear][boulderMonth] ??= {};
+  dateBoulder[boulderYear][boulderMonth][boulderWeek] ??= {};
+  dateBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay] ??= {};
+  dateBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
+      [boulder.boulderID] = newData;
+
+  if (maxFlahsedGrade != null) {
+    if (dateBoulder[boulderYear][boulderMonth][boulderWeek]
+            ["maxFlahsedGrade"] !=
+        null) {
+      if (maxFlahsedGrade >
+          dateBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
+              ["maxFlahsedGrade"]) {
+        dateBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
+            ["maxFlahsedGrade"] = maxFlahsedGrade;
+      }
+    } else {
+      dateBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
+          ["maxFlahsedGrade"] = maxFlahsedGrade;
+    }
+  }
+  if (maxToppedGrade != null) {
+    if (dateBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
+            ["maxToppedGrade"] !=
+        null) {
+      if (maxToppedGrade >
+          dateBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
+              ["maxToppedGrade"]) {
+        dateBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
+            ["maxToppedGrade"] = maxToppedGrade;
+      }
+    } else {
+      dateBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
+          ["maxToppedGrade"] = maxToppedGrade;
+    }
+  }
+
+  return dateBoulder;
 }
 
 double updatePoints({required double points, double? existingData}) {
@@ -199,6 +254,8 @@ Map<String, dynamic> updateClimberToppedMap(
     int? gradeNumberVoted,
     String? gradeColourVoted,
     int? gradeArrowVoted,
+    double? boulderPoints,
+    DateTime? toppedDate,
     Map<String, dynamic>? existingData}) {
   String displayName = currentProfile.displayName;
   bool isAnonymous = currentProfile.isAnonymous;
@@ -208,10 +265,13 @@ Map<String, dynamic> updateClimberToppedMap(
     repeats ??= existingData[userID]["repeats"];
     topped ??= existingData[userID]["topped"];
     flashed ??= existingData[userID]['flashed'];
-    if (existingData[userID] !=null){
-    gradeNumberVoted ??= existingData[userID]["gradeNumber"];
-    gradeColourVoted ??= existingData[userID]["gradeColour"];
-    gradeArrowVoted ??= existingData[userID]["gradeArrow"];}
+    toppedDate ??= existingData[userID]["toppedDate"];
+
+    if (existingData[userID] != null) {
+      gradeNumberVoted ??= existingData[userID]["gradeNumber"];
+      gradeColourVoted ??= existingData[userID]["gradeColour"];
+      gradeArrowVoted ??= existingData[userID]["gradeArrow"];
+    }
   } else {
     existingData = {};
   }
@@ -226,6 +286,8 @@ Map<String, dynamic> updateClimberToppedMap(
     "gradeNumber": gradeNumberVoted,
     "gradeColour": gradeColourVoted,
     "gradeArrow": gradeArrowVoted,
+    "boulderPoints": boulderPoints,
+    "toppedDate": toppedDate,
   };
 
   existingData[userID] = newData;
@@ -235,13 +297,13 @@ Map<String, dynamic> updateClimberToppedMap(
 enum TimePeriod { week, month, semester, year, allTime }
 
 // Map enum values to display strings
-  final Map<TimePeriod, String> timePeriodStrings = {
-    TimePeriod.week: 'Week',
-    TimePeriod.month: 'Month',
-    TimePeriod.semester: 'Semester',
-    TimePeriod.year: 'Year',
-    TimePeriod.allTime: 'All Time',
-  };
+final Map<TimePeriod, String> timePeriodStrings = {
+  TimePeriod.week: 'Week',
+  TimePeriod.month: 'Month',
+  TimePeriod.semester: 'Semester',
+  TimePeriod.year: 'Year',
+  TimePeriod.allTime: 'All Time',
+};
 
 DateTime calculateDateThreshold(TimePeriod timePeriod) {
   DateTime currentTime = DateTime.now();
@@ -488,4 +550,26 @@ String capitalize(String s) {
   return s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }
 
+int getIsoWeekNumber(DateTime date) {
+  DateTime january4th = DateTime(date.year, 1, 4);
+  int daysSinceJanuary4th = date.difference(january4th).inDays;
+  int weekNumber = ((daysSinceJanuary4th + january4th.weekday + 6) / 7).floor();
 
+  if (weekNumber == 0) {
+    // If the date is in the last week of the previous year
+    weekNumber = getIsoWeekNumber(DateTime(date.year - 1, 12, 31));
+  }
+
+  return weekNumber;
+}
+
+DateTime getStartDateOfWeek(int year, int weekNumber) {
+  DateTime january4th = DateTime(year, 1, 4);
+  int daysToAdd = (weekNumber - 1) * 7 - january4th.weekday + 1;
+  return january4th.add(Duration(days: daysToAdd));
+}
+
+DateTime getEndDateOfWeek(int year, int weekNumber) {
+  DateTime startDate = getStartDateOfWeek(year, weekNumber);
+  return startDate.add(Duration(days: 6));
+}

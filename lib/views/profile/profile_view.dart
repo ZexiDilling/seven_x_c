@@ -5,6 +5,7 @@ import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/constants/colours_thems.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/auth/auth_service.dart';
+import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
@@ -34,6 +35,61 @@ class _ProfileViewState extends State<ProfileView> {
     super.initState();
 
     isShowingMainData = true;
+    _updateFirebaseData();
+  }
+
+  _updateFirebaseData() async {
+    if (currentProfile!.climbedBoulders != null) {
+      var boulderIDs = currentProfile!.climbedBoulders!.keys.toList();
+
+      boulderIDs.sort((a, b) {
+        DateTime dateA =
+            DateTime.parse(currentProfile!.climbedBoulders![a]!['date']);
+        DateTime dateB =
+            DateTime.parse(currentProfile!.climbedBoulders![b]!['date']);
+        return dateA.compareTo(dateB);
+      });
+
+      int maxFlahsedGrade = 0;
+      int maxToppedGrade = 0;
+
+      for (var boulderID in boulderIDs) {
+        Stream<Iterable<CloudBoulder>> boulderStream =
+            firebaseService.getBoulder(boulderID: boulderID);
+        Iterable<CloudBoulder> boulders = await boulderStream.first;
+        CloudBoulder currentBoulder = boulders.first;
+        int gradeNumberSetter =
+            currentProfile!.climbedBoulders![boulderID]["gradeNumber"];
+        bool flashed = currentProfile!.climbedBoulders![boulderID]["flashed"];
+        if (flashed && gradeNumberSetter > maxFlahsedGrade) {
+          maxFlahsedGrade = gradeNumberSetter;
+        }
+        if (gradeNumberSetter > maxToppedGrade) {
+          maxToppedGrade = gradeNumberSetter;
+        }
+        DateTime toppedDate =
+            currentProfile!.climbedBoulders![boulderID]["date"];
+        double boulderPoints = currentProfile!.climbedBoulders![boulderID]["boulderPoints"];
+
+        firebaseService.updateBoulder(
+            boulderID: currentBoulder.boulderID,
+            climberTopped: updateClimberToppedMap(
+                currentProfile: currentProfile!,
+                boulderPoints: boulderPoints,
+                toppedDate: toppedDate,
+                existingData: currentBoulder.climberTopped));
+
+        firebaseService.updateUser(
+            currentProfile: currentProfile!,
+            dateBoulderTopped: updateDateBoulderToppedMap(
+                boulder: currentBoulder,
+                userID: currentProfile!.userID,
+                flashed: flashed,
+                maxFlahsedGrade: maxFlahsedGrade,
+                maxToppedGrade: maxToppedGrade));
+        currentProfile!.climbedBoulders!.remove(boulderID);
+      }
+    }
   }
 
   Future<void> _initializeData() async {

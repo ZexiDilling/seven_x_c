@@ -18,6 +18,7 @@ class CloudBoulder {
   final String? boulderName;
   final Map<String, dynamic>? boulderChallenges;
   final Map<String, dynamic>? gradeNumberClimbers;
+
   Map<String, dynamic>? climberTopped;
   final Timestamp setDateBoulder;
   final Timestamp? updateDateBoulder;
@@ -61,9 +62,10 @@ class CloudBoulder {
         gotZone = snapshot.data()[gotZoneFieldName] as bool,
         boulderName = snapshot.data()[boulderNameFieldName] as String?,
         setDateBoulder = snapshot.data()[setDateBoulderFiledName] as Timestamp,
-        updateDateBoulder = snapshot.data()[updateDateBoulderFiledName] as Timestamp,
-        boulderChallenges =
-            snapshot.data()[boulderChallengesFieldName] as Map<String, dynamic>?,
+        updateDateBoulder =
+            snapshot.data()[updateDateBoulderFiledName] as Timestamp,
+        boulderChallenges = snapshot.data()[boulderChallengesFieldName]
+            as Map<String, dynamic>?,
         gradeNumberClimbers =
             snapshot.data()[gradingClimbersFieldName] as Map<String, dynamic>?,
         climberTopped =
