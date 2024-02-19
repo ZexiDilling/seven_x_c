@@ -5,6 +5,7 @@ bug fixes:
 
 Data structure changes:
     Change the way topped data is storred to make it easier to show data
+    Change the way setter data is storred to make it easier to show data
 
     TODO before updating!!!!
     change chart data

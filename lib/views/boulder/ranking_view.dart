@@ -13,6 +13,8 @@ class RankView extends StatefulWidget {
   _RankViewState createState() => _RankViewState();
 }
 
+Map<String, List> semesterMap = {"spring": ["febuary", "marts", "april", "may", "june", "july"],"fall": ["august, september, october, november, december, january"]};
+
 class _RankViewState extends State<RankView> with TickerProviderStateMixin {
   late TabController _tabController;
   List<TimePeriod> dropdownOptions = [
@@ -107,7 +109,7 @@ class RankingTab extends StatelessWidget {
   final TimePeriod timePeriod;
   final FirebaseCloudStorage firebaseService;
 
-  const RankingTab({
+  const RankingTab({super.key, 
     required this.criteria,
     required this.timePeriod,
     required this.firebaseService,
@@ -125,7 +127,7 @@ class RankingTab extends StatelessWidget {
           return Text('Error: ${snapshot.error}');
         } else if (!snapshot.hasData) {
           // Handle case where data is not available
-          return Text('No data available.');
+          return const Text('No data available.');
         } else {
           List<String> rankings = snapshot.data!;
           return SizedBox(
@@ -153,7 +155,6 @@ class RankingTab extends StatelessWidget {
     try {
       // Fetch all users
       Iterable<CloudProfile> users = await userService.getAllUsers().first;
-      print(criteria);
       // Filter users based on different criteria
       Map<String, dynamic> filteredRankings = {};
 
@@ -230,7 +231,6 @@ class RankingTab extends StatelessWidget {
       }
       return mapSorter(filteredRankings);
     } catch (e) {
-      print(e);
       return [];
     }
   }

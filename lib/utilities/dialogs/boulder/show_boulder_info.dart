@@ -1152,12 +1152,13 @@ double calculateRepeatPoints(CloudProfile currentProfile, CloudBoulder boulder,
 int checkGrade(CloudProfile currentProfile, String boulderID, String style) {
   int maxValue = 0;
   DateTime currentDate = DateTime.now();
-  int year = currentDate.year.toInt();
-  int currentMonth = currentDate.month.toInt();
+  String year = currentDate.year.toString();
+  int comparedMonth = currentDate.month.toInt();
+  // String currentMonth = comparedMonth.toString();
   int boulderGrade = 0;
   for (var month in currentProfile.dateBoulderTopped![year]!) {
     for (var week in currentProfile.dateBoulderTopped![year]![month]) {
-      if (currentMonth - month < 2) {
+      if (comparedMonth - month < 2) {
         for (var day in currentProfile.dateBoulderTopped![year]![month][week]) {
           for (var boulder in currentProfile.dateBoulderTopped![year]![month]
               [week][day]) {
@@ -1268,6 +1269,7 @@ void updateUserRemovedFlashed(
           boulder: boulder,
           userID: currentProfile.userID,
           flashed: flashed,
+          boulderPoints: boulderPoints,
           maxFlahsedGrade: maxFlahsedGrade,
           existingData: currentProfile.dateBoulderTopped));
 }
@@ -1371,6 +1373,7 @@ void updateUserTopped(
           boulder: boulder,
           userID: currentProfile.userID,
           flashed: flashed,
+          boulderPoints: boulderPoints,
           maxFlahsedGrade: maxFlahsedGrade,
           maxToppedGrade: maxToppedGrade,
           existingData: currentProfile.dateBoulderTopped));

@@ -10,15 +10,16 @@ class CloudBoulder {
   final String holdColour;
   final String gradeColour;
   final int gradeNumberSetter;
+  final int gradeDifficulty;
   final bool topOut;
   final bool active;
   final bool hiddenGrade;
   final bool compBoulder;
   final bool gotZone;
+  final double? setterPoint;
   final String? boulderName;
   final Map<String, dynamic>? boulderChallenges;
   final Map<String, dynamic>? gradeNumberClimbers;
-
   Map<String, dynamic>? climberTopped;
   final Timestamp setDateBoulder;
   final Timestamp? updateDateBoulder;
@@ -34,11 +35,13 @@ class CloudBoulder {
     this.holdColour,
     this.gradeColour,
     this.gradeNumberSetter,
+    this.gradeDifficulty,
     this.topOut,
     this.active,
     this.hiddenGrade,
     this.compBoulder,
     this.gotZone,
+    this.setterPoint,
     this.boulderName,
     this.setDateBoulder,
     this.updateDateBoulder, {
@@ -55,11 +58,13 @@ class CloudBoulder {
         holdColour = snapshot.data()[holdColourFieledName] as String,
         gradeColour = snapshot.data()[gradeColourFieledName] as String,
         gradeNumberSetter = snapshot.data()[gradingSetterFieldName] as int,
+        gradeDifficulty = snapshot.data()[gradingSetterFieldName] as int,
         topOut = snapshot.data()[topOutFieldName] as bool,
         active = snapshot.data()[activeFieldName] as bool,
         hiddenGrade = snapshot.data()[hiddenGradeFieldName] as bool,
         compBoulder = snapshot.data()[compBoulderFieldName] as bool,
         gotZone = snapshot.data()[gotZoneFieldName] as bool,
+        setterPoint = snapshot.data()[setterPointFieldName] as double?,
         boulderName = snapshot.data()[boulderNameFieldName] as String?,
         setDateBoulder = snapshot.data()[setDateBoulderFiledName] as Timestamp,
         updateDateBoulder =

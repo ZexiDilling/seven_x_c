@@ -32,8 +32,9 @@ Future<void> showAddNewBoulder(
   bool hiddenGrade = compView;
   bool compBoulder = compView;
   String selectedGrade = '';
+  double setterPoints = 0.0;
 
-  int difficultyLevel = 1;
+  int? difficultyLevel;
   // const gradingSystem = "colour";
   // const gradingSystem = "french";
   // const gradingSystem = "v_grade";
@@ -122,14 +123,14 @@ Future<void> showAddNewBoulder(
                                           return DropdownMenuItem(
                                             value: colorName,
                                             child: Container(
-                                                color: nameToColor(
-                                                    currentSettings
-                                                            .settingsGradeColour![
-                                                        colorName]),
+                                                color: nameToColor(currentSettings
+                                                        .settingsGradeColour![
+                                                    colorName]),
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.all(8.0),
-                                                  child: Text(capitalize(colorName)),
+                                                  child: Text(
+                                                      capitalize(colorName)),
                                                 )),
                                           );
                                         }),
@@ -139,13 +140,17 @@ Future<void> showAddNewBoulder(
                                       ),
                                     ),
                                     Slider(
-                                      value: difficultyLevel.toDouble(),
+                                      value: difficultyLevel != null
+                                          ? difficultyLevel!.toDouble()
+                                          : 3.0,
                                       min: 1,
                                       max: 5,
                                       divisions:
                                           4, // Number of divisions between min and max values
-                                      label: arrowDict()[difficultyLevel]![
-                                          'difficulty'],
+                                      label: difficultyLevel != null
+                                          ? arrowDict()[difficultyLevel]![
+                                              'difficulty']
+                                          : arrowDict()[3]!['difficulty'],
                                       onChanged: (double value) {
                                         setState(() {
                                           difficultyLevel = value.toInt();
@@ -278,7 +283,12 @@ Future<void> showAddNewBoulder(
                           } else {
                             if (selectedGrade == "") {
                               gradeValue = difficultyLevelToArrow(
-                                  difficultyLevel, gradeColorChoice!);
+                                  difficultyLevel!, gradeColorChoice!);
+                            } 
+                            if (difficultyLevel == null) {
+
+                              var arrow = getArrowFromNumberAndColor(gradeValue, gradeColorChoice!);
+                              difficultyLevel = getdifficultyFromArrow(arrow);
                             }
                             if (compView && !compBoulder) {
                               // Show a confirmation dialog
@@ -290,9 +300,15 @@ Future<void> showAddNewBoulder(
                                 compBoulder = !compBoulder;
                               }
                             }
-
                             CloudBoulder? newBoulder;
                             try {
+                              var setterProfiles = await fireBaseService
+                                  .getUserFromDisplayName(selectedSetter)
+                                  .first;
+                              CloudProfile setterProfile = setterProfiles.first;
+
+                              setterPoints = calculateSetterPoints(
+                                  setterProfile, gradeColorChoice!);
                               newBoulder =
                                   await fireBaseService.createNewBoulder(
                                       setter: setterTeam == true
@@ -306,11 +322,13 @@ Future<void> showAddNewBoulder(
                                       holdColour: holdColorChoice!,
                                       gradeColour: gradeColorChoice!,
                                       gradeNumberSetter: gradeValue,
+                                      gradeDifficulty: difficultyLevel!,
                                       topOut: topOut,
                                       active: true,
                                       hiddenGrade: hiddenGrade,
                                       compBoulder: compBoulder,
                                       gotZone: gotZone,
+                                      setterPoint: setterPoints,
                                       setDateBoulder: Timestamp.now());
                             } catch (e) {
                               if (e.toString().contains(
@@ -347,16 +365,13 @@ Future<void> showAddNewBoulder(
                                       .first;
                                   CloudProfile setterProfile =
                                       setterProfiles.first;
-
-                                  double setterPoints = calculateSetterPoints(
-                                      setterProfile, newBoulder);
                                   await fireBaseService.updateUser(
                                     currentProfile: setterProfile,
-                                    setBoulders: updateBoulderSet(
-                                      currentProfile: setterProfile,
+                                    dateBoulderSet: updateBoulderSet(
+                                      setterProfile: setterProfile,
                                       newBoulder: newBoulder,
-                                      setterPoints: setterPoints,
-                                      existingData: setterProfile.setBoulders,
+                                      existingData:
+                                          setterProfile.dateBoulderSet,
                                     ),
                                     setterPoints: updatePoints(
                                         points: setterPoints,
@@ -391,16 +406,16 @@ Future<void> showAddNewBoulder(
       });
 }
 
-double calculateSetterPoints(setterProfile, newBoulder) {
+double calculateSetterPoints(setterProfile, String boulderGradeColour) {
   // Calculate points based on the conditions
   double points = defaultSetterPoints;
   // Get the setBoulders map from the setterProfile
   Map<String, dynamic> setBoulders = setterProfile.setBoulders ?? {};
-
+  String currentGradeColour = boulderGradeColour;
   // Bonus points for green and yellow
-  if (newBoulder.gradeColour.toLowerCase() == 'green') {
+  if (currentGradeColour.toLowerCase() == 'green') {
     points += 3;
-  } else if (newBoulder.gradeColour.toLowerCase() == 'yellow') {
+  } else if (currentGradeColour.toLowerCase() == 'yellow') {
     points += 2;
   }
 
@@ -410,17 +425,17 @@ double calculateSetterPoints(setterProfile, newBoulder) {
   }
 
   // Extracting colours from setBoulders
-  List<String> gradeColour = [];
+  List<String> gradeColours = [];
   for (var boulderData in setBoulders.values) {
     if (boulderData is Map<String, dynamic> &&
         boulderData['gradeColour'] is String) {
-      gradeColour.add(boulderData['gradeColour']);
+      gradeColours.add(boulderData['gradeColour']);
     }
   }
 
   // Count occurrences of each colour
   Map<String, int> colourOccurrences = {};
-  for (String colour in gradeColour) {
+  for (String colour in gradeColours) {
     colourOccurrences[colour] = (colourOccurrences[colour] ?? 0) + 1;
   }
 
@@ -433,7 +448,7 @@ double calculateSetterPoints(setterProfile, newBoulder) {
       mostCreatedColours.isEmpty ? '' : mostCreatedColours.last;
 
   // Get the index of the newBoulder's gradeColour in the most created colours list
-  int gradeColourIndex = mostCreatedColours.indexOf(newBoulder.gradeColour);
+  int gradeColourIndex = mostCreatedColours.indexOf(currentGradeColour);
 
   if (gradeColourIndex == 0) {
     // Same as most created colour
@@ -447,7 +462,7 @@ double calculateSetterPoints(setterProfile, newBoulder) {
   }
 
   // Bonus points for least created colour
-  if (newBoulder.gradeColour == leastCreatedColour) {
+  if (currentGradeColour == leastCreatedColour) {
     points += 2;
   }
 

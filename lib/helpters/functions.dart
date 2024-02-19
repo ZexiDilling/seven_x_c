@@ -1,3 +1,4 @@
+
 import 'package:seven_x_c/constants/comp_const.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
@@ -36,21 +37,21 @@ Map<String, dynamic> updateClimberBoulderSetMap(
   return bouldersClimbedData;
 }
 
-Map<int, dynamic> removeDateBoulderToppedMap(
+Map<String, dynamic> removeDateBoulderToppedMap(
     {required CloudBoulder boulder,
     required userID,
     required int maxFlahsedGrade,
     required int maxToppedGrade,
-    required Map<int, dynamic>? existingData}) {
+    required Map<String, dynamic>? existingData}) {
   String boulderID = boulder.boulderID;
-  Map<int, dynamic> dateBoulder = existingData ?? {};
+  Map<String, dynamic> dateBoulder = existingData ?? {};
 
   DateTime boulderDate = boulder.climberTopped![userID]["dateTopped"];
 
-  int boulderYear = boulderDate.year.toInt();
-  int boulderMonth = boulderDate.month.toInt();
-  int boulderWeek = getIsoWeekNumber(boulderDate);
-  int boulderDay = boulderDate.day.toInt();
+  String boulderYear = boulderDate.year.toString();
+  String boulderMonth = boulderDate.month.toString();
+  String boulderWeek = getIsoWeekNumber(boulderDate).toString();
+  String boulderDay = boulderDate.day.toString();
 
   dateBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
       .remove(boulderID.toString());
@@ -63,31 +64,33 @@ Map<int, dynamic> removeDateBoulderToppedMap(
   return dateBoulder;
 }
 
-Map<int, dynamic> updateDateBoulderToppedMap({
+Map<String, dynamic> updateDateBoulderToppedMap({
   required CloudBoulder boulder,
   required String userID,
   required bool flashed,
+  required boulderPoints,
   int? maxFlahsedGrade,
   int? maxToppedGrade,
-  Map<int, dynamic>? existingData,
+  Map<String, dynamic>? existingData,
 }) {
   String gradeColour = boulder.gradeColour;
   int gradeNumberSetter = boulder.gradeNumberSetter;
 
-  DateTime boulderDate = boulder.climberTopped![userID]["dateTopped"];
+  DateTime boulderDate = boulder.climberTopped![userID]["toppedDate"];
 
-  int boulderYear = boulderDate.year.toInt();
-  int boulderMonth = boulderDate.month.toInt();
-  int boulderWeek = getIsoWeekNumber(boulderDate);
-  int boulderDay = boulderDate.day.toInt();
+  String boulderYear = boulderDate.year.toString();
+  String boulderMonth = boulderDate.month.toString();
+  String boulderWeek = getIsoWeekNumber(boulderDate).toString();
+  String boulderDay = boulderDate.day.toString();
 
   Map<String, dynamic> newData = {
     "gradeColour": gradeColour,
     "gradeNumber": gradeNumberSetter,
     "flashed": flashed,
+    "points": boulderPoints,
   };
 
-  Map<int, dynamic> dateBoulder = existingData ?? {};
+  Map<String, dynamic> dateBoulder = existingData ?? {};
 
   dateBoulder[boulderYear] ??= {};
   dateBoulder[boulderYear][boulderMonth] ??= {};
@@ -163,24 +166,31 @@ Map<String, dynamic> updateBoulderCompSet({
 }
 
 Map<String, dynamic> updateBoulderSet(
-    {required CloudProfile currentProfile,
+    {required CloudProfile setterProfile,
     required CloudBoulder newBoulder,
-    required double setterPoints,
     Map<String, dynamic>? existingData}) {
-  String boulderID = newBoulder.boulderID;
+  DateTime boulderDate = newBoulder.setDateBoulder as DateTime;
+
+  String boulderYear = boulderDate.year.toString();
+  String boulderMonth = boulderDate.month.toString();
+  String boulderWeek = getIsoWeekNumber(boulderDate).toString();
+  String boulderDay = boulderDate.day.toString();
 
   Map<String, dynamic> newData = {
-    'holdColour': newBoulder.holdColour,
-    'gradeColour': newBoulder.gradeColour,
-    'gradeNumberSetter': newBoulder.gradeNumberSetter,
-    'topOut': newBoulder.topOut,
-    'compBoulder': newBoulder.compBoulder,
-    'setDateBoulder': newBoulder.setDateBoulder,
-    "setterPoints": setterPoints,
+    "holdColour": newBoulder.holdColour,
+    "gradeColour": newBoulder.gradeColour,
+    "gradeNumberSetter": newBoulder.gradeNumberSetter,
+    "gradeDifficulty": newBoulder.gradeDifficulty,
   };
 
   Map<String, dynamic> setBoulder = existingData ?? {};
-  setBoulder[boulderID] = newData;
+
+  setBoulder[boulderYear] ??= {};
+  setBoulder[boulderYear][boulderMonth] ??= {};
+  setBoulder[boulderYear][boulderMonth][boulderWeek] ??= {};
+  setBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay] ??= {};
+  setBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
+      [newBoulder.boulderID] = newData;
 
   return setBoulder;
 }
@@ -260,14 +270,14 @@ Map<String, dynamic> updateClimberToppedMap(
   String displayName = currentProfile.displayName;
   bool isAnonymous = currentProfile.isAnonymous;
   String userID = currentProfile.userID;
-  if (existingData != null && existingData.isNotEmpty) {
-    attempts ??= existingData[userID]['attempts'];
-    repeats ??= existingData[userID]["repeats"];
-    topped ??= existingData[userID]["topped"];
-    flashed ??= existingData[userID]['flashed'];
-    toppedDate ??= existingData[userID]["toppedDate"];
 
+  if (existingData != null && existingData.isNotEmpty) {
     if (existingData[userID] != null) {
+      attempts ??= existingData[userID]['attempts'];
+      repeats ??= existingData[userID]["repeats"];
+      topped ??= existingData[userID]["topped"];
+      flashed ??= existingData[userID]['flashed'];
+      toppedDate ??= existingData[userID]["toppedDate"];
       gradeNumberVoted ??= existingData[userID]["gradeNumber"];
       gradeColourVoted ??= existingData[userID]["gradeColour"];
       gradeArrowVoted ??= existingData[userID]["gradeArrow"];
@@ -571,5 +581,5 @@ DateTime getStartDateOfWeek(int year, int weekNumber) {
 
 DateTime getEndDateOfWeek(int year, int weekNumber) {
   DateTime startDate = getStartDateOfWeek(year, weekNumber);
-  return startDate.add(Duration(days: 6));
+  return startDate.add(const Duration(days: 6));
 }

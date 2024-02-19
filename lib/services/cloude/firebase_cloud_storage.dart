@@ -33,11 +33,13 @@ class FirebaseCloudStorage {
     String? holdColour,
     String? gradeColour,
     int? gradeNumberSetter,
+    int? gradeDifficulty,
     bool? topOut,
     bool? active,
     bool? hiddenGrade,
     bool? compBoulder,
     bool? gotZone,
+    double? setterPoint,
     String? boulderName,
     Timestamp? updateDateBoulder,
     Map<String, dynamic>? boulderChallenges,
@@ -58,11 +60,15 @@ class FirebaseCloudStorage {
       if (gradeNumberSetter != null) {
         updatedData[gradingSetterFieldName] = gradeNumberSetter;
       }
+      if (gradeDifficulty != null) {
+        updatedData[gradeDifficultyFieldName] = gradeDifficulty;
+      }
       if (topOut != null) updatedData[topOutFieldName] = topOut;
       if (active != null) updatedData[activeFieldName] = active;
       if (hiddenGrade != null) updatedData[hiddenGradeFieldName] = hiddenGrade;
       if (compBoulder != null) updatedData[compBoulderFieldName] = compBoulder;
       if (gotZone != null) updatedData[gotZoneFieldName] = gotZone;
+      if (setterPoint != null) updatedData[setterPointFieldName] = setterPoint;
       if (boulderName != null) updatedData[boulderNameFieldName] = boulderName;
       if (updateDateBoulder != null) {
         updatedData[updateDateBoulderFiledName] = updateDateBoulder;
@@ -98,6 +104,7 @@ class FirebaseCloudStorage {
     return allBoulders;
   }
 
+
   Stream<Iterable<CloudBoulder>> getBoulder({required String boulderID}) {
     final allBoulders = bouldersCollection
         .where(boulderID, isEqualTo: boulderID)
@@ -115,12 +122,14 @@ class FirebaseCloudStorage {
     required String holdColour,
     required String gradeColour,
     required int gradeNumberSetter,
+    required int gradeDifficulty,
     required bool topOut,
     required bool active,
     required bool hiddenGrade,
     required bool compBoulder,
     required bool gotZone,
     required Timestamp setDateBoulder,
+    required double setterPoint,
     Timestamp? updateDateBoulder,
     Map<String, dynamic>? boulderChallenges,
     Map<String, dynamic>? gradeNumberClimber,
@@ -135,6 +144,7 @@ class FirebaseCloudStorage {
       holdColourFieledName: holdColour,
       gradeColourFieledName: gradeColour,
       gradingSetterFieldName: gradeNumberSetter,
+      gradeDifficultyFieldName: gradeDifficulty,
       topOutFieldName: topOut,
       activeFieldName: active,
       hiddenGradeFieldName: hiddenGrade,
@@ -143,6 +153,7 @@ class FirebaseCloudStorage {
       boulderNameFieldName: boulderName,
       setDateBoulderFiledName: setDateBoulder,
       updateDateBoulderFiledName: setDateBoulder,
+      setterPointFieldName: setterPoint,
       if (boulderChallenges != null)
         boulderChallengesFieldName: boulderChallenges,
       if (gradeNumberClimber != null)
@@ -161,11 +172,13 @@ class FirebaseCloudStorage {
       holdColour,
       gradeColour,
       gradeNumberSetter,
+      gradeDifficulty,
       topOut,
       active,
       hiddenGrade,
       compBoulder,
       gotZone,
+      setterPoint,
       boulderName,
       setDateBoulder,
       setDateBoulder,
@@ -223,7 +236,8 @@ class FirebaseCloudStorage {
     String? settingsID,
     bool? isAnonymous,
     Map<String, dynamic>? climbedBoulders,
-    Map<int, dynamic>? dateBoulderTopped,
+    Map<String, dynamic>? dateBoulderTopped,
+    Map<String, dynamic>? dateBoulderSet,
     Map<String, dynamic>? setBoulders,
     Map<String, dynamic>? challengeProfile,
     Map<String, dynamic>? compProfile,
@@ -232,7 +246,7 @@ class FirebaseCloudStorage {
     String? gradingSystem,
     int? maxFlahsedGrade,
     int? maxToppedGrade,
-  }) async {
+  }) async {    
     try {
       // Create a map to store non-null fields and their values
       final Map<String, dynamic> updatedData = {};
@@ -257,6 +271,9 @@ class FirebaseCloudStorage {
       }
       if (dateBoulderTopped != null) {
         updatedData[dateBoulderToppedFieldName] = dateBoulderTopped;
+      }
+      if (dateBoulderSet != null) {
+        updatedData[dateBoulderSetFieldName] = dateBoulderSet;
       }
       if (setBoulders != null) updatedData[setBouldersFieldName] = setBoulders;
       if (challengeProfile != null) {
@@ -292,7 +309,8 @@ class FirebaseCloudStorage {
     required String settingsID,
     required bool isAnonymous,
     Map<String, dynamic>? climbedBoulders,
-    Map<int, dynamic>? dateBoulderTopped,
+    Map<String, dynamic>? dateBoulderTopped,
+    Map<String, dynamic>? dateBoulderSet,
     Map<String, dynamic>? setBoulders,
     Map<String, dynamic>? challengeProfile,
     Map<String, dynamic>? comp,
@@ -316,6 +334,7 @@ class FirebaseCloudStorage {
       if (climbedBoulders != null) climbedBouldersFieldName: climbedBoulders,
       if (dateBoulderTopped != null)
         dateBoulderToppedFieldName: dateBoulderTopped,
+      if (dateBoulderSet != null) dateBoulderSetFieldName: dateBoulderSet,
       if (setBoulders != null) setBouldersFieldName: setBoulders,
       if (challengeProfile != null) challengeProfileFieldName: challengeProfile,
       if (comp != null) compBoulderFieldName: comp,
@@ -339,6 +358,7 @@ class FirebaseCloudStorage {
       isAnonymous,
       climbedBoulders,
       dateBoulderTopped,
+      dateBoulderSet,
       setBoulders,
       challengeProfile,
       comp,

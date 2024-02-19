@@ -163,6 +163,7 @@ Fix challenges to work.
 
 Fix states on profile view
 
+Remove setter points and re-calc + update on the new setter if they are differet than "DTU Setter Team" and "Geust setters"
 
 
 Make it possible to adjust the sections. 
