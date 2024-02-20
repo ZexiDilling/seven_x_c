@@ -4,7 +4,7 @@ import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 
-
+ 
 double barRoundness = 2;
 double barWidth = 10;
 

@@ -1,0 +1,914 @@
+import 'dart:collection';
+import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
+import 'package:seven_x_c/views/boulder/ranking_view.dart' show semesterMap;
+import 'package:seven_x_c/helpters/functions.dart'
+    show TimePeriod, getStartDateOfWeek;
+
+Future<PointsData> getPoints(
+  CloudProfile currentProfile,
+  Map<String, String> selectedTime,
+  TimePeriod selectedTimePeriod,
+  Map<int, String> gradeNumberToColour,
+  bool perTimeInterval,
+) async {
+  double pointsBoulder = 0;
+  double pointsSetter = 0;
+  double pointsChallenges = 0;
+  int amountBoulder = 0;
+  int amountSetter = 0;
+  int amountChallenges = 0;
+  LinkedHashMap<String, int> boulderClimbedAmount = LinkedHashMap();
+  LinkedHashMap<String, int> boulderClimbedMaxClimbed = LinkedHashMap();
+  LinkedHashMap<String, int> boulderClimbedMaxFlashed = LinkedHashMap();
+  LinkedHashMap<String, Map<String, int>> boulderClimbedColours =
+      LinkedHashMap();
+  LinkedHashMap<String, int> boulderSetAmount = LinkedHashMap();
+  LinkedHashMap<String, Map<String, int>> boulderSetColours = LinkedHashMap();
+  LinkedHashMap<String, Map<String, int>> boulderSetHoldColours = LinkedHashMap();
+  LinkedHashMap<String, Map<String, int>> boulderSetGrading = LinkedHashMap();
+
+
+  
+  int maxClimbed = 0;
+  int maxFlash = 0;
+  String style = "setter";
+  // bool perTimeInterval = false;
+  try {
+    switch (style) {
+      case "climber":
+        if (currentProfile.dateBoulderTopped != null) {
+          switch (selectedTimePeriod) {
+            case TimePeriod.year:
+              var yearData =
+                  currentProfile.dateBoulderTopped![selectedTime["year"]];
+              int latestMonth =
+                  DateTime.now().year > int.parse(selectedTime["year"]!)
+                      ? 12
+                      : DateTime.now().month;
+              if (yearData != null) {
+                for (var month
+                    in List.generate(12, (index) => (index + 1).toString())) {
+                  if (perTimeInterval) {
+                    boulderClimbedAmount[month] ??= 0;
+                    boulderClimbedMaxClimbed[month] ??= maxClimbed;
+                    boulderClimbedMaxFlashed[month] ??= maxFlash;
+                    boulderClimbedColours[month] ??= {};
+                  }
+                }
+                for (var month
+                    in List.generate(12, (index) => (index + 1).toString())) {
+                  var monthData = yearData[month];
+
+                  if (monthData != null && int.parse(month) <= latestMonth) {
+                    for (var weeks in monthData.keys) {
+                      var weekData = monthData[weeks];
+                      if (weekData != null) {
+                        for (var days in weekData.keys) {
+                          var dayData = weekData[days];
+                          if (dayData != null) {
+                            for (var boulder in dayData.keys) {
+                              if (boulder != "maxToppedGrade" &&
+                                  boulder != "maxFlahsedGrade") {
+                                Map<String, dynamic> boulderData =
+                                    dayData[boulder];
+                                pointsBoulder += boulderData["points"] ?? 0;
+                                amountBoulder++;
+                                boulderClimbedAmount[month] ??= 0;
+                                boulderClimbedAmount[month] =
+                                    (boulderClimbedAmount[month] ?? 0) + 1;
+
+                                boulderClimbedMaxClimbed[month] ??= maxClimbed;
+                                if (boulderData["gradeNumber"] >
+                                    boulderClimbedMaxClimbed[month]) {
+                                  boulderClimbedMaxClimbed[month] =
+                                      boulderData["gradeNumber"];
+                                  maxClimbed = boulderData["gradeNumber"];
+                                } else {
+                                  boulderClimbedMaxClimbed[month] = maxClimbed;
+                                }
+                                boulderClimbedMaxFlashed[month] ??= maxFlash;
+                                if (boulderData["gradeNumber"] >
+                                    boulderClimbedMaxFlashed[month]) {
+                                  boulderClimbedMaxFlashed[month] =
+                                      boulderData["gradeNumber"];
+                                  maxFlash = boulderData["gradeNumber"];
+                                } else {
+                                  boulderClimbedMaxFlashed[month] = maxFlash;
+                                }
+
+                                boulderClimbedColours[month] ??= {};
+                                boulderClimbedColours[month]![
+                                    boulderData["gradeColour"]] ??= 0;
+                                boulderClimbedColours[month]![
+                                        boulderData["gradeColour"]] =
+                                    (boulderClimbedColours[month]![
+                                                boulderData["gradeColour"]] ??
+                                            0) +
+                                        1;
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  } else {
+                    if (!perTimeInterval) {
+                      if (int.parse(month) <= latestMonth) {
+                        boulderClimbedAmount[month] ??= 0;
+                        boulderClimbedMaxClimbed[month] ??= maxClimbed;
+                        boulderClimbedMaxFlashed[month] ??= maxFlash;
+                        boulderClimbedColours[month] ??= {};
+                      } else {
+                        boulderClimbedAmount[month] ??= 0;
+                        boulderClimbedMaxClimbed[month] ??= 0;
+                        boulderClimbedMaxFlashed[month] ??= 0;
+                        boulderClimbedColours[month] ??= {};
+                      }
+                    }
+                  }
+                }
+              }
+            case TimePeriod.semester:
+              var yearData =
+                  currentProfile.dateBoulderTopped![selectedTime["year"]];
+              int latestMonth =
+                  DateTime.now().year > int.parse(selectedTime["year"]!)
+                      ? 12
+                      : DateTime.now().month;
+              if (yearData != null) {
+                for (var month
+                    in List.generate(12, (index) => (index + 1).toString())) {
+                  if (perTimeInterval &&
+                      semesterMap[selectedTime["semester"]]!.contains(month)) {
+                    boulderClimbedAmount[month] ??= 0;
+                    boulderClimbedMaxClimbed[month] ??= maxClimbed;
+                    boulderClimbedMaxFlashed[month] ??= maxFlash;
+                    boulderClimbedColours[month] ??= {};
+                  }
+                }
+
+                for (var month
+                    in List.generate(12, (index) => (index + 1).toString())) {
+                  var monthData = yearData[month];
+
+                  if (semesterMap[selectedTime["semester"]]!.contains(month)) {
+                    if (monthData != null && int.parse(month) <= latestMonth) {
+                      var monthData = yearData[month];
+                      {
+                        boulderClimbedAmount[month] ??= 0;
+                        boulderClimbedMaxClimbed[month] ??= 0;
+                        boulderClimbedMaxFlashed[month] ??= 0;
+                        boulderClimbedColours[month] ??= {};
+
+                        for (var weeks in monthData.keys) {
+                          var weekData = monthData[weeks];
+                          if (weekData != null) {
+                            for (var days in weekData.keys) {
+                              var dayData = weekData[days];
+                              if (dayData != null) {
+                                for (var boulder in dayData.keys) {
+                                  if (boulder != "maxToppedGrade" &&
+                                      boulder != "maxFlahsedGrade") {
+                                    Map<String, dynamic> boulderData =
+                                        dayData[boulder];
+                                    pointsBoulder += boulderData["points"] ?? 0;
+                                    amountBoulder++;
+                                    boulderClimbedAmount[month] ??= 0;
+                                    boulderClimbedAmount[month] =
+                                        (boulderClimbedAmount[month] ?? 0) + 1;
+
+                                    boulderClimbedMaxClimbed[month] ??=
+                                        maxClimbed;
+                                    if (boulderData["gradeNumber"] >
+                                        boulderClimbedMaxClimbed[month]) {
+                                      boulderClimbedMaxClimbed[month] =
+                                          boulderData["gradeNumber"];
+                                      maxClimbed = boulderData["gradeNumber"];
+                                    } else {
+                                      boulderClimbedMaxClimbed[month] =
+                                          maxClimbed;
+                                    }
+                                    boulderClimbedMaxFlashed[month] ??=
+                                        maxFlash;
+                                    if (boulderData["gradeNumber"] >
+                                        boulderClimbedMaxFlashed[month]) {
+                                      boulderClimbedMaxFlashed[month] =
+                                          boulderData["gradeNumber"];
+                                      maxFlash = boulderData["gradeNumber"];
+                                    } else {
+                                      boulderClimbedMaxFlashed[month] =
+                                          maxFlash;
+                                    }
+
+                                    boulderClimbedColours[month] ??= {};
+                                    boulderClimbedColours[month]![
+                                        boulderData["gradeColour"]] ??= 0;
+                                    boulderClimbedColours[month]![
+                                            boulderData["gradeColour"]] =
+                                        (boulderClimbedColours[month]![
+                                                    boulderData[
+                                                        "gradeColour"]] ??
+                                                0) +
+                                            1;
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    } else {
+                      if (!perTimeInterval) {
+                        if (int.parse(month) <= latestMonth) {
+                       
+                          boulderClimbedAmount[month] ??= 0;
+                          boulderClimbedMaxClimbed[month] ??= maxClimbed;
+                          boulderClimbedMaxFlashed[month] ??= maxFlash;
+                          boulderClimbedColours[month] ??= {};
+                        } else {
+                          boulderClimbedAmount[month] ??= 0;
+                          boulderClimbedMaxClimbed[month] ??= 0;
+                          boulderClimbedMaxFlashed[month] ??= 0;
+                          boulderClimbedColours[month] ??= {};
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            case TimePeriod.month:
+              var monthData =
+                  currentProfile.dateBoulderTopped![selectedTime["year"]]
+                      [selectedTime["month"]];
+              {
+                int lastDay =
+                    DateTime.now().month > int.parse(selectedTime["month"]!)
+                        ? DateTime(int.parse(selectedTime["year"]!),
+                                int.parse(selectedTime["month"]!) + 1, 0)
+                            .day
+                        : DateTime.now().day;
+
+                var allDaysInMonth = List.generate(
+                  DateTime(
+                    int.parse(selectedTime["year"]!),
+                    int.parse(selectedTime["month"]!) + 1,
+                    0,
+                  ).day,
+                  (index) => (index + 1).toString(),
+                );
+
+                if (perTimeInterval) {
+                  for (var day in allDaysInMonth) {
+                    boulderClimbedAmount[day] ??= 0;
+                    boulderClimbedMaxClimbed[day] ??= maxClimbed;
+                    boulderClimbedMaxFlashed[day] ??= maxFlash;
+                    boulderClimbedColours[day] ??= {};
+                  }
+                }
+
+                // Iterate over all possible days in the month
+
+                for (var weeks in monthData.keys) {
+                  var weekData = monthData[weeks];
+                  if (weekData != null) {
+                    for (var day in allDaysInMonth) {
+                      var dayData = weekData[day];
+                      if (dayData != null && int.parse(day) >= lastDay) {
+                        for (var boulder in dayData.keys) {
+                          if (boulder != "maxToppedGrade" &&
+                              boulder != "maxFlahsedGrade") {
+                            Map<String, dynamic> boulderData = dayData[boulder];
+                            pointsBoulder += boulderData["points"] ?? 0;
+                            amountBoulder++;
+                            boulderClimbedAmount[day] ??= 0;
+                            boulderClimbedAmount[day] =
+                                (boulderClimbedAmount[day] ?? 0) + 1;
+
+                            boulderClimbedMaxClimbed[day] ??= maxClimbed;
+                            if (boulderData["gradeNumber"] >
+                                boulderClimbedMaxClimbed[day]) {
+                              boulderClimbedMaxClimbed[day] =
+                                  boulderData["gradeNumber"];
+                              maxClimbed = boulderData["gradeNumber"];
+                            } else {
+                              boulderClimbedMaxClimbed[day] = maxClimbed;
+                            }
+                            boulderClimbedMaxFlashed[day] ??= maxFlash;
+                            if (boulderData["gradeNumber"] >
+                                boulderClimbedMaxFlashed[day]) {
+                              boulderClimbedMaxFlashed[day] =
+                                  boulderData["gradeNumber"];
+                              maxFlash = boulderData["gradeNumber"];
+                            } else {
+                              boulderClimbedMaxFlashed[day] = maxFlash;
+                            }
+
+                            boulderClimbedColours[day] ??= {};
+                            boulderClimbedColours[day]![
+                                boulderData["gradeColour"]] ??= 0;
+                            boulderClimbedColours[day]![
+                                    boulderData["gradeColour"]] =
+                                (boulderClimbedColours[day]![
+                                            boulderData["gradeColour"]] ??
+                                        0) +
+                                    1;
+                          }
+                        }
+                      } else {
+                        if (!perTimeInterval) {
+                          if (int.parse(day) <= lastDay) {
+                            boulderClimbedAmount[day] ??= 0;
+                            boulderClimbedMaxClimbed[day] ??= maxClimbed;
+                            boulderClimbedMaxFlashed[day] ??= maxFlash;
+                            boulderClimbedColours[day] ??= {};
+                          } else {
+                            boulderClimbedAmount[day] ??= 0;
+                            boulderClimbedMaxClimbed[day] ??= maxClimbed;
+                            boulderClimbedMaxFlashed[day] ??= maxFlash;
+                            boulderClimbedColours[day] ??= {};
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            case TimePeriod.week:
+              var weekData =
+                  currentProfile.dateBoulderTopped![selectedTime["year"]]
+                      [selectedTime["month"]][selectedTime["week"]];
+              // Iterate over all possible days in the week
+              int lastDay =
+                  DateTime.now().month > int.parse(selectedTime["month"]!)
+                      ? DateTime(int.parse(selectedTime["year"]!),
+                              int.parse(selectedTime["month"]!) + 1, 0)
+                          .day
+                      : DateTime.now().day;
+              // Calculate the date based on ISO week number and weekday
+              int year = int.parse(selectedTime["year"]!);
+              int week = int.parse(selectedTime["week"]!);
+              DateTime startOfWeek = getStartDateOfWeek(year, week);
+              Map<String, String> dateToDay = {};
+              for (var dayNumber in List.generate(7, (index) => index + 1)) {
+                // Calculate the date based on ISO week number and weekday
+                DateTime currentDate =
+                    startOfWeek.add(Duration(days: dayNumber - 1));
+                String currentDay = currentDate.day.toString();
+                // Now you can use the day of the week
+                String dayOfWeek = currentDate.weekday.toString();
+
+                dateToDay[currentDay] = dayOfWeek;
+
+                if (perTimeInterval) {
+                  boulderClimbedAmount[dayOfWeek] ??= 0;
+                  boulderClimbedMaxClimbed[dayOfWeek] ??= maxClimbed;
+                  boulderClimbedMaxFlashed[dayOfWeek] ??= maxFlash;
+                  boulderClimbedColours[dayOfWeek] ??= {};
+                }
+              }
+              if (weekData != null) {
+                for (var dayNumber in List.generate(7, (index) => index + 1)) {
+                  DateTime currentDate =
+                      startOfWeek.add(Duration(days: dayNumber - 1));
+                  String day = currentDate.day.toString();
+                  String dayOfWeek = dateToDay[day]!;
+                  var dayData = weekData[day];
+                  if (dayData != null && int.parse(day) >= lastDay) {
+                    for (var boulder in dayData.keys) {
+                      if (boulder != "maxToppedGrade" &&
+                          boulder != "maxFlahsedGrade") {
+                        Map<String, dynamic> boulderData = dayData[boulder];
+                        pointsBoulder += boulderData["points"] ?? 0;
+                        amountBoulder++;
+                        boulderClimbedAmount[dayOfWeek] ??= 0;
+                        boulderClimbedAmount[dayOfWeek] =
+                            (boulderClimbedAmount[dayOfWeek] ?? 0) + 1;
+
+                        boulderClimbedMaxClimbed[dayOfWeek] ??= maxClimbed;
+                        if (boulderData["gradeNumber"] >
+                            boulderClimbedMaxClimbed[dayOfWeek]) {
+                          boulderClimbedMaxClimbed[dayOfWeek] =
+                              boulderData["gradeNumber"];
+                          maxClimbed = boulderData["gradeNumber"];
+                        } else {
+                          boulderClimbedMaxClimbed[dayOfWeek] = maxClimbed;
+                        }
+                        boulderClimbedMaxFlashed[dayOfWeek] ??= maxFlash;
+                        if (boulderData["gradeNumber"] >
+                            boulderClimbedMaxFlashed[dayOfWeek]) {
+                          boulderClimbedMaxFlashed[dayOfWeek] =
+                              boulderData["gradeNumber"];
+                          maxFlash = boulderData["gradeNumber"];
+                        } else {
+                          boulderClimbedMaxFlashed[dayOfWeek] = maxFlash;
+                        }
+
+                        boulderClimbedColours[dayOfWeek] ??= {};
+                        boulderClimbedColours[dayOfWeek]![
+                            boulderData["gradeColour"]] ??= 0;
+                        boulderClimbedColours[dayOfWeek]![
+                                boulderData["gradeColour"]] =
+                            (boulderClimbedColours[dayOfWeek]![
+                                        boulderData["gradeColour"]] ??
+                                    0) +
+                                1;
+                      }
+                    }
+                  } else {
+                    if (int.parse(day) <= lastDay) {
+                      boulderClimbedAmount[dayOfWeek] ??= 0;
+                      boulderClimbedMaxClimbed[dayOfWeek] ??= maxClimbed;
+                      boulderClimbedMaxFlashed[dayOfWeek] ??= maxFlash;
+                      boulderClimbedColours[dayOfWeek] ??= {};
+                    } else {
+                      boulderClimbedAmount[dayOfWeek] ??= 0;
+                      boulderClimbedMaxClimbed[dayOfWeek] ??= 0;
+                      boulderClimbedMaxFlashed[dayOfWeek] ??= 0;
+                      boulderClimbedColours[dayOfWeek] ??= {};
+                    }
+                  }
+                }
+              }
+          }
+        }
+      case "setter":
+        if (currentProfile.dateBoulderSet != null) {
+          
+          switch (selectedTimePeriod) {
+            case TimePeriod.year:
+              var yearData =
+                  currentProfile.dateBoulderSet![selectedTime["year"]];
+              int latestMonth =
+                  DateTime.now().year > int.parse(selectedTime["year"]!)
+                      ? 12
+                      : DateTime.now().month;
+              if (yearData != null) {
+                for (var month
+                    in List.generate(12, (index) => (index + 1).toString())) {
+                  if (perTimeInterval) {
+                    
+                    boulderSetAmount[month] ??= 0;
+                    boulderSetColours[month] ??= {};
+                    
+                  }
+                }
+                for (var month
+                    in List.generate(12, (index) => (index + 1).toString())) {
+                  var monthData = yearData[month];
+
+                  if (monthData != null && int.parse(month) <= latestMonth) {
+                    for (var weeks in monthData.keys) {
+                      var weekData = monthData[weeks];
+                      if (weekData != null) {
+                        for (var days in weekData.keys) {
+                          var dayData = weekData[days];
+                          if (dayData != null) {
+                            for (var boulder in dayData.keys) {
+
+                                Map<String, dynamic> boulderData =
+                                    dayData[boulder];
+  
+                                pointsSetter += boulderData["points"] ?? 0;
+                                amountSetter ++;
+
+                                boulderClimbedAmount[month] ??= 0;
+                                boulderClimbedAmount[month] =
+                                    (boulderClimbedAmount[month] ?? 0) + 1;
+
+                                boulderSetColours[month] ??= {};
+                                boulderSetColours[month]![
+                                    boulderData["gradeColour"]] ??= 0;
+                                boulderSetColours[month]![
+                                        boulderData["gradeColour"]] =
+                                    (boulderSetColours[month]![
+                                                boulderData["gradeColour"]] ??
+                                            0) +
+                                        1;
+boulderSetHoldColours
+        boulderSetGrading
+
+                              }
+                            }
+                          
+                        }
+                      }
+                    }
+                  } else {
+                    if (!perTimeInterval) {
+                      if (int.parse(month) <= latestMonth) {
+                        boulderClimbedAmount[month] ??= 0;
+                        boulderClimbedMaxClimbed[month] ??= maxClimbed;
+                        boulderClimbedMaxFlashed[month] ??= maxFlash;
+                        boulderClimbedColours[month] ??= {};
+                      } else {
+                        boulderClimbedAmount[month] ??= 0;
+                        boulderClimbedMaxClimbed[month] ??= 0;
+                        boulderClimbedMaxFlashed[month] ??= 0;
+                        boulderClimbedColours[month] ??= {};
+                      }
+                    }
+                  }
+                }
+              }
+            case TimePeriod.semester:
+              var yearData =
+                  currentProfile.dateBoulderTopped![selectedTime["year"]];
+              int latestMonth =
+                  DateTime.now().year > int.parse(selectedTime["year"]!)
+                      ? 12
+                      : DateTime.now().month;
+              if (yearData != null) {
+                for (var month
+                    in List.generate(12, (index) => (index + 1).toString())) {
+                  if (perTimeInterval &&
+                      semesterMap[selectedTime["semester"]]!.contains(month)) {
+                    boulderClimbedAmount[month] ??= 0;
+                    boulderClimbedMaxClimbed[month] ??= maxClimbed;
+                    boulderClimbedMaxFlashed[month] ??= maxFlash;
+                    boulderClimbedColours[month] ??= {};
+                  }
+                }
+
+                for (var month
+                    in List.generate(12, (index) => (index + 1).toString())) {
+                  var monthData = yearData[month];
+
+                  if (semesterMap[selectedTime["semester"]]!.contains(month)) {
+                    if (monthData != null && int.parse(month) <= latestMonth) {
+                      var monthData = yearData[month];
+                      {
+                        boulderClimbedAmount[month] ??= 0;
+                        boulderClimbedMaxClimbed[month] ??= 0;
+                        boulderClimbedMaxFlashed[month] ??= 0;
+                        boulderClimbedColours[month] ??= {};
+
+                        for (var weeks in monthData.keys) {
+                          var weekData = monthData[weeks];
+                          if (weekData != null) {
+                            for (var days in weekData.keys) {
+                              var dayData = weekData[days];
+                              if (dayData != null) {
+                                for (var boulder in dayData.keys) {
+                                  if (boulder != "maxToppedGrade" &&
+                                      boulder != "maxFlahsedGrade") {
+                                    Map<String, dynamic> boulderData =
+                                        dayData[boulder];
+                                    pointsBoulder += boulderData["points"] ?? 0;
+                                    amountBoulder++;
+                                    boulderClimbedAmount[month] ??= 0;
+                                    boulderClimbedAmount[month] =
+                                        (boulderClimbedAmount[month] ?? 0) + 1;
+
+                                    boulderClimbedMaxClimbed[month] ??=
+                                        maxClimbed;
+                                    if (boulderData["gradeNumber"] >
+                                        boulderClimbedMaxClimbed[month]) {
+                                      boulderClimbedMaxClimbed[month] =
+                                          boulderData["gradeNumber"];
+                                      maxClimbed = boulderData["gradeNumber"];
+                                    } else {
+                                      boulderClimbedMaxClimbed[month] =
+                                          maxClimbed;
+                                    }
+                                    boulderClimbedMaxFlashed[month] ??=
+                                        maxFlash;
+                                    if (boulderData["gradeNumber"] >
+                                        boulderClimbedMaxFlashed[month]) {
+                                      boulderClimbedMaxFlashed[month] =
+                                          boulderData["gradeNumber"];
+                                      maxFlash = boulderData["gradeNumber"];
+                                    } else {
+                                      boulderClimbedMaxFlashed[month] =
+                                          maxFlash;
+                                    }
+
+                                    boulderClimbedColours[month] ??= {};
+                                    boulderClimbedColours[month]![
+                                        boulderData["gradeColour"]] ??= 0;
+                                    boulderClimbedColours[month]![
+                                            boulderData["gradeColour"]] =
+                                        (boulderClimbedColours[month]![
+                                                    boulderData[
+                                                        "gradeColour"]] ??
+                                                0) +
+                                            1;
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    } else {
+                      if (!perTimeInterval) {
+                        if (int.parse(month) <= latestMonth) {
+                        
+                          boulderClimbedAmount[month] ??= 0;
+                          boulderClimbedMaxClimbed[month] ??= maxClimbed;
+                          boulderClimbedMaxFlashed[month] ??= maxFlash;
+                          boulderClimbedColours[month] ??= {};
+                        } else {
+                          boulderClimbedAmount[month] ??= 0;
+                          boulderClimbedMaxClimbed[month] ??= 0;
+                          boulderClimbedMaxFlashed[month] ??= 0;
+                          boulderClimbedColours[month] ??= {};
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            case TimePeriod.month:
+              var monthData =
+                  currentProfile.dateBoulderTopped![selectedTime["year"]]
+                      [selectedTime["month"]];
+              {
+                int lastDay =
+                    DateTime.now().month > int.parse(selectedTime["month"]!)
+                        ? DateTime(int.parse(selectedTime["year"]!),
+                                int.parse(selectedTime["month"]!) + 1, 0)
+                            .day
+                        : DateTime.now().day;
+
+                var allDaysInMonth = List.generate(
+                  DateTime(
+                    int.parse(selectedTime["year"]!),
+                    int.parse(selectedTime["month"]!) + 1,
+                    0,
+                  ).day,
+                  (index) => (index + 1).toString(),
+                );
+
+                if (perTimeInterval) {
+                  for (var day in allDaysInMonth) {
+                    boulderClimbedAmount[day] ??= 0;
+                    boulderClimbedMaxClimbed[day] ??= maxClimbed;
+                    boulderClimbedMaxFlashed[day] ??= maxFlash;
+                    boulderClimbedColours[day] ??= {};
+                  }
+                }
+
+                // Iterate over all possible days in the month
+
+                for (var weeks in monthData.keys) {
+                  var weekData = monthData[weeks];
+                  if (weekData != null) {
+                    for (var day in allDaysInMonth) {
+                      var dayData = weekData[day];
+                      if (dayData != null && int.parse(day) >= lastDay) {
+                        for (var boulder in dayData.keys) {
+                          if (boulder != "maxToppedGrade" &&
+                              boulder != "maxFlahsedGrade") {
+                            Map<String, dynamic> boulderData = dayData[boulder];
+                            pointsBoulder += boulderData["points"] ?? 0;
+                            amountBoulder++;
+                            boulderClimbedAmount[day] ??= 0;
+                            boulderClimbedAmount[day] =
+                                (boulderClimbedAmount[day] ?? 0) + 1;
+
+                            boulderClimbedMaxClimbed[day] ??= maxClimbed;
+                            if (boulderData["gradeNumber"] >
+                                boulderClimbedMaxClimbed[day]) {
+                              boulderClimbedMaxClimbed[day] =
+                                  boulderData["gradeNumber"];
+                              maxClimbed = boulderData["gradeNumber"];
+                            } else {
+                              boulderClimbedMaxClimbed[day] = maxClimbed;
+                            }
+                            boulderClimbedMaxFlashed[day] ??= maxFlash;
+                            if (boulderData["gradeNumber"] >
+                                boulderClimbedMaxFlashed[day]) {
+                              boulderClimbedMaxFlashed[day] =
+                                  boulderData["gradeNumber"];
+                              maxFlash = boulderData["gradeNumber"];
+                            } else {
+                              boulderClimbedMaxFlashed[day] = maxFlash;
+                            }
+
+                            boulderClimbedColours[day] ??= {};
+                            boulderClimbedColours[day]![
+                                boulderData["gradeColour"]] ??= 0;
+                            boulderClimbedColours[day]![
+                                    boulderData["gradeColour"]] =
+                                (boulderClimbedColours[day]![
+                                            boulderData["gradeColour"]] ??
+                                        0) +
+                                    1;
+                          }
+                        }
+                      } else {
+                        if (!perTimeInterval) {
+                          if (int.parse(day) <= lastDay) {
+                            boulderClimbedAmount[day] ??= 0;
+                            boulderClimbedMaxClimbed[day] ??= maxClimbed;
+                            boulderClimbedMaxFlashed[day] ??= maxFlash;
+                            boulderClimbedColours[day] ??= {};
+                          } else {
+                            boulderClimbedAmount[day] ??= 0;
+                            boulderClimbedMaxClimbed[day] ??= maxClimbed;
+                            boulderClimbedMaxFlashed[day] ??= maxFlash;
+                            boulderClimbedColours[day] ??= {};
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            case TimePeriod.week:
+              var weekData =
+                  currentProfile.dateBoulderTopped![selectedTime["year"]]
+                      [selectedTime["month"]][selectedTime["week"]];
+              // Iterate over all possible days in the week
+              int lastDay =
+                  DateTime.now().month > int.parse(selectedTime["month"]!)
+                      ? DateTime(int.parse(selectedTime["year"]!),
+                              int.parse(selectedTime["month"]!) + 1, 0)
+                          .day
+                      : DateTime.now().day;
+              // Calculate the date based on ISO week number and weekday
+              int year = int.parse(selectedTime["year"]!);
+              int week = int.parse(selectedTime["week"]!);
+              DateTime startOfWeek = getStartDateOfWeek(year, week);
+              Map<String, String> dateToDay = {};
+              for (var dayNumber in List.generate(7, (index) => index + 1)) {
+                // Calculate the date based on ISO week number and weekday
+                DateTime currentDate =
+                    startOfWeek.add(Duration(days: dayNumber - 1));
+                String currentDay = currentDate.day.toString();
+                // Now you can use the day of the week
+                String dayOfWeek = currentDate.weekday.toString();
+
+                dateToDay[currentDay] = dayOfWeek;
+
+                if (perTimeInterval) {
+                  boulderClimbedAmount[dayOfWeek] ??= 0;
+                  boulderClimbedMaxClimbed[dayOfWeek] ??= maxClimbed;
+                  boulderClimbedMaxFlashed[dayOfWeek] ??= maxFlash;
+                  boulderClimbedColours[dayOfWeek] ??= {};
+                }
+              }
+              if (weekData != null) {
+                for (var dayNumber in List.generate(7, (index) => index + 1)) {
+                  DateTime currentDate =
+                      startOfWeek.add(Duration(days: dayNumber - 1));
+                  String day = currentDate.day.toString();
+                  String dayOfWeek = dateToDay[day]!;
+                  var dayData = weekData[day];
+                  if (dayData != null && int.parse(day) >= lastDay) {
+                    for (var boulder in dayData.keys) {
+                      if (boulder != "maxToppedGrade" &&
+                          boulder != "maxFlahsedGrade") {
+                        Map<String, dynamic> boulderData = dayData[boulder];
+                        pointsBoulder += boulderData["points"] ?? 0;
+                        amountBoulder++;
+                        boulderClimbedAmount[dayOfWeek] ??= 0;
+                        boulderClimbedAmount[dayOfWeek] =
+                            (boulderClimbedAmount[dayOfWeek] ?? 0) + 1;
+
+                        boulderClimbedMaxClimbed[dayOfWeek] ??= maxClimbed;
+                        if (boulderData["gradeNumber"] >
+                            boulderClimbedMaxClimbed[dayOfWeek]) {
+                          boulderClimbedMaxClimbed[dayOfWeek] =
+                              boulderData["gradeNumber"];
+                          maxClimbed = boulderData["gradeNumber"];
+                        } else {
+                          boulderClimbedMaxClimbed[dayOfWeek] = maxClimbed;
+                        }
+                        boulderClimbedMaxFlashed[dayOfWeek] ??= maxFlash;
+                        if (boulderData["gradeNumber"] >
+                            boulderClimbedMaxFlashed[dayOfWeek]) {
+                          boulderClimbedMaxFlashed[dayOfWeek] =
+                              boulderData["gradeNumber"];
+                          maxFlash = boulderData["gradeNumber"];
+                        } else {
+                          boulderClimbedMaxFlashed[dayOfWeek] = maxFlash;
+                        }
+
+                        boulderClimbedColours[dayOfWeek] ??= {};
+                        boulderClimbedColours[dayOfWeek]![
+                            boulderData["gradeColour"]] ??= 0;
+                        boulderClimbedColours[dayOfWeek]![
+                                boulderData["gradeColour"]] =
+                            (boulderClimbedColours[dayOfWeek]![
+                                        boulderData["gradeColour"]] ??
+                                    0) +
+                                1;
+                      }
+                    }
+                  } else {
+                    if (int.parse(day) <= lastDay) {
+                      boulderClimbedAmount[dayOfWeek] ??= 0;
+                      boulderClimbedMaxClimbed[dayOfWeek] ??= maxClimbed;
+                      boulderClimbedMaxFlashed[dayOfWeek] ??= maxFlash;
+                      boulderClimbedColours[dayOfWeek] ??= {};
+                    } else {
+                      boulderClimbedAmount[dayOfWeek] ??= 0;
+                      boulderClimbedMaxClimbed[dayOfWeek] ??= 0;
+                      boulderClimbedMaxFlashed[dayOfWeek] ??= 0;
+                      boulderClimbedColours[dayOfWeek] ??= {};
+                    }
+                  }
+                }
+              }
+            default:
+              pointsBoulder = 0;
+              pointsSetter = 0;
+              pointsChallenges = 0;
+              amountBoulder = 0;
+              amountSetter = 0;
+              amountChallenges = 0;
+          }
+        }
+
+      default:
+        pointsBoulder = 0;
+        pointsSetter = 0;
+        pointsChallenges = 0;
+        amountBoulder = 0;
+        amountSetter = 0;
+        amountChallenges = 0;
+    }
+    return PointsData(
+      pointsBoulder: pointsBoulder,
+      pointsSetter: pointsSetter,
+      pointsChallenges: pointsChallenges,
+      amountBoulder: amountBoulder,
+      amountSetter: amountSetter,
+      amountChallenges: amountChallenges,
+      boulderClimbedAmount: boulderClimbedAmount,
+      boulderClimbedMaxClimbed: boulderClimbedMaxClimbed,
+      boulderClimbedMaxFlashed: boulderClimbedMaxFlashed,
+      boulderClimbedColours: boulderClimbedColours,
+      boulderSetAmount: boulderSetAmount,
+      boulderSetColours: boulderSetColours,
+      boulderSetHoldColours: boulderSetHoldColours,
+boulderSetGrading: boulderSetGrading,
+      
+      
+    );
+  } catch (e) {
+    return PointsData(
+      pointsBoulder: 0,
+      pointsSetter: 0,
+      pointsChallenges: 0,
+      amountBoulder: 0,
+      amountSetter: 0,
+      amountChallenges: 0,
+      boulderClimbedAmount: boulderClimbedAmount,
+      boulderClimbedMaxClimbed: boulderClimbedMaxClimbed,
+      boulderClimbedMaxFlashed: boulderClimbedMaxFlashed,
+      boulderClimbedColours: boulderClimbedColours,
+      boulderSetAmount: boulderSetAmount,
+      boulderSetColours: boulderSetColours,
+      boulderSetHoldColours: boulderSetHoldColours,
+boulderSetGrading: boulderSetGrading,
+      
+    );
+  }
+}
+
+String? findGradeColour(Map<int, String> gradeNumberToColour, int gradeNumber) {
+  // Iterate through the sorted keys in gradeNumberToColour
+  for (int key in gradeNumberToColour.keys.toList()..sort()) {
+    if (gradeNumber <= key) {
+      return gradeNumberToColour[key];
+    }
+  }
+  return null; // Return null if no match is found
+}
+
+class PointsData {
+  double pointsBoulder;
+  double pointsSetter;
+  double pointsChallenges;
+  int amountBoulder;
+  int amountSetter;
+  int amountChallenges;
+  LinkedHashMap<String, int> boulderClimbedAmount = LinkedHashMap();
+  LinkedHashMap<String, int> boulderClimbedMaxClimbed = LinkedHashMap();
+  LinkedHashMap<String, int> boulderClimbedMaxFlashed = LinkedHashMap();
+  LinkedHashMap<String, Map<String, int>> boulderClimbedColours =
+      LinkedHashMap();
+  LinkedHashMap<String, int> boulderSetAmount = LinkedHashMap();
+  LinkedHashMap<String, Map<String, int>> boulderSetColours = LinkedHashMap();
+  LinkedHashMap<String, Map<String, int>> boulderSetHoldColours = LinkedHashMap();
+  LinkedHashMap<String, Map<String, int>> boulderSetGrading = LinkedHashMap();
+
+  PointsData({
+    required this.pointsBoulder,
+    required this.pointsSetter,
+    required this.pointsChallenges,
+    required this.amountBoulder,
+    required this.amountSetter,
+    required this.amountChallenges,
+    required this.boulderClimbedAmount,
+    required this.boulderClimbedMaxClimbed,
+    required this.boulderClimbedMaxFlashed,
+    required this.boulderClimbedColours,
+    required this.boulderSetAmount,
+    required this.boulderSetColours,
+    required this.boulderSetHoldColours,
+    required this.boulderSetGrading,
+  });
+}

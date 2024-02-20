@@ -13,7 +13,7 @@ class RankView extends StatefulWidget {
   _RankViewState createState() => _RankViewState();
 }
 
-Map<String, List> semesterMap = {"spring": ["febuary", "marts", "april", "may", "june", "july"],"fall": ["august, september, october, november, december, january"]};
+Map<String, List> semesterMap = {"spring": ["2", "3", "4", "5", "6", "7"],"fall": ["8", "9", "10", "11", "12", "1"]};
 
 class _RankViewState extends State<RankView> with TickerProviderStateMixin {
   late TabController _tabController;
@@ -22,7 +22,6 @@ class _RankViewState extends State<RankView> with TickerProviderStateMixin {
     TimePeriod.month,
     TimePeriod.semester,
     TimePeriod.year,
-    TimePeriod.allTime,
   ];
   TimePeriod selectedTimePeriod = TimePeriod.week;
   late final FirebaseCloudStorage firebaseService;

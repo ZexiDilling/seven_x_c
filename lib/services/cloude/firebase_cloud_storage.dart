@@ -296,6 +296,7 @@ class FirebaseCloudStorage {
       // Update the document with the non-null fields
       await profileCollection.doc(currentProfile.profileID).update(updatedData);
     } catch (e) {
+      print(e);
       throw CouldNotUpdateUserException();
     }
   }

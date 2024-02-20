@@ -1,4 +1,4 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:seven_x_c/constants/comp_const.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
@@ -167,20 +167,57 @@ Map<String, dynamic> updateBoulderCompSet({
 
 Map<String, dynamic> updateBoulderSet(
     {required CloudProfile setterProfile,
-    required CloudBoulder newBoulder,
+    required String boulderId,
+    CloudBoulder? newBoulder,
+    required double setterPoints,
     Map<String, dynamic>? existingData}) {
-  DateTime boulderDate = newBoulder.setDateBoulder as DateTime;
+  String boulderYear = "";
+  String boulderMonth = "";
+  String boulderWeek = "";
+  String boulderDay = "";
+  String boulderID = "";
 
-  String boulderYear = boulderDate.year.toString();
-  String boulderMonth = boulderDate.month.toString();
-  String boulderWeek = getIsoWeekNumber(boulderDate).toString();
-  String boulderDay = boulderDate.day.toString();
+  var holdColour;
+  var gradeColour;
+  var gradeNumberSetter;
+  var gradeDifficulty;
+
+  if (newBoulder != null) {
+    Timestamp boulderTimeStamp = newBoulder.setDateBoulder;
+    DateTime boulderDate = boulderTimeStamp.toDate();
+    boulderYear = boulderDate.year.toString();
+    boulderMonth = boulderDate.month.toString();
+    boulderWeek = getIsoWeekNumber(boulderDate).toString();
+    boulderDay = boulderDate.day.toString();
+
+    holdColour = newBoulder.holdColour;
+    gradeColour = newBoulder.gradeColour;
+
+    gradeNumberSetter = newBoulder.gradeNumberSetter;
+    gradeDifficulty = newBoulder.gradeDifficulty;
+    boulderID = newBoulder.boulderID;
+  } else {
+    DateTime boulderDate = setterProfile.setBoulders![boulderId]["setDateBoulder"];
+    boulderYear = boulderDate.year.toString();
+    boulderMonth = boulderDate.month.toString();
+    boulderWeek = getIsoWeekNumber(boulderDate).toString();
+    boulderDay = boulderDate.day.toString();
+    boulderID = boulderId;
+    holdColour = setterProfile.setBoulders![boulderId]["holdColour"];
+    gradeColour = setterProfile.setBoulders![boulderId]["gradeColour"];
+    gradeNumberSetter =
+        setterProfile.setBoulders![boulderId]["gradeNumberSetter"];
+
+    gradeDifficulty =
+        setterProfile.setBoulders![boulderId]["gradeDifficulty"] ?? 1;
+  }
 
   Map<String, dynamic> newData = {
-    "holdColour": newBoulder.holdColour,
-    "gradeColour": newBoulder.gradeColour,
-    "gradeNumberSetter": newBoulder.gradeNumberSetter,
-    "gradeDifficulty": newBoulder.gradeDifficulty,
+    "holdColour": holdColour,
+    "gradeColour": gradeColour,
+    "gradeNumberSetter": gradeNumberSetter,
+    "gradeDifficulty": gradeDifficulty,
+    "points": setterPoints
   };
 
   Map<String, dynamic> setBoulder = existingData ?? {};
@@ -189,8 +226,8 @@ Map<String, dynamic> updateBoulderSet(
   setBoulder[boulderYear][boulderMonth] ??= {};
   setBoulder[boulderYear][boulderMonth][boulderWeek] ??= {};
   setBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay] ??= {};
-  setBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
-      [newBoulder.boulderID] = newData;
+  setBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay][boulderID] =
+      newData;
 
   return setBoulder;
 }
@@ -304,7 +341,7 @@ Map<String, dynamic> updateClimberToppedMap(
   return existingData;
 }
 
-enum TimePeriod { week, month, semester, year, allTime }
+enum TimePeriod { week, month, semester, year }
 
 // Map enum values to display strings
 final Map<TimePeriod, String> timePeriodStrings = {
@@ -312,7 +349,6 @@ final Map<TimePeriod, String> timePeriodStrings = {
   TimePeriod.month: 'Month',
   TimePeriod.semester: 'Semester',
   TimePeriod.year: 'Year',
-  TimePeriod.allTime: 'All Time',
 };
 
 DateTime calculateDateThreshold(TimePeriod timePeriod) {
@@ -344,10 +380,6 @@ DateTime calculateDateThreshold(TimePeriod timePeriod) {
       // Return the first day of the current month 12 months ago
       return currentTime.subtract(
           const Duration(days: 30 * 12)); // Assuming 30 days in a month
-
-    case TimePeriod.allTime:
-      DateTime initialDate = DateTime.parse("2024-01-01 00:00:00.000");
-      return initialDate;
 
     default:
       return DateTime(0); // Or handle the default case accordingly
@@ -391,8 +423,6 @@ String getTimePeriodLabel(TimePeriod timePeriod) {
       return 'Semester';
     case TimePeriod.year:
       return 'Year';
-    case TimePeriod.allTime:
-      return 'All Time';
   }
 }
 

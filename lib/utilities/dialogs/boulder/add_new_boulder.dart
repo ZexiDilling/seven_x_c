@@ -356,20 +356,25 @@ Future<void> showAddNewBoulder(
                                 }
                               }
                             }
-
+                            
                             if (newBoulder != null) {
+
                               if (!setterTeam && !guestSetterTeam) {
+                                
                                 try {
                                   var setterProfiles = await fireBaseService
                                       .getUserFromDisplayName(selectedSetter)
                                       .first;
                                   CloudProfile setterProfile =
                                       setterProfiles.first;
+                                      print(setterProfile.displayName);
                                   await fireBaseService.updateUser(
                                     currentProfile: setterProfile,
                                     dateBoulderSet: updateBoulderSet(
                                       setterProfile: setterProfile,
+                                      boulderId: newBoulder.boulderID,
                                       newBoulder: newBoulder,
+                                      setterPoints: setterPoints,
                                       existingData:
                                           setterProfile.dateBoulderSet,
                                     ),
@@ -378,6 +383,7 @@ Future<void> showAddNewBoulder(
                                         existingData:
                                             setterProfile.setterPoints),
                                   );
+                                  print(setterProfile.dateBoulderSet);
                                 } catch (e) {
                                   // ignore: use_build_context_synchronously
                                   showErrorDialog(context, "$e");
@@ -385,8 +391,10 @@ Future<void> showAddNewBoulder(
                               }
                             }
                             // ignore: use_build_context_synchronously
-                            Navigator.of(context).pop();
+                            
                           }
+                          print("hej!!");
+                          Navigator.of(context).pop();
                         },
                         child: const Text('Save'),
                       ),

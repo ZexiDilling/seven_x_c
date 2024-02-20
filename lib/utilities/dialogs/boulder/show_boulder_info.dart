@@ -15,7 +15,7 @@ import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
-import 'package:seven_x_c/utilities/charts/barcharts.dart';
+import 'package:seven_x_c/utilities/charts/barcharts_gradings.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
@@ -1213,7 +1213,7 @@ double calculateboulderPoints(CloudProfile currentProfile, CloudBoulder boulder,
   // Check if the user have points from this boulder
   if (boulder.climberTopped != null) {
     if (boulder.climberTopped!.containsKey((currentProfile.userID))) {
-      if (boulder.climberTopped![boulder.boulderID]["topped"]) {
+      if (boulder.climberTopped![currentProfile.userID]["topped"]) {
         boulderPoints = boulderPoints *
             (repeats > 0
                 ? repeatsMultiplier - (repeats - 1) * repeatsDecrement
