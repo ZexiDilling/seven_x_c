@@ -41,7 +41,7 @@ Widget leftTitles(double value, TitleMeta meta) {
 }
 
 List<BarChartRodStackItem> generateRodStackItems(CloudSettings currentSettings,
-    List<double> values, List<String> colorOrder, bool isTouched) {
+    List<double> values, List<String> colorOrder, bool isTouched, bool setterViewGrade) {
   List<BarChartRodStackItem> rodStackItems = [];
   double startValue = 0;
 
@@ -51,7 +51,8 @@ List<BarChartRodStackItem> generateRodStackItems(CloudSettings currentSettings,
       BarChartRodStackItem(
         startValue,
         endValue,
-        nameToColor(currentSettings.settingsGradeColour![colorOrder[counter]]),
+        setterViewGrade ? 
+        nameToColor(currentSettings.settingsGradeColour![colorOrder[counter]]) : nameToColor(currentSettings.settingsHoldColour![colorOrder[counter]]),
         BorderSide(
           color: borderColour,
           width: isTouched ? 2 : 0,
@@ -78,7 +79,7 @@ BarChartGroupData generateGroup(
   CloudSettings currentSettings,
   int x,
   List<double> values,
-  List<String> colorOrder,
+  List<String> colorOrder, bool setterViewGrade,
 ) {
   final sum = values.reduce((a, b) => a + b);
   final isTouched = touchedIndex == x;
@@ -101,7 +102,7 @@ BarChartGroupData generateGroup(
                 bottomRight: Radius.circular(6),
               ),
         rodStackItems: generateRodStackItems(
-            currentSettings, values, colorOrder, isTouched),
+            currentSettings, values, colorOrder, isTouched, setterViewGrade),
       ),
       BarChartRodData(
         toY: isTop >= 0 ? -sum : sum,

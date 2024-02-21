@@ -18,6 +18,7 @@ class LineChartGraph extends StatelessWidget {
     required this.selectedTimePeriod,
     required this.gradingSystem,
     required this.gradeNumberToColour,
+    required this.setterViewGrade,
   });
   final CloudSettings currentSettings;
   final String chartSelection;
@@ -25,15 +26,15 @@ class LineChartGraph extends StatelessWidget {
   final PointsData graphData;
   final String gradingSystem;
   final Map<int, String> gradeNumberToColour;
+  final bool setterViewGrade;
 
   @override
   Widget build(BuildContext context) {
-
-    List<String> colorOrder = [];
+    List<String> gradeColorOrder = [];
     if (gradeNumberToColour.length > 1) {
-      colorOrder = gradeNumberToColour.values.toList();
+      gradeColorOrder = gradeNumberToColour.values.toList();
     } else {
-      colorOrder = [
+      gradeColorOrder = [
         'green',
         'yellow',
         'blue',
@@ -43,6 +44,10 @@ class LineChartGraph extends StatelessWidget {
         "silver"
       ];
     }
+
+    List<String> holdColourOrder =
+        currentSettings.settingsHoldColour!.keys.toList();
+
     switch (chartSelection) {
       case "maxGrade":
         List<FlSpot> climbedEntries =
@@ -90,7 +95,7 @@ class LineChartGraph extends StatelessWidget {
         Map<String, List<double>> listColorsClimbed = {};
 
         for (String date in graphData.boulderClimbedColours.keys) {
-          for (var colour in colorOrder) {
+          for (var colour in gradeColorOrder) {
             double colourCount =
                 graphData.boulderClimbedColours[date]?[colour]?.toDouble() ??
                     0.0;
@@ -102,48 +107,84 @@ class LineChartGraph extends StatelessWidget {
             }
           }
         }
-        
+
         return BarChart(
-          boulderBarChart(currentSettings, listColorsClimbed, maxValue,
-              colorOrder, selectedTimePeriod, chartSelection),
+          boulderBarChart(
+              currentSettings,
+              listColorsClimbed,
+              maxValue,
+              gradeColorOrder,
+              selectedTimePeriod,
+              chartSelection,
+              setterViewGrade),
         );
       case "SetterData":
+        Map<String, Map<String, int>> colorData = {};
+        List<String> colorOrder = [];
+        if (setterViewGrade) {
+          colorData = graphData.boulderSetGradeColours;
+          colorOrder = gradeColorOrder;
+        } else {
+          colorData = graphData.boulderSetHoldColours;
+          colorOrder = holdColourOrder;
+        }
         Map<String, List<double>> listColorsClimbed = {};
-        for (String date in graphData.boulderClimbedColours.keys) {
+        for (var date in colorData.keys) {
           for (var colour in colorOrder) {
-            double colourCount =
-                graphData.boulderClimbedColours[date]?[colour]?.toDouble() ??
-                    0.0;
+            double colourCount = colorData[date]?[colour]?.toDouble() ?? 0.0;
+
             if (listColorsClimbed[date] == null) {
               listColorsClimbed[date] = [colourCount];
             } else {
               listColorsClimbed[date]!.add(colourCount);
             }
           }
-
-          List<int> graphList = graphData.boulderSetAmount.entries.map((entry) {
-            final int yValue = (entry.value).toInt();
-            return yValue;
-          }).toList();
-          double maxValue = 0;
-          if (graphList.isNotEmpty) {
-            maxValue = (graphList.reduce(max)).toDouble();
-          }
-
-          return BarChart(
-            boulderBarChart(currentSettings, listColorsClimbed, maxValue,
-                colorOrder, selectedTimePeriod, chartSelection),
-          );
         }
-      case "SetterDataPie":
-      Map<String, int> boulderSetSplit = {"yellow": 1}; 
-        return PieChart(
-          
-          pirChartSetter(
-              currentSettings, boulderSetSplit, colorOrder),
+
+        List<int> graphList = graphData.boulderSetAmount.entries.map((entry) {
+          final int yValue = (entry.value).toInt();
+          return yValue;
+        }).toList();
+        double maxValue = 0;
+        if (graphList.isNotEmpty) {
+          maxValue = (graphList.reduce(max)).toDouble();
+        }
+        return BarChart(
+          boulderBarChart(currentSettings, listColorsClimbed, maxValue,
+              colorOrder, selectedTimePeriod, chartSelection, setterViewGrade),
         );
+
+      case "SetterDataPie":
+        Map<String, Map<String, int>> colorData = {};
+        List<String> colorOrder = [];
+        Map<String, int> boulderSetSplit = {};
+        if (setterViewGrade) {
+          colorData = graphData.boulderSetGradeColours;
+          colorOrder = gradeColorOrder;
+        } else {
+          colorData = graphData.boulderSetHoldColours;
+          colorOrder = holdColourOrder;
+        }
+
+        colorData.forEach((date, colorCounts) {
+          for (String color in colorOrder) {
+            if (colorCounts.containsKey(color)) {
+              boulderSetSplit[color] =
+                  (boulderSetSplit[color] ?? 0) + colorCounts[color]!;
+            } else {
+              // If the color doesn't exist in colorCounts, set the count to 0
+              boulderSetSplit[color] = (boulderSetSplit[color] ?? 0);
+            }
+          }
+        });
+
+        return PieChart(
+          pirChartSetter(
+              currentSettings, boulderSetSplit, colorOrder, setterViewGrade),
+        );
+
       default:
         return const Text('Invalid chart selection');
-    } return const Text('Invalid chart selection');
-  } 
+    }
+  }
 }

@@ -367,7 +367,6 @@ Future<void> showAddNewBoulder(
                                       .first;
                                   CloudProfile setterProfile =
                                       setterProfiles.first;
-                                      print(setterProfile.displayName);
                                   await fireBaseService.updateUser(
                                     currentProfile: setterProfile,
                                     dateBoulderSet: updateBoulderSet(
@@ -383,17 +382,14 @@ Future<void> showAddNewBoulder(
                                         existingData:
                                             setterProfile.setterPoints),
                                   );
-                                  print(setterProfile.dateBoulderSet);
                                 } catch (e) {
                                   // ignore: use_build_context_synchronously
                                   showErrorDialog(context, "$e");
                                 }
                               }
                             }
-                            // ignore: use_build_context_synchronously
-                            
                           }
-                          print("hej!!");
+                          // ignore: use_build_context_synchronously
                           Navigator.of(context).pop();
                         },
                         child: const Text('Save'),

@@ -17,7 +17,7 @@ Map<String, String> selectedTime = {
   "month": "2",
   "week": "8"
 };
-
+bool setterViewGrade = true;
 bool perTimeInterval = false;
 
 class ProfileView extends StatefulWidget {
@@ -47,7 +47,6 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   _updateFirebaseData() async {
-
     if (currentProfile!.setBoulders != null &&
         currentProfile!.setBoulders!.isNotEmpty) {
       var boulderIDs = currentProfile!.setBoulders!.keys.toList();
@@ -373,7 +372,9 @@ class _ProfileViewState extends State<ProfileView> {
                                         gradingSystem:
                                             currentProfile.gradingSystem,
                                         gradeNumberToColour:
-                                            gradeNumberToColour)
+                                            gradeNumberToColour,
+                                        setterViewGrade: setterViewGrade,
+                                      )
                                     : const Text("Loading"),
                               ),
                             ),

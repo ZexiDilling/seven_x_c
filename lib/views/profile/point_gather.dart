@@ -23,12 +23,20 @@ Future<PointsData> getPoints(
   LinkedHashMap<String, Map<String, int>> boulderClimbedColours =
       LinkedHashMap();
   LinkedHashMap<String, int> boulderSetAmount = LinkedHashMap();
-  LinkedHashMap<String, Map<String, int>> boulderSetColours = LinkedHashMap();
-  LinkedHashMap<String, Map<String, int>> boulderSetHoldColours = LinkedHashMap();
+  LinkedHashMap<String, Map<String, int>> boulderSetGradeColours =
+      LinkedHashMap();
+  LinkedHashMap<String, Map<String, int>> boulderSetHoldColours =
+      LinkedHashMap();
   LinkedHashMap<String, Map<String, int>> boulderSetGrading = LinkedHashMap();
+  LinkedHashMap<String, Map<int, Map<String, int>>> boulderGradeToHoldColour =
+      LinkedHashMap();
+  LinkedHashMap<String, Map<String, Map<String, int>>>
+      boulderGradeColourToHoldColour = LinkedHashMap();
+  LinkedHashMap<String, Map<String, Map<String, int>>>
+      boulderHoldColourToGrade = LinkedHashMap();
+  LinkedHashMap<String, Map<String, Map<int, int>>>
+      boulderHoldColourToGradeColour = LinkedHashMap();
 
-
-  
   int maxClimbed = 0;
   int maxFlash = 0;
   String style = "setter";
@@ -155,11 +163,6 @@ Future<PointsData> getPoints(
                     if (monthData != null && int.parse(month) <= latestMonth) {
                       var monthData = yearData[month];
                       {
-                        boulderClimbedAmount[month] ??= 0;
-                        boulderClimbedMaxClimbed[month] ??= 0;
-                        boulderClimbedMaxFlashed[month] ??= 0;
-                        boulderClimbedColours[month] ??= {};
-
                         for (var weeks in monthData.keys) {
                           var weekData = monthData[weeks];
                           if (weekData != null) {
@@ -220,7 +223,6 @@ Future<PointsData> getPoints(
                     } else {
                       if (!perTimeInterval) {
                         if (int.parse(month) <= latestMonth) {
-                       
                           boulderClimbedAmount[month] ??= 0;
                           boulderClimbedMaxClimbed[month] ??= maxClimbed;
                           boulderClimbedMaxFlashed[month] ??= maxFlash;
@@ -380,6 +382,7 @@ Future<PointsData> getPoints(
                         Map<String, dynamic> boulderData = dayData[boulder];
                         pointsBoulder += boulderData["points"] ?? 0;
                         amountBoulder++;
+
                         boulderClimbedAmount[dayOfWeek] ??= 0;
                         boulderClimbedAmount[dayOfWeek] =
                             (boulderClimbedAmount[dayOfWeek] ?? 0) + 1;
@@ -433,7 +436,6 @@ Future<PointsData> getPoints(
         }
       case "setter":
         if (currentProfile.dateBoulderSet != null) {
-          
           switch (selectedTimePeriod) {
             case TimePeriod.year:
               var yearData =
@@ -445,12 +447,14 @@ Future<PointsData> getPoints(
               if (yearData != null) {
                 for (var month
                     in List.generate(12, (index) => (index + 1).toString())) {
-                  if (perTimeInterval) {
-                    
-                    boulderSetAmount[month] ??= 0;
-                    boulderSetColours[month] ??= {};
-                    
-                  }
+                  boulderSetAmount[month] ??= 0;
+                  boulderSetGradeColours[month] ??= {};
+                  boulderSetHoldColours[month] ??= {};
+                  boulderSetGrading[month] ??= {};
+                  boulderGradeToHoldColour[month] ??= {};
+                  boulderGradeColourToHoldColour[month] ??= {};
+                  boulderHoldColourToGrade[month] ??= {};
+                  boulderHoldColourToGradeColour[month] ??= {};
                 }
                 for (var month
                     in List.generate(12, (index) => (index + 1).toString())) {
@@ -464,47 +468,25 @@ Future<PointsData> getPoints(
                           var dayData = weekData[days];
                           if (dayData != null) {
                             for (var boulder in dayData.keys) {
+                              Map<String, dynamic> boulderData =
+                                  dayData[boulder];
 
-                                Map<String, dynamic> boulderData =
-                                    dayData[boulder];
-  
-                                pointsSetter += boulderData["points"] ?? 0;
-                                amountSetter ++;
-
-                                boulderClimbedAmount[month] ??= 0;
-                                boulderClimbedAmount[month] =
-                                    (boulderClimbedAmount[month] ?? 0) + 1;
-
-                                boulderSetColours[month] ??= {};
-                                boulderSetColours[month]![
-                                    boulderData["gradeColour"]] ??= 0;
-                                boulderSetColours[month]![
-                                        boulderData["gradeColour"]] =
-                                    (boulderSetColours[month]![
-                                                boulderData["gradeColour"]] ??
-                                            0) +
-                                        1;
-boulderSetHoldColours
-        boulderSetGrading
-
-                              }
+                              pointsSetter += boulderData["points"] ?? 0;
+                              amountSetter++;
+                              setterGraphSetup(
+                                  month,
+                                  boulderClimbedAmount,
+                                  boulderSetGradeColours,
+                                  boulderData,
+                                  boulderSetHoldColours,
+                                  boulderGradeToHoldColour,
+                                  boulderGradeColourToHoldColour,
+                                  boulderHoldColourToGrade,
+                                  boulderHoldColourToGradeColour,
+                                  boulderSetAmount);
                             }
-                          
+                          }
                         }
-                      }
-                    }
-                  } else {
-                    if (!perTimeInterval) {
-                      if (int.parse(month) <= latestMonth) {
-                        boulderClimbedAmount[month] ??= 0;
-                        boulderClimbedMaxClimbed[month] ??= maxClimbed;
-                        boulderClimbedMaxFlashed[month] ??= maxFlash;
-                        boulderClimbedColours[month] ??= {};
-                      } else {
-                        boulderClimbedAmount[month] ??= 0;
-                        boulderClimbedMaxClimbed[month] ??= 0;
-                        boulderClimbedMaxFlashed[month] ??= 0;
-                        boulderClimbedColours[month] ??= {};
                       }
                     }
                   }
@@ -512,7 +494,7 @@ boulderSetHoldColours
               }
             case TimePeriod.semester:
               var yearData =
-                  currentProfile.dateBoulderTopped![selectedTime["year"]];
+                  currentProfile.dateBoulderSet![selectedTime["year"]];
               int latestMonth =
                   DateTime.now().year > int.parse(selectedTime["year"]!)
                       ? 12
@@ -520,12 +502,15 @@ boulderSetHoldColours
               if (yearData != null) {
                 for (var month
                     in List.generate(12, (index) => (index + 1).toString())) {
-                  if (perTimeInterval &&
-                      semesterMap[selectedTime["semester"]]!.contains(month)) {
-                    boulderClimbedAmount[month] ??= 0;
-                    boulderClimbedMaxClimbed[month] ??= maxClimbed;
-                    boulderClimbedMaxFlashed[month] ??= maxFlash;
-                    boulderClimbedColours[month] ??= {};
+                  if (semesterMap[selectedTime["semester"]]!.contains(month)) {
+                    boulderSetAmount[month] ??= 0;
+                    boulderSetGradeColours[month] ??= {};
+                    boulderSetHoldColours[month] ??= {};
+                    boulderSetGrading[month] ??= {};
+                    boulderGradeToHoldColour[month] ??= {};
+                    boulderGradeColourToHoldColour[month] ??= {};
+                    boulderHoldColourToGrade[month] ??= {};
+                    boulderHoldColourToGradeColour[month] ??= {};
                   }
                 }
 
@@ -537,11 +522,6 @@ boulderSetHoldColours
                     if (monthData != null && int.parse(month) <= latestMonth) {
                       var monthData = yearData[month];
                       {
-                        boulderClimbedAmount[month] ??= 0;
-                        boulderClimbedMaxClimbed[month] ??= 0;
-                        boulderClimbedMaxFlashed[month] ??= 0;
-                        boulderClimbedColours[month] ??= {};
-
                         for (var weeks in monthData.keys) {
                           var weekData = monthData[weeks];
                           if (weekData != null) {
@@ -549,69 +529,26 @@ boulderSetHoldColours
                               var dayData = weekData[days];
                               if (dayData != null) {
                                 for (var boulder in dayData.keys) {
-                                  if (boulder != "maxToppedGrade" &&
-                                      boulder != "maxFlahsedGrade") {
-                                    Map<String, dynamic> boulderData =
-                                        dayData[boulder];
-                                    pointsBoulder += boulderData["points"] ?? 0;
-                                    amountBoulder++;
-                                    boulderClimbedAmount[month] ??= 0;
-                                    boulderClimbedAmount[month] =
-                                        (boulderClimbedAmount[month] ?? 0) + 1;
+                                  Map<String, dynamic> boulderData =
+                                      dayData[boulder];
 
-                                    boulderClimbedMaxClimbed[month] ??=
-                                        maxClimbed;
-                                    if (boulderData["gradeNumber"] >
-                                        boulderClimbedMaxClimbed[month]) {
-                                      boulderClimbedMaxClimbed[month] =
-                                          boulderData["gradeNumber"];
-                                      maxClimbed = boulderData["gradeNumber"];
-                                    } else {
-                                      boulderClimbedMaxClimbed[month] =
-                                          maxClimbed;
-                                    }
-                                    boulderClimbedMaxFlashed[month] ??=
-                                        maxFlash;
-                                    if (boulderData["gradeNumber"] >
-                                        boulderClimbedMaxFlashed[month]) {
-                                      boulderClimbedMaxFlashed[month] =
-                                          boulderData["gradeNumber"];
-                                      maxFlash = boulderData["gradeNumber"];
-                                    } else {
-                                      boulderClimbedMaxFlashed[month] =
-                                          maxFlash;
-                                    }
-
-                                    boulderClimbedColours[month] ??= {};
-                                    boulderClimbedColours[month]![
-                                        boulderData["gradeColour"]] ??= 0;
-                                    boulderClimbedColours[month]![
-                                            boulderData["gradeColour"]] =
-                                        (boulderClimbedColours[month]![
-                                                    boulderData[
-                                                        "gradeColour"]] ??
-                                                0) +
-                                            1;
-                                  }
+                                  pointsSetter += boulderData["points"] ?? 0;
+                                  amountSetter++;
+                                  setterGraphSetup(
+                                      month,
+                                      boulderClimbedAmount,
+                                      boulderSetGradeColours,
+                                      boulderData,
+                                      boulderSetHoldColours,
+                                      boulderGradeToHoldColour,
+                                      boulderGradeColourToHoldColour,
+                                      boulderHoldColourToGrade,
+                                      boulderHoldColourToGradeColour,
+                                      boulderSetAmount);
                                 }
                               }
                             }
                           }
-                        }
-                      }
-                    } else {
-                      if (!perTimeInterval) {
-                        if (int.parse(month) <= latestMonth) {
-                        
-                          boulderClimbedAmount[month] ??= 0;
-                          boulderClimbedMaxClimbed[month] ??= maxClimbed;
-                          boulderClimbedMaxFlashed[month] ??= maxFlash;
-                          boulderClimbedColours[month] ??= {};
-                        } else {
-                          boulderClimbedAmount[month] ??= 0;
-                          boulderClimbedMaxClimbed[month] ??= 0;
-                          boulderClimbedMaxFlashed[month] ??= 0;
-                          boulderClimbedColours[month] ??= {};
                         }
                       }
                     }
@@ -620,7 +557,7 @@ boulderSetHoldColours
               }
             case TimePeriod.month:
               var monthData =
-                  currentProfile.dateBoulderTopped![selectedTime["year"]]
+                  currentProfile.dateBoulderSet![selectedTime["year"]]
                       [selectedTime["month"]];
               {
                 int lastDay =
@@ -639,13 +576,15 @@ boulderSetHoldColours
                   (index) => (index + 1).toString(),
                 );
 
-                if (perTimeInterval) {
-                  for (var day in allDaysInMonth) {
-                    boulderClimbedAmount[day] ??= 0;
-                    boulderClimbedMaxClimbed[day] ??= maxClimbed;
-                    boulderClimbedMaxFlashed[day] ??= maxFlash;
-                    boulderClimbedColours[day] ??= {};
-                  }
+                for (var day in allDaysInMonth) {
+                  boulderSetAmount[day] ??= 0;
+                  boulderSetGradeColours[day] ??= {};
+                  boulderSetHoldColours[day] ??= {};
+                  boulderSetGrading[day] ??= {};
+                  boulderGradeToHoldColour[day] ??= {};
+                  boulderGradeColourToHoldColour[day] ??= {};
+                  boulderHoldColourToGrade[day] ??= {};
+                  boulderHoldColourToGradeColour[day] ??= {};
                 }
 
                 // Iterate over all possible days in the month
@@ -657,44 +596,22 @@ boulderSetHoldColours
                       var dayData = weekData[day];
                       if (dayData != null && int.parse(day) >= lastDay) {
                         for (var boulder in dayData.keys) {
-                          if (boulder != "maxToppedGrade" &&
-                              boulder != "maxFlahsedGrade") {
-                            Map<String, dynamic> boulderData = dayData[boulder];
-                            pointsBoulder += boulderData["points"] ?? 0;
-                            amountBoulder++;
-                            boulderClimbedAmount[day] ??= 0;
-                            boulderClimbedAmount[day] =
-                                (boulderClimbedAmount[day] ?? 0) + 1;
+                          Map<String, dynamic> boulderData = dayData[boulder];
 
-                            boulderClimbedMaxClimbed[day] ??= maxClimbed;
-                            if (boulderData["gradeNumber"] >
-                                boulderClimbedMaxClimbed[day]) {
-                              boulderClimbedMaxClimbed[day] =
-                                  boulderData["gradeNumber"];
-                              maxClimbed = boulderData["gradeNumber"];
-                            } else {
-                              boulderClimbedMaxClimbed[day] = maxClimbed;
-                            }
-                            boulderClimbedMaxFlashed[day] ??= maxFlash;
-                            if (boulderData["gradeNumber"] >
-                                boulderClimbedMaxFlashed[day]) {
-                              boulderClimbedMaxFlashed[day] =
-                                  boulderData["gradeNumber"];
-                              maxFlash = boulderData["gradeNumber"];
-                            } else {
-                              boulderClimbedMaxFlashed[day] = maxFlash;
-                            }
+                          pointsSetter += boulderData["points"] ?? 0;
+                          amountSetter++;
 
-                            boulderClimbedColours[day] ??= {};
-                            boulderClimbedColours[day]![
-                                boulderData["gradeColour"]] ??= 0;
-                            boulderClimbedColours[day]![
-                                    boulderData["gradeColour"]] =
-                                (boulderClimbedColours[day]![
-                                            boulderData["gradeColour"]] ??
-                                        0) +
-                                    1;
-                          }
+                          setterGraphSetup(
+                              day,
+                              boulderClimbedAmount,
+                              boulderSetGradeColours,
+                              boulderData,
+                              boulderSetHoldColours,
+                              boulderGradeToHoldColour,
+                              boulderGradeColourToHoldColour,
+                              boulderHoldColourToGrade,
+                              boulderHoldColourToGradeColour,
+                              boulderSetAmount);
                         }
                       } else {
                         if (!perTimeInterval) {
@@ -717,7 +634,7 @@ boulderSetHoldColours
               }
             case TimePeriod.week:
               var weekData =
-                  currentProfile.dateBoulderTopped![selectedTime["year"]]
+                  currentProfile.dateBoulderSet![selectedTime["year"]]
                       [selectedTime["month"]][selectedTime["week"]];
               // Iterate over all possible days in the week
               int lastDay =
@@ -741,12 +658,14 @@ boulderSetHoldColours
 
                 dateToDay[currentDay] = dayOfWeek;
 
-                if (perTimeInterval) {
-                  boulderClimbedAmount[dayOfWeek] ??= 0;
-                  boulderClimbedMaxClimbed[dayOfWeek] ??= maxClimbed;
-                  boulderClimbedMaxFlashed[dayOfWeek] ??= maxFlash;
-                  boulderClimbedColours[dayOfWeek] ??= {};
-                }
+                boulderSetAmount[dayOfWeek] ??= 0;
+                boulderSetGradeColours[dayOfWeek] ??= {};
+                boulderSetHoldColours[dayOfWeek] ??= {};
+                boulderSetGrading[dayOfWeek] ??= {};
+                boulderGradeToHoldColour[dayOfWeek] ??= {};
+                boulderGradeColourToHoldColour[dayOfWeek] ??= {};
+                boulderHoldColourToGrade[dayOfWeek] ??= {};
+                boulderHoldColourToGradeColour[dayOfWeek] ??= {};
               }
               if (weekData != null) {
                 for (var dayNumber in List.generate(7, (index) => index + 1)) {
@@ -757,56 +676,22 @@ boulderSetHoldColours
                   var dayData = weekData[day];
                   if (dayData != null && int.parse(day) >= lastDay) {
                     for (var boulder in dayData.keys) {
-                      if (boulder != "maxToppedGrade" &&
-                          boulder != "maxFlahsedGrade") {
-                        Map<String, dynamic> boulderData = dayData[boulder];
-                        pointsBoulder += boulderData["points"] ?? 0;
-                        amountBoulder++;
-                        boulderClimbedAmount[dayOfWeek] ??= 0;
-                        boulderClimbedAmount[dayOfWeek] =
-                            (boulderClimbedAmount[dayOfWeek] ?? 0) + 1;
+                      Map<String, dynamic> boulderData = dayData[boulder];
 
-                        boulderClimbedMaxClimbed[dayOfWeek] ??= maxClimbed;
-                        if (boulderData["gradeNumber"] >
-                            boulderClimbedMaxClimbed[dayOfWeek]) {
-                          boulderClimbedMaxClimbed[dayOfWeek] =
-                              boulderData["gradeNumber"];
-                          maxClimbed = boulderData["gradeNumber"];
-                        } else {
-                          boulderClimbedMaxClimbed[dayOfWeek] = maxClimbed;
-                        }
-                        boulderClimbedMaxFlashed[dayOfWeek] ??= maxFlash;
-                        if (boulderData["gradeNumber"] >
-                            boulderClimbedMaxFlashed[dayOfWeek]) {
-                          boulderClimbedMaxFlashed[dayOfWeek] =
-                              boulderData["gradeNumber"];
-                          maxFlash = boulderData["gradeNumber"];
-                        } else {
-                          boulderClimbedMaxFlashed[dayOfWeek] = maxFlash;
-                        }
+                      pointsSetter += boulderData["points"] ?? 0;
+                      amountSetter++;
 
-                        boulderClimbedColours[dayOfWeek] ??= {};
-                        boulderClimbedColours[dayOfWeek]![
-                            boulderData["gradeColour"]] ??= 0;
-                        boulderClimbedColours[dayOfWeek]![
-                                boulderData["gradeColour"]] =
-                            (boulderClimbedColours[dayOfWeek]![
-                                        boulderData["gradeColour"]] ??
-                                    0) +
-                                1;
-                      }
-                    }
-                  } else {
-                    if (int.parse(day) <= lastDay) {
-                      boulderClimbedAmount[dayOfWeek] ??= 0;
-                      boulderClimbedMaxClimbed[dayOfWeek] ??= maxClimbed;
-                      boulderClimbedMaxFlashed[dayOfWeek] ??= maxFlash;
-                      boulderClimbedColours[dayOfWeek] ??= {};
-                    } else {
-                      boulderClimbedAmount[dayOfWeek] ??= 0;
-                      boulderClimbedMaxClimbed[dayOfWeek] ??= 0;
-                      boulderClimbedMaxFlashed[dayOfWeek] ??= 0;
-                      boulderClimbedColours[dayOfWeek] ??= {};
+                      setterGraphSetup(
+                          dayOfWeek,
+                          boulderClimbedAmount,
+                          boulderSetGradeColours,
+                          boulderData,
+                          boulderSetHoldColours,
+                          boulderGradeToHoldColour,
+                          boulderGradeColourToHoldColour,
+                          boulderHoldColourToGrade,
+                          boulderHoldColourToGradeColour,
+                          boulderSetAmount);
                     }
                   }
                 }
@@ -841,11 +726,13 @@ boulderSetHoldColours
       boulderClimbedMaxFlashed: boulderClimbedMaxFlashed,
       boulderClimbedColours: boulderClimbedColours,
       boulderSetAmount: boulderSetAmount,
-      boulderSetColours: boulderSetColours,
+      boulderSetGradeColours: boulderSetGradeColours,
       boulderSetHoldColours: boulderSetHoldColours,
-boulderSetGrading: boulderSetGrading,
-      
-      
+      boulderSetGrading: boulderSetGrading,
+      boulderGradeToHoldColour: boulderGradeToHoldColour,
+      boulderGradeColourToHoldColour: boulderGradeColourToHoldColour,
+      boulderHoldColourToGrade: boulderHoldColourToGrade,
+      boulderHoldColourToGradeColour: boulderHoldColourToGradeColour,
     );
   } catch (e) {
     return PointsData(
@@ -860,12 +747,92 @@ boulderSetGrading: boulderSetGrading,
       boulderClimbedMaxFlashed: boulderClimbedMaxFlashed,
       boulderClimbedColours: boulderClimbedColours,
       boulderSetAmount: boulderSetAmount,
-      boulderSetColours: boulderSetColours,
+      boulderSetGradeColours: boulderSetGradeColours,
       boulderSetHoldColours: boulderSetHoldColours,
-boulderSetGrading: boulderSetGrading,
-      
+      boulderSetGrading: boulderSetGrading,
+      boulderGradeToHoldColour: boulderGradeToHoldColour,
+      boulderGradeColourToHoldColour: boulderGradeColourToHoldColour,
+      boulderHoldColourToGrade: boulderHoldColourToGrade,
+      boulderHoldColourToGradeColour: boulderHoldColourToGradeColour,
     );
   }
+}
+
+void setterGraphSetup(
+    String timePeriode,
+    LinkedHashMap<String, int> boulderClimbedAmount,
+    LinkedHashMap<String, Map<String, int>> boulderSetGradeColours,
+    Map<String, dynamic> boulderData,
+    LinkedHashMap<String, Map<String, int>> boulderSetHoldColours,
+    LinkedHashMap<String, Map<int, Map<String, int>>> boulderGradeToHoldColour,
+    LinkedHashMap<String, Map<String, Map<String, int>>>
+        boulderGradeColourToHoldColour,
+    LinkedHashMap<String, Map<String, Map<String, int>>>
+        boulderHoldColourToGrade,
+    LinkedHashMap<String, Map<String, Map<int, int>>>
+        boulderHoldColourToGradeColour,
+    LinkedHashMap<String, int> boulderSetAmount) {
+  boulderSetAmount[timePeriode] ??= 0;
+  boulderSetAmount[timePeriode] = (boulderSetAmount[timePeriode] ?? 0) + 1;
+  boulderClimbedAmount[timePeriode] ??= 0;
+  boulderClimbedAmount[timePeriode] =
+      (boulderClimbedAmount[timePeriode] ?? 0) + 1;
+  boulderSetGradeColours[timePeriode] ??= {};
+  boulderSetGradeColours[timePeriode]![boulderData["gradeColour"]] ??= 0;
+  boulderSetGradeColours[timePeriode]![boulderData["gradeColour"]] =
+      (boulderSetGradeColours[timePeriode]![boulderData["gradeColour"]] ?? 0) +
+          1;
+
+  boulderSetHoldColours[timePeriode] ??= {};
+  boulderSetHoldColours[timePeriode]![boulderData["holdColour"]] ??= 0;
+  boulderSetHoldColours[timePeriode]![boulderData["holdColour"]] =
+      (boulderSetHoldColours[timePeriode]![boulderData["holdColour"]] ?? 0) + 1;
+
+  boulderGradeToHoldColour[timePeriode] ??= {};
+  boulderGradeToHoldColour[timePeriode]![boulderData["gradeNumberSetter"]] ??=
+      {};
+  boulderGradeToHoldColour[timePeriode]![boulderData["gradeNumberSetter"]]![
+      boulderData["holdColour"]] ??= 0;
+  boulderGradeToHoldColour[timePeriode]![boulderData["gradeNumberSetter"]]![
+      boulderData["holdColour"]] = (boulderGradeToHoldColour[timePeriode]![
+              boulderData["gradeNumberSetter"]]![boulderData["holdColour"]] ??
+          0) +
+      1;
+
+  boulderGradeColourToHoldColour[timePeriode] ??= {};
+  boulderGradeColourToHoldColour[timePeriode]![boulderData["gradeColour"]] ??=
+      {};
+  boulderGradeColourToHoldColour[timePeriode]![boulderData["gradeColour"]]![
+      boulderData["holdColour"]] ??= 0;
+  boulderGradeColourToHoldColour[timePeriode]![boulderData["gradeColour"]]![
+          boulderData["holdColour"]] =
+      (boulderGradeColourToHoldColour[timePeriode]![
+                  boulderData["gradeColour"]]![boulderData["holdColour"]] ??
+              0) +
+          1;
+
+  boulderHoldColourToGrade[timePeriode] ??= {};
+  boulderHoldColourToGrade[timePeriode]![boulderData["holdColour"]] ??= {};
+  boulderHoldColourToGrade[timePeriode]![boulderData["holdColour"]]![
+      boulderData["gradeNumberSetter"]] ??= 0;
+  boulderHoldColourToGrade[timePeriode]![boulderData["holdColour"]]![
+          boulderData["gradeNumberSetter"]] =
+      (boulderHoldColourToGrade[timePeriode]![boulderData["holdColour"]]![
+                  boulderData["gradeNumberSetter"]] ??
+              0) +
+          1;
+
+  boulderHoldColourToGradeColour[timePeriode] ??= {};
+  boulderHoldColourToGradeColour[timePeriode]![boulderData["holdColour"]] ??=
+      {};
+  boulderHoldColourToGradeColour[timePeriode]![boulderData["holdColour"]]![
+      boulderData["gradeColour"]] ??= 0;
+  boulderHoldColourToGradeColour[timePeriode]![boulderData["holdColour"]]![
+          boulderData["gradeColour"]] =
+      (boulderHoldColourToGradeColour[timePeriode]![boulderData["holdColour"]]![
+                  boulderData["gradeColour"]] ??
+              0) +
+          1;
 }
 
 String? findGradeColour(Map<int, String> gradeNumberToColour, int gradeNumber) {
@@ -891,24 +858,37 @@ class PointsData {
   LinkedHashMap<String, Map<String, int>> boulderClimbedColours =
       LinkedHashMap();
   LinkedHashMap<String, int> boulderSetAmount = LinkedHashMap();
-  LinkedHashMap<String, Map<String, int>> boulderSetColours = LinkedHashMap();
-  LinkedHashMap<String, Map<String, int>> boulderSetHoldColours = LinkedHashMap();
+  LinkedHashMap<String, Map<String, int>> boulderSetGradeColours =
+      LinkedHashMap();
+  LinkedHashMap<String, Map<String, int>> boulderSetHoldColours =
+      LinkedHashMap();
   LinkedHashMap<String, Map<String, int>> boulderSetGrading = LinkedHashMap();
+  LinkedHashMap<String, Map<int, Map<String, int>>> boulderGradeToHoldColour =
+      LinkedHashMap();
+  LinkedHashMap<String, Map<String, Map<String, int>>>
+      boulderGradeColourToHoldColour = LinkedHashMap();
+  LinkedHashMap<String, Map<String, Map<String, int>>>
+      boulderHoldColourToGrade = LinkedHashMap();
+  LinkedHashMap<String, Map<String, Map<int, int>>>
+      boulderHoldColourToGradeColour = LinkedHashMap();
 
-  PointsData({
-    required this.pointsBoulder,
-    required this.pointsSetter,
-    required this.pointsChallenges,
-    required this.amountBoulder,
-    required this.amountSetter,
-    required this.amountChallenges,
-    required this.boulderClimbedAmount,
-    required this.boulderClimbedMaxClimbed,
-    required this.boulderClimbedMaxFlashed,
-    required this.boulderClimbedColours,
-    required this.boulderSetAmount,
-    required this.boulderSetColours,
-    required this.boulderSetHoldColours,
-    required this.boulderSetGrading,
-  });
+  PointsData(
+      {required this.pointsBoulder,
+      required this.pointsSetter,
+      required this.pointsChallenges,
+      required this.amountBoulder,
+      required this.amountSetter,
+      required this.amountChallenges,
+      required this.boulderClimbedAmount,
+      required this.boulderClimbedMaxClimbed,
+      required this.boulderClimbedMaxFlashed,
+      required this.boulderClimbedColours,
+      required this.boulderSetAmount,
+      required this.boulderSetGradeColours,
+      required this.boulderSetHoldColours,
+      required this.boulderSetGrading,
+      required this.boulderGradeToHoldColour,
+      required this.boulderGradeColourToHoldColour,
+      required this.boulderHoldColourToGrade,
+      required this.boulderHoldColourToGradeColour});
 }

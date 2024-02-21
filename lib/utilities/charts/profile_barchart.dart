@@ -9,7 +9,7 @@ BarChartData boulderBarChart(
     double maxYValue,
     List<String> colorOrder,
     TimePeriod selectedTimePeriod,
-    String chartSelection) {
+    String chartSelection, bool setterViewGrade) {
   return BarChartData(
     titlesData: FlTitlesData(
       show: true,
@@ -54,7 +54,7 @@ BarChartData boulderBarChart(
               currentSettings,
               int.parse(entry.key),
               entry.value,
-              colorOrder,
+              colorOrder, setterViewGrade,
             ))
         .toList(),
   );

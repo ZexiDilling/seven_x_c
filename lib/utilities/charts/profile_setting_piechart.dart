@@ -7,7 +7,7 @@ import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 import 'package:seven_x_c/utilities/charts/profile_chart_extra.dart';
 
 List<PieChartSectionData> showingSections(CloudSettings currentSettings,
-      Map<String, int> boulderSplit, List<String> colorOrder) {
+      Map<String, int> boulderSplit, List<String> colorOrder, bool setterViewGrade) {
     return List.generate(boulderSplit.length, (counter) {
       final isTouched = counter == touchedIndex;
       final fontSize = isTouched ? 20.0 : 16.0;
@@ -18,8 +18,9 @@ List<PieChartSectionData> showingSections(CloudSettings currentSettings,
       final colorValue = boulderSplit[colorKey];
 
       return PieChartSectionData(
-        color: nameToColor(
-            currentSettings.settingsGradeColour![colorOrder[counter]]),
+        color: setterViewGrade ? nameToColor(
+            currentSettings.settingsGradeColour![colorOrder[counter]]) : nameToColor(
+            currentSettings.settingsHoldColour![colorOrder[counter]]),
         value: (colorValue ?? 0.0).toDouble(),
         title: colorValue?.toString() ?? "",
         radius: radius,
@@ -34,7 +35,7 @@ List<PieChartSectionData> showingSections(CloudSettings currentSettings,
   }
 
   PieChartData pirChartSetter(CloudSettings currentSettings,
-      Map<String, int> boulderSplit, List<String> colorOrder) {
+      Map<String, int> boulderSplit, List<String> colorOrder, bool setterViewGrade) {
     return PieChartData(
       pieTouchData: PieTouchData(),
       borderData: FlBorderData(
@@ -42,6 +43,6 @@ List<PieChartSectionData> showingSections(CloudSettings currentSettings,
       ),
       sectionsSpace: 0,
       centerSpaceRadius: 40,
-      sections: showingSections(currentSettings, boulderSplit, colorOrder),
+      sections: showingSections(currentSettings, boulderSplit, colorOrder, setterViewGrade),
     );
   }
