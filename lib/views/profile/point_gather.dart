@@ -10,6 +10,7 @@ Future<PointsData> getPoints(
   TimePeriod selectedTimePeriod,
   Map<int, String> gradeNumberToColour,
   bool perTimeInterval,
+  String grapStyle,
 ) async {
   double pointsBoulder = 0;
   double pointsSetter = 0;
@@ -17,6 +18,12 @@ Future<PointsData> getPoints(
   int amountBoulder = 0;
   int amountSetter = 0;
   int amountChallenges = 0;
+  int amountBoulderFlashed = 0;
+  int maxBoulderClimbed = 0;
+  int maxBoulderFlashed = 0;
+  int daysClimbed = 0;
+  int daysSetting = 0;
+  int amountChallengesCreated = 0;
   LinkedHashMap<String, int> boulderClimbedAmount = LinkedHashMap();
   LinkedHashMap<String, int> boulderClimbedMaxClimbed = LinkedHashMap();
   LinkedHashMap<String, int> boulderClimbedMaxFlashed = LinkedHashMap();
@@ -36,13 +43,15 @@ Future<PointsData> getPoints(
       boulderHoldColourToGrade = LinkedHashMap();
   LinkedHashMap<String, Map<String, Map<int, int>>>
       boulderHoldColourToGradeColour = LinkedHashMap();
+  String maxBoulderClimbedColour = "";
+String maxBoulderFlashedColour = "";
 
   int maxClimbed = 0;
   int maxFlash = 0;
-  String style = "setter";
+  
   // bool perTimeInterval = false;
   try {
-    switch (style) {
+    switch (grapStyle) {
       case "climber":
         if (currentProfile.dateBoulderTopped != null) {
           switch (selectedTimePeriod) {
@@ -74,6 +83,7 @@ Future<PointsData> getPoints(
                         for (var days in weekData.keys) {
                           var dayData = weekData[days];
                           if (dayData != null) {
+                            daysClimbed++;
                             for (var boulder in dayData.keys) {
                               if (boulder != "maxToppedGrade" &&
                                   boulder != "maxFlahsedGrade") {
@@ -81,6 +91,7 @@ Future<PointsData> getPoints(
                                     dayData[boulder];
                                 pointsBoulder += boulderData["points"] ?? 0;
                                 amountBoulder++;
+
                                 boulderClimbedAmount[month] ??= 0;
                                 boulderClimbedAmount[month] =
                                     (boulderClimbedAmount[month] ?? 0) + 1;
@@ -91,17 +102,22 @@ Future<PointsData> getPoints(
                                   boulderClimbedMaxClimbed[month] =
                                       boulderData["gradeNumber"];
                                   maxClimbed = boulderData["gradeNumber"];
+                                  maxBoulderClimbedColour = boulderData["gradeColour"];
                                 } else {
                                   boulderClimbedMaxClimbed[month] = maxClimbed;
                                 }
-                                boulderClimbedMaxFlashed[month] ??= maxFlash;
-                                if (boulderData["gradeNumber"] >
-                                    boulderClimbedMaxFlashed[month]) {
-                                  boulderClimbedMaxFlashed[month] =
-                                      boulderData["gradeNumber"];
-                                  maxFlash = boulderData["gradeNumber"];
-                                } else {
-                                  boulderClimbedMaxFlashed[month] = maxFlash;
+                                if (boulderData["flashed"]) {
+                                  amountBoulderFlashed++;
+                                  boulderClimbedMaxFlashed[month] ??= maxFlash;
+                                  if (boulderData["gradeNumber"] >
+                                      boulderClimbedMaxFlashed[month]) {
+                                    boulderClimbedMaxFlashed[month] =
+                                        boulderData["gradeNumber"];
+                                    maxFlash = boulderData["gradeNumber"];
+                                    maxBoulderFlashedColour = boulderData["gradeColour"];
+                                  } else {
+                                    boulderClimbedMaxFlashed[month] = maxFlash;
+                                  }
                                 }
 
                                 boulderClimbedColours[month] ??= {};
@@ -113,6 +129,8 @@ Future<PointsData> getPoints(
                                                 boulderData["gradeColour"]] ??
                                             0) +
                                         1;
+                                maxBoulderClimbed = maxClimbed;
+                                maxBoulderFlashed = maxFlash;
                               }
                             }
                           }
@@ -169,6 +187,7 @@ Future<PointsData> getPoints(
                             for (var days in weekData.keys) {
                               var dayData = weekData[days];
                               if (dayData != null) {
+                                daysClimbed++;
                                 for (var boulder in dayData.keys) {
                                   if (boulder != "maxToppedGrade" &&
                                       boulder != "maxFlahsedGrade") {
@@ -187,20 +206,26 @@ Future<PointsData> getPoints(
                                       boulderClimbedMaxClimbed[month] =
                                           boulderData["gradeNumber"];
                                       maxClimbed = boulderData["gradeNumber"];
+                                      maxBoulderClimbedColour = boulderData["gradeColour"];
                                     } else {
                                       boulderClimbedMaxClimbed[month] =
                                           maxClimbed;
                                     }
-                                    boulderClimbedMaxFlashed[month] ??=
-                                        maxFlash;
-                                    if (boulderData["gradeNumber"] >
-                                        boulderClimbedMaxFlashed[month]) {
-                                      boulderClimbedMaxFlashed[month] =
-                                          boulderData["gradeNumber"];
-                                      maxFlash = boulderData["gradeNumber"];
-                                    } else {
-                                      boulderClimbedMaxFlashed[month] =
+
+                                    if (boulderData["flashed"]) {
+                                      amountBoulderFlashed++;
+                                      boulderClimbedMaxFlashed[month] ??=
                                           maxFlash;
+                                      if (boulderData["gradeNumber"] >
+                                          boulderClimbedMaxFlashed[month]) {
+                                        boulderClimbedMaxFlashed[month] =
+                                            boulderData["gradeNumber"];
+                                        maxFlash = boulderData["gradeNumber"];
+                                        maxBoulderFlashedColour = boulderData["gradeColour"];
+                                      } else {
+                                        boulderClimbedMaxFlashed[month] =
+                                            maxFlash;
+                                      }
                                     }
 
                                     boulderClimbedColours[month] ??= {};
@@ -213,6 +238,9 @@ Future<PointsData> getPoints(
                                                         "gradeColour"]] ??
                                                 0) +
                                             1;
+
+                                    maxBoulderClimbed = maxClimbed;
+                                    maxBoulderFlashed = maxFlash;
                                   }
                                 }
                               }
@@ -276,6 +304,7 @@ Future<PointsData> getPoints(
                     for (var day in allDaysInMonth) {
                       var dayData = weekData[day];
                       if (dayData != null && int.parse(day) >= lastDay) {
+                        daysClimbed++;
                         for (var boulder in dayData.keys) {
                           if (boulder != "maxToppedGrade" &&
                               boulder != "maxFlahsedGrade") {
@@ -292,17 +321,23 @@ Future<PointsData> getPoints(
                               boulderClimbedMaxClimbed[day] =
                                   boulderData["gradeNumber"];
                               maxClimbed = boulderData["gradeNumber"];
+                              maxBoulderClimbedColour = boulderData["gradeColour"];
                             } else {
                               boulderClimbedMaxClimbed[day] = maxClimbed;
                             }
-                            boulderClimbedMaxFlashed[day] ??= maxFlash;
-                            if (boulderData["gradeNumber"] >
-                                boulderClimbedMaxFlashed[day]) {
-                              boulderClimbedMaxFlashed[day] =
-                                  boulderData["gradeNumber"];
-                              maxFlash = boulderData["gradeNumber"];
-                            } else {
-                              boulderClimbedMaxFlashed[day] = maxFlash;
+
+                            if (boulderData["flashed"]) {
+                              amountBoulderFlashed++;
+                              boulderClimbedMaxFlashed[day] ??= maxFlash;
+                              if (boulderData["gradeNumber"] >
+                                  boulderClimbedMaxFlashed[day]) {
+                                boulderClimbedMaxFlashed[day] =
+                                    boulderData["gradeNumber"];
+                                maxFlash = boulderData["gradeNumber"];
+                                maxBoulderFlashedColour = boulderData["gradeColour"];
+                              } else {
+                                boulderClimbedMaxFlashed[day] = maxFlash;
+                              }
                             }
 
                             boulderClimbedColours[day] ??= {};
@@ -314,6 +349,8 @@ Future<PointsData> getPoints(
                                             boulderData["gradeColour"]] ??
                                         0) +
                                     1;
+                            maxBoulderClimbed = maxClimbed;
+                            maxBoulderFlashed = maxFlash;
                           }
                         }
                       } else {
@@ -376,6 +413,7 @@ Future<PointsData> getPoints(
                   String dayOfWeek = dateToDay[day]!;
                   var dayData = weekData[day];
                   if (dayData != null && int.parse(day) >= lastDay) {
+                    daysClimbed++;
                     for (var boulder in dayData.keys) {
                       if (boulder != "maxToppedGrade" &&
                           boulder != "maxFlahsedGrade") {
@@ -393,17 +431,23 @@ Future<PointsData> getPoints(
                           boulderClimbedMaxClimbed[dayOfWeek] =
                               boulderData["gradeNumber"];
                           maxClimbed = boulderData["gradeNumber"];
+                          maxBoulderClimbedColour = boulderData["gradeColour"];
+
                         } else {
                           boulderClimbedMaxClimbed[dayOfWeek] = maxClimbed;
                         }
-                        boulderClimbedMaxFlashed[dayOfWeek] ??= maxFlash;
-                        if (boulderData["gradeNumber"] >
-                            boulderClimbedMaxFlashed[dayOfWeek]) {
-                          boulderClimbedMaxFlashed[dayOfWeek] =
-                              boulderData["gradeNumber"];
-                          maxFlash = boulderData["gradeNumber"];
-                        } else {
-                          boulderClimbedMaxFlashed[dayOfWeek] = maxFlash;
+                        if (boulderData["flashed"]) {
+                          amountBoulderFlashed++;
+                          boulderClimbedMaxFlashed[dayOfWeek] ??= maxFlash;
+                          if (boulderData["gradeNumber"] >
+                              boulderClimbedMaxFlashed[dayOfWeek]) {
+                            boulderClimbedMaxFlashed[dayOfWeek] =
+                                boulderData["gradeNumber"];
+                            maxFlash = boulderData["gradeNumber"];
+                            maxBoulderFlashedColour = boulderData["gradeColour"];
+                          } else {
+                            boulderClimbedMaxFlashed[dayOfWeek] = maxFlash;
+                          }
                         }
 
                         boulderClimbedColours[dayOfWeek] ??= {};
@@ -415,6 +459,8 @@ Future<PointsData> getPoints(
                                         boulderData["gradeColour"]] ??
                                     0) +
                                 1;
+                        maxBoulderClimbed = maxClimbed;
+                        maxBoulderFlashed = maxFlash;
                       }
                     }
                   } else {
@@ -467,6 +513,7 @@ Future<PointsData> getPoints(
                         for (var days in weekData.keys) {
                           var dayData = weekData[days];
                           if (dayData != null) {
+                            daysSetting ++;
                             for (var boulder in dayData.keys) {
                               Map<String, dynamic> boulderData =
                                   dayData[boulder];
@@ -528,6 +575,7 @@ Future<PointsData> getPoints(
                             for (var days in weekData.keys) {
                               var dayData = weekData[days];
                               if (dayData != null) {
+                                daysSetting ++;
                                 for (var boulder in dayData.keys) {
                                   Map<String, dynamic> boulderData =
                                       dayData[boulder];
@@ -556,9 +604,8 @@ Future<PointsData> getPoints(
                 }
               }
             case TimePeriod.month:
-              var monthData =
-                  currentProfile.dateBoulderSet![selectedTime["year"]]
-                      [selectedTime["month"]];
+              var monthData = currentProfile
+                  .dateBoulderSet![selectedTime["year"]][selectedTime["month"]];
               {
                 int lastDay =
                     DateTime.now().month > int.parse(selectedTime["month"]!)
@@ -595,6 +642,7 @@ Future<PointsData> getPoints(
                     for (var day in allDaysInMonth) {
                       var dayData = weekData[day];
                       if (dayData != null && int.parse(day) >= lastDay) {
+                        daysSetting ++;
                         for (var boulder in dayData.keys) {
                           Map<String, dynamic> boulderData = dayData[boulder];
 
@@ -675,6 +723,7 @@ Future<PointsData> getPoints(
                   String dayOfWeek = dateToDay[day]!;
                   var dayData = weekData[day];
                   if (dayData != null && int.parse(day) >= lastDay) {
+                    daysSetting ++;
                     for (var boulder in dayData.keys) {
                       Map<String, dynamic> boulderData = dayData[boulder];
 
@@ -718,9 +767,9 @@ Future<PointsData> getPoints(
       pointsBoulder: pointsBoulder,
       pointsSetter: pointsSetter,
       pointsChallenges: pointsChallenges,
-      amountBoulder: amountBoulder,
+      amountBoulderClimbed: amountBoulder,
       amountSetter: amountSetter,
-      amountChallenges: amountChallenges,
+      amountChallengesDone: amountChallenges,
       boulderClimbedAmount: boulderClimbedAmount,
       boulderClimbedMaxClimbed: boulderClimbedMaxClimbed,
       boulderClimbedMaxFlashed: boulderClimbedMaxFlashed,
@@ -733,15 +782,23 @@ Future<PointsData> getPoints(
       boulderGradeColourToHoldColour: boulderGradeColourToHoldColour,
       boulderHoldColourToGrade: boulderHoldColourToGrade,
       boulderHoldColourToGradeColour: boulderHoldColourToGradeColour,
+      amountBoulderFlashed: amountBoulderFlashed,
+      maxBoulderClimbed: maxBoulderClimbed,
+      maxBoulderFlashed: maxBoulderFlashed,
+      daysClimbed: daysClimbed,
+      daysSetting: daysSetting,
+      amountChallengesCreated: amountChallengesCreated,
+      maxBoulderClimbedColour: maxBoulderClimbedColour,
+maxBoulderFlashedColour: maxBoulderFlashedColour,
     );
   } catch (e) {
     return PointsData(
       pointsBoulder: 0,
       pointsSetter: 0,
       pointsChallenges: 0,
-      amountBoulder: 0,
+      amountBoulderClimbed: 0,
       amountSetter: 0,
-      amountChallenges: 0,
+      amountChallengesDone: 0,
       boulderClimbedAmount: boulderClimbedAmount,
       boulderClimbedMaxClimbed: boulderClimbedMaxClimbed,
       boulderClimbedMaxFlashed: boulderClimbedMaxFlashed,
@@ -754,6 +811,14 @@ Future<PointsData> getPoints(
       boulderGradeColourToHoldColour: boulderGradeColourToHoldColour,
       boulderHoldColourToGrade: boulderHoldColourToGrade,
       boulderHoldColourToGradeColour: boulderHoldColourToGradeColour,
+      amountBoulderFlashed: amountBoulderFlashed,
+      maxBoulderClimbed: maxBoulderClimbed,
+      maxBoulderFlashed: maxBoulderFlashed,
+      daysClimbed: daysClimbed,
+      daysSetting: daysSetting,
+      amountChallengesCreated: amountChallengesCreated,
+      maxBoulderClimbedColour: maxBoulderClimbedColour,
+maxBoulderFlashedColour: maxBoulderFlashedColour,
     );
   }
 }
@@ -849,9 +914,18 @@ class PointsData {
   double pointsBoulder;
   double pointsSetter;
   double pointsChallenges;
-  int amountBoulder;
+  int amountBoulderFlashed;
+  int maxBoulderClimbed;
+  int maxBoulderFlashed;
+  int daysClimbed;
+  int daysSetting;
+  int amountBoulderClimbed;
   int amountSetter;
-  int amountChallenges;
+  int amountChallengesDone;
+  int amountChallengesCreated;
+String maxBoulderClimbedColour;
+String maxBoulderFlashedColour;
+
   LinkedHashMap<String, int> boulderClimbedAmount = LinkedHashMap();
   LinkedHashMap<String, int> boulderClimbedMaxClimbed = LinkedHashMap();
   LinkedHashMap<String, int> boulderClimbedMaxFlashed = LinkedHashMap();
@@ -876,9 +950,17 @@ class PointsData {
       {required this.pointsBoulder,
       required this.pointsSetter,
       required this.pointsChallenges,
-      required this.amountBoulder,
+      required this.amountBoulderClimbed,
+      required this.amountBoulderFlashed,
+      required this.maxBoulderClimbed,
+      required this.maxBoulderClimbedColour,
+      required this.maxBoulderFlashed,
+      required this.maxBoulderFlashedColour,
+      required this.daysClimbed,
+      required this.daysSetting,
       required this.amountSetter,
-      required this.amountChallenges,
+      required this.amountChallengesDone,
+      required this.amountChallengesCreated,
       required this.boulderClimbedAmount,
       required this.boulderClimbedMaxClimbed,
       required this.boulderClimbedMaxFlashed,

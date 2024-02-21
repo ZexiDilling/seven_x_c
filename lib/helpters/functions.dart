@@ -199,7 +199,8 @@ Map<String, dynamic> updateBoulderSet(
     gradeDifficulty = newBoulder.gradeDifficulty;
     boulderID = newBoulder.boulderID;
   } else {
-    DateTime boulderDate = setterProfile.setBoulders![boulderId]["setDateBoulder"];
+    DateTime boulderDate =
+        setterProfile.setBoulders![boulderId]["setDateBoulder"];
     boulderYear = boulderDate.year.toString();
     boulderMonth = boulderDate.month.toString();
     boulderWeek = getIsoWeekNumber(boulderDate).toString();
@@ -614,4 +615,29 @@ DateTime getStartDateOfWeek(int year, int weekNumber) {
 DateTime getEndDateOfWeek(int year, int weekNumber) {
   DateTime startDate = getStartDateOfWeek(year, weekNumber);
   return startDate.add(const Duration(days: 6));
+}
+
+String weekLable(int year, int weekNumber) {
+  DateTime starteDate = getStartDateOfWeek(year, weekNumber);
+
+  String startDay = starteDate.day.toString();
+  String startMonth = starteDate.month.toString();
+  String startYear = starteDate.year.toString().substring(2);
+
+  DateTime endDate = getEndDateOfWeek(year, weekNumber);
+  String endDay = endDate.day.toString();
+  String endMonth = endDate.month.toString();
+  String endYear = endDate.year.toString().substring(2);
+  String weekLable =
+      "$startDay/$startMonth/$startYear - $endDay/$endMonth/$endYear";
+  return weekLable;
+}
+
+Map<String, String> getSelectedTime(DateTime date) {
+  return {
+    "year": date.year.toString(),
+    "semester": (date.month >= 1 && date.month <= 6) ? "spring" : "fall",
+    "month": date.month.toString(),
+    "week": getIsoWeekNumber(date).toString(),
+  };
 }

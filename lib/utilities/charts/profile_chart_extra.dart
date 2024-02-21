@@ -40,8 +40,12 @@ Widget leftTitles(double value, TitleMeta meta) {
   );
 }
 
-List<BarChartRodStackItem> generateRodStackItems(CloudSettings currentSettings,
-    List<double> values, List<String> colorOrder, bool isTouched, bool setterViewGrade) {
+List<BarChartRodStackItem> generateRodStackItems(
+    CloudSettings currentSettings,
+    List<double> values,
+    List<String> colorOrder,
+    bool isTouched,
+    bool setterViewGrade) {
   List<BarChartRodStackItem> rodStackItems = [];
   double startValue = 0;
 
@@ -51,8 +55,11 @@ List<BarChartRodStackItem> generateRodStackItems(CloudSettings currentSettings,
       BarChartRodStackItem(
         startValue,
         endValue,
-        setterViewGrade ? 
-        nameToColor(currentSettings.settingsGradeColour![colorOrder[counter]]) : nameToColor(currentSettings.settingsHoldColour![colorOrder[counter]]),
+        setterViewGrade
+            ? nameToColor(
+                currentSettings.settingsGradeColour![colorOrder[counter]])
+            : nameToColor(
+                currentSettings.settingsHoldColour![colorOrder[counter]]),
         BorderSide(
           color: borderColour,
           width: isTouched ? 2 : 0,
@@ -79,7 +86,8 @@ BarChartGroupData generateGroup(
   CloudSettings currentSettings,
   int x,
   List<double> values,
-  List<String> colorOrder, bool setterViewGrade,
+  List<String> colorOrder,
+  bool setterViewGrade,
 ) {
   final sum = values.reduce((a, b) => a + b);
   final isTouched = touchedIndex == x;
@@ -120,7 +128,7 @@ BarChartGroupData generateGroup(
       ),
     ],
   );
-} 
+}
 
 Widget bottomTitles(
   double value,
@@ -128,7 +136,6 @@ Widget bottomTitles(
   TimePeriod selectedTimePeriod,
   String chartSelection,
 ) {
-
   const style = TextStyle(color: textColour, fontSize: fontChartSize);
   String text = '';
   // Format the date based on the selected time period
@@ -160,13 +167,15 @@ Widget bottomTitles(
       }
       break;
     case TimePeriod.month:
-      text = value.toInt().toString();
+      if (value.toInt() % 2 == 1) {
+        text = value.toInt().toString(); // Odd value
+      } else {
+        text = ""; // Even value
+      }
       break;
     case TimePeriod.year:
     case TimePeriod.semester:
       switch (value.toInt().toString()) {
-        
-        
         case "1":
           text = "Jan";
           break;
@@ -209,7 +218,7 @@ Widget bottomTitles(
     default:
       break;
   }
- 
+
   return SideTitleWidget(
     axisSide: meta.axisSide,
     child: Transform.rotate(
@@ -220,9 +229,7 @@ Widget bottomTitles(
 }
 
 SideTitleWidget getGradeLabel(
-  
     double value, TitleMeta meta, String gradingSystem) {
-
   int index = value.toInt();
   String text = "";
   if (allGrading.containsKey(index)) {

@@ -64,12 +64,12 @@ class LineChartGraph extends StatelessWidget {
             ? climbedEntries
                 .map((entry) => entry.y)
                 .reduce((a, b) => a > b ? a : b)
-            : 27.0;
+            : 10.0;
 
         double maxY = (maxYValue + 2).clamp(0, 27);
 
         double minY = (maxY - 6).clamp(0, maxY);
-
+        print(graphData.boulderClimbedMaxClimbed);
         return LineChart(
           maxGradeChart(
               graphData.boulderClimbedMaxClimbed,
@@ -90,7 +90,8 @@ class LineChartGraph extends StatelessWidget {
         double maxValue = 0;
         if (graphList.isNotEmpty) {
           maxValue = (graphList.reduce(max)).toDouble();
-        }
+        } else {maxValue = 10;}
+
 
         Map<String, List<double>> listColorsClimbed = {};
 
@@ -148,7 +149,7 @@ class LineChartGraph extends StatelessWidget {
         double maxValue = 0;
         if (graphList.isNotEmpty) {
           maxValue = (graphList.reduce(max)).toDouble();
-        }
+        } else {maxValue = 10;}
         return BarChart(
           boulderBarChart(currentSettings, listColorsClimbed, maxValue,
               colorOrder, selectedTimePeriod, chartSelection, setterViewGrade),

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/constants/colours_thems.dart';
+import 'package:seven_x_c/constants/graph_const.dart';
 import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
@@ -10,15 +11,6 @@ import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 import 'package:seven_x_c/utilities/charts/profile_charts.dart';
 import 'package:seven_x_c/views/profile/point_gather.dart';
-
-Map<String, String> selectedTime = {
-  "year": "2024",
-  "semester": "spring",
-  "month": "2",
-  "week": "8"
-};
-bool setterViewGrade = true;
-bool perTimeInterval = false;
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -36,6 +28,12 @@ class _ProfileViewState extends State<ProfileView> {
   late bool isShowingMainData;
   Map<int, String> gradeNumberToColour = {};
   String chartSelection = "maxGrade";
+
+  bool setterViewGrade = true;
+  bool perTimeInterval = false;
+  String graphStyle = "climber";
+
+  Map<String, String> selectedTime = getSelectedTime(DateTime.now());
 
   @override
   void initState() {
@@ -234,24 +232,92 @@ class _ProfileViewState extends State<ProfileView> {
       ),
       body: Column(
         children: [
-          // Your dropdown button
-          DropdownButton<TimePeriod>(
-            value: selectedTimePeriod,
-            onChanged: (TimePeriod? newValue) {
-              if (newValue != null) {
-                setState(() {
-                  selectedTimePeriod = newValue;
-                });
-              }
-            },
-            items: TimePeriod.values.map((TimePeriod value) {
-              return DropdownMenuItem<TimePeriod>(
-                value: value,
-                child: Text(timePeriodStrings[value]!),
-              );
-            }).toList(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 25.0),
+                child: DropdownButton<TimePeriod>(
+                  value: selectedTimePeriod,
+                  onChanged: (TimePeriod? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        selectedTimePeriod = newValue;
+                      });
+                    }
+                  },
+                  items: TimePeriod.values.map((TimePeriod value) {
+                    return DropdownMenuItem<TimePeriod>(
+                      value: value,
+                      child: Text(timePeriodStrings[value]!),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const Text("Per Time"),
+              Checkbox(
+                value: perTimeInterval,
+                onChanged: (value) {
+                  if (chartSelection == "maxGrade") {
+                    setState(() {
+                      perTimeInterval = value ?? false;
+                    });
+                  }
+                },
+                activeColor:
+                    chartSelection == "maxGrade" ? Colors.blue : Colors.grey,
+                checkColor: chartSelection == "maxGrade"
+                    ? Colors.white
+                    : const Color.fromARGB(255, 233, 229, 229),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+              ),
+            ],
           ),
-          // Your StreamBuilder
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () {},
+                child: Icon(Icons.arrow_left),
+              ),
+              Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: switch (selectedTimePeriod) {
+                    TimePeriod.week => Text(
+                        weekLable(int.parse(selectedTime["year"]!),
+                            int.parse(selectedTime["week"]!)),
+                        style: TextStyle(fontSize: 18.0),
+                      ),
+
+                    // TODO: Handle this case.
+                    TimePeriod.month => Text(
+                        selectedTime[timePeriodStrings[selectedTimePeriod]!
+                            .toLowerCase()]!,
+                        style: TextStyle(fontSize: 18.0),
+                      ),
+                    // TODO: Handle this case.
+                    TimePeriod.semester => Text(
+                        selectedTime[timePeriodStrings[selectedTimePeriod]!
+                            .toLowerCase()]!,
+                        style: TextStyle(fontSize: 18.0),
+                      ),
+                    // TODO: Handle this case.
+                    TimePeriod.year => Text(
+                        selectedTime[timePeriodStrings[selectedTimePeriod]!
+                            .toLowerCase()]!,
+                        style: TextStyle(fontSize: 18.0),
+                      ),
+                  }),
+              Visibility(
+                visible: true,
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Icon(Icons.arrow_right),
+                ),
+              ),
+            ],
+          ),
           Expanded(
             child: StreamBuilder<Iterable<CloudProfile>>(
                 stream: firebaseService.getUser(userID: userId),
@@ -280,6 +346,7 @@ class _ProfileViewState extends State<ProfileView> {
                       selectedTimePeriod,
                       gradeNumberToColour,
                       perTimeInterval,
+                      graphStyle,
                     ),
                     builder: (BuildContext context,
                         AsyncSnapshot<PointsData> pointsSnapshot) {
@@ -300,22 +367,6 @@ class _ProfileViewState extends State<ProfileView> {
                         physics: const BouncingScrollPhysics(),
                         child: Column(
                           children: [
-                            ListTile(
-                              title: Text(
-                                  'Boulder Points: ${pointsData.pointsBoulder}'),
-                            ),
-                            ListTile(
-                              title: Text(
-                                  'Challenge Points: ${pointsData.pointsChallenges}'),
-                            ),
-                            if (currentProfile.isSetter)
-                              ListTile(
-                                title: Text(
-                                    'Setter Points: ${pointsData.pointsSetter}'),
-                              ),
-                            const SizedBox(
-                              height: 40,
-                            ),
                             OverflowBar(
                               alignment: MainAxisAlignment.spaceEvenly,
                               children: <Widget>[
@@ -323,6 +374,7 @@ class _ProfileViewState extends State<ProfileView> {
                                     child: const Text('Max Grade'),
                                     onPressed: () {
                                       setState(() {
+                                        graphStyle = "climber";
                                         chartSelection = "maxGrade";
                                       });
                                     }),
@@ -330,6 +382,7 @@ class _ProfileViewState extends State<ProfileView> {
                                     child: const Text('Climbs'),
                                     onPressed: () {
                                       setState(() {
+                                        graphStyle = "climber";
                                         chartSelection = "climbs";
                                       });
                                     }),
@@ -339,6 +392,7 @@ class _ProfileViewState extends State<ProfileView> {
                                       child: const Text('Setter Data'),
                                       onPressed: () {
                                         setState(() {
+                                          graphStyle = "setter";
                                           chartSelection = "SetterData";
                                         });
                                       }),
@@ -349,6 +403,7 @@ class _ProfileViewState extends State<ProfileView> {
                                       child: const Text('Setter Pie'),
                                       onPressed: () {
                                         setState(() {
+                                          graphStyle = "setter";
                                           chartSelection = "SetterDataPie";
                                         });
                                       }),
@@ -381,6 +436,172 @@ class _ProfileViewState extends State<ProfileView> {
                             const SizedBox(
                               height: 10,
                             ),
+                            Container(
+                              child: graphStyle == "climber"
+                                  ? GridView.builder(
+                                      shrinkWrap: true,
+                                      gridDelegate:
+                                          const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 3,
+                                        childAspectRatio: 10 / 3,
+                                        crossAxisSpacing: 5.0,
+                                        mainAxisSpacing: 5.0,
+                                      ),
+                                      itemCount: 9,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        String text = '';
+                                        Color? diffBoxColour;
+                                        switch (index) {
+                                          case 0:
+                                            text =
+                                                'BP: ${pointsData.pointsBoulder}';
+                                            break;
+                                          case 1:
+                                            text =
+                                                'BC: ${pointsData.amountBoulderClimbed}';
+                                            break;
+                                          case 2:
+                                            text =
+                                                'BF: ${pointsData.amountBoulderFlashed}';
+
+                                            break;
+                                          case 3:
+                                            text =
+                                                'MF: ${pointsData.maxBoulderFlashed}';
+                                            if (pointsData
+                                                    .maxBoulderFlashedColour !=
+                                                "") {
+                                              diffBoxColour = nameToColor(
+                                                  currentSettings!
+                                                          .settingsGradeColour![
+                                                      pointsData
+                                                          .maxBoulderFlashedColour]);
+                                            }
+                                            break;
+                                          case 4:
+                                            text =
+                                                'MC: ${pointsData.maxBoulderClimbed}';
+                                            if (pointsData
+                                                    .maxBoulderClimbedColour !=
+                                                "") {
+                                              diffBoxColour = nameToColor(
+                                                  currentSettings!
+                                                          .settingsGradeColour![
+                                                      pointsData
+                                                          .maxBoulderClimbedColour]);
+                                            }
+                                            break;
+                                          case 5:
+                                            text =
+                                                'DC: ${pointsData.daysClimbed}';
+                                            break;
+                                          case 6:
+                                            text =
+                                                'CP: ${pointsData.pointsChallenges}';
+                                            break;
+                                          case 7:
+                                            text =
+                                                'CD: ${pointsData.amountChallengesDone}';
+                                            break;
+                                          case 8:
+                                            text =
+                                                'CC: ${pointsData.amountChallengesCreated}';
+                                            break;
+                                        }
+
+                                        // Customize the content of each grid item as needed
+                                        return SizedBox(
+                                          height:
+                                              5.0, // Adjust the height as needed
+                                          width: 5.0,
+                                          child: Container(
+                                            color: diffBoxColour ??
+                                                boxBackgroundColor,
+                                            child: Center(
+                                              child: Text(
+                                                text,
+                                                style: TextStyle(
+                                                  color:
+                                                      boxTextColour, // Set the text color
+                                                  fontSize:
+                                                      boxTextSize, // Set the font size
+                                                  fontWeight: FontWeight
+                                                      .bold, // Set the font weight
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    )
+                                  : GridView.builder(
+                                      shrinkWrap: true,
+                                      gridDelegate:
+                                          const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 3,
+                                        childAspectRatio: 10 / 3,
+                                        crossAxisSpacing: 10.0,
+                                        mainAxisSpacing: 10.0,
+                                      ),
+                                      itemCount: 9,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        String text = '';
+                                        Color? diffBoxColour;
+                                        switch (index) {
+                                          case 0:
+                                            text =
+                                                'SP: ${pointsData.pointsSetter}';
+                                            break;
+                                          case 1:
+                                            text =
+                                                'BC: ${pointsData.amountSetter}';
+                                            break;
+                                          case 2:
+                                            text =
+                                                'BF: ${pointsData.daysSetting}';
+                                            break;
+                                        }
+
+                                        // Customize the content of each grid item as needed
+                                        return Container(
+                                          color: diffBoxColour ??
+                                              boxBackgroundColor, // Set the color or customize as needed
+                                          child: Center(
+                                            child: Text(
+                                              text,
+                                              style: TextStyle(
+                                                color:
+                                                    boxTextColour, // Set the text color
+                                                fontSize:
+                                                    boxTextSize, // Set the font size
+                                                fontWeight: FontWeight
+                                                    .bold, // Set the font weight
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                            ),
+                            const SizedBox(height: 20),
+                            const Text(
+                              "Info dump: \n"
+                              'BP: Boulder Points\n'
+                              'BC: Amount Boulder Climbed\n'
+                              'BF: Amount Boulder Flashed\n'
+                              'MF: Max Flashed Boulder Grade\n'
+                              'MC: Max Climbed Boulder Grade\n'
+                              'DC: Days Climbed\n'
+                              'Challenge is not updated yet\n'
+                              'CP: Challenge Points\n'
+                              'CD: Challenge Done\n'
+                              'CC: Challenge Created',
+                              style: TextStyle(
+                                fontSize: 16.0,
+                              ),
+                            )
                           ],
                         ),
                       );
