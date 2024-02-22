@@ -47,7 +47,6 @@ Future<PointsData> getPoints(
       boulderHoldColourToGradeColour = LinkedHashMap();
   String maxBoulderClimbedColour = "";
   String maxBoulderFlashedColour = "";
-  print(currentProfile.dateBoulderTopped);
   // bool perTimeInterval = false;
   try {
     switch (graphStyle) {

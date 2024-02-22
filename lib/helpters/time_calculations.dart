@@ -174,7 +174,7 @@ int graLastDayOfMonth(int year, int month) {
   DateTime firstDayOfNextMonth = DateTime(year, month + 1, 1);
 
   // Subtract one day to get the last day of the current month
-  DateTime lastDayOfMonth = firstDayOfNextMonth.subtract(Duration(days: 1));
+  DateTime lastDayOfMonth = firstDayOfNextMonth.subtract(const Duration(days: 1));
 
   return lastDayOfMonth.day;
 }
