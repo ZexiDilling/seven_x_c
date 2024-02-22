@@ -475,7 +475,7 @@ Future<bool> showBoulderInformation(
                                                     child: const Text('Cancel'),
                                                   ),
                                                   TextButton(
-                                                    onPressed: () {
+                                                    onPressed: () {                                                 
                                                       fireBaseService
                                                           .deleteBoulder(
                                                               boulderID: boulder
