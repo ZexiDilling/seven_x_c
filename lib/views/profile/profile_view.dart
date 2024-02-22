@@ -280,15 +280,15 @@ class _ProfileViewState extends State<ProfileView> {
                 },
                 icon: const Icon(IconManager.info),
               ),
-               IconButton(
-            onPressed: () {
-              selectedTime = getSelectedTime(DateTime.now());
-              setState(() {
-                selectedTime = selectedTime;
-              });
-            },
-            icon: const Icon(IconManager.reset),
-          ),
+              IconButton(
+                onPressed: () {
+                  selectedTime = getSelectedTime(DateTime.now());
+                  setState(() {
+                    selectedTime = selectedTime;
+                  });
+                },
+                icon: const Icon(IconManager.reset),
+              ),
             ],
           ),
           const SizedBox(
@@ -297,10 +297,9 @@ class _ProfileViewState extends State<ProfileView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              
-                  IconButton(
-            onPressed: () {
-              switch (selectedTimePeriod) {
+              IconButton(
+                onPressed: () {
+                  switch (selectedTimePeriod) {
                     case TimePeriod.week:
                       selectedTime = weekAdjustment(selectedTime, false);
 
@@ -315,11 +314,10 @@ class _ProfileViewState extends State<ProfileView> {
                   setState(() {
                     selectedTime = selectedTime;
                   });
-            },
-            icon: const Icon(IconManager.leftArrow),
-            iconSize: iconSizeChart,
-          ),
-
+                },
+                icon: const Icon(IconManager.leftArrow),
+                iconSize: iconSizeChart,
+              ),
               Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: switch (selectedTimePeriod) {
@@ -342,31 +340,30 @@ class _ProfileViewState extends State<ProfileView> {
                   }),
               Visibility(
                 visible: true,
-                child:  IconButton(
-            onPressed: () {
-              switch (selectedTimePeriod) {
-                    case TimePeriod.week:
-                      selectedTime = weekAdjustment(selectedTime, true);
+                child: IconButton(
+                  onPressed: () {
+                    switch (selectedTimePeriod) {
+                      case TimePeriod.week:
+                        selectedTime = weekAdjustment(selectedTime, true);
 
-                    case TimePeriod.month:
-                      selectedTime = montAdjustment(selectedTime, true);
+                      case TimePeriod.month:
+                        selectedTime = montAdjustment(selectedTime, true);
 
-                    case TimePeriod.semester:
-                      selectedTime = semesterAdjustment(selectedTime, false);
-                    case TimePeriod.year:
-                      selectedTime = yearAdjustment(selectedTime, true);
-                  }
-                  setState(() {
-                    selectedTime = selectedTime;
-                  });
-            },
-            icon: const Icon(IconManager.rightArrow),
-            iconSize: iconSizeChart,
-          ),
+                      case TimePeriod.semester:
+                        selectedTime = semesterAdjustment(selectedTime, true);
+                      case TimePeriod.year:
+                        selectedTime = yearAdjustment(selectedTime, true);
+                    }
+                    setState(() {
+                      selectedTime = selectedTime;
+                    });
+                  },
+                  icon: const Icon(IconManager.rightArrow),
+                  iconSize: iconSizeChart,
+                ),
               ),
             ],
           ),
-         
           const SizedBox(
             height: 25,
           ),
@@ -413,7 +410,7 @@ class _ProfileViewState extends State<ProfileView> {
 
                       // Access the PointsData object from the snapshot
                       PointsData pointsData = pointsSnapshot.data!;
-
+                      
                       // Render your UI with the updated points information
                       return SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
