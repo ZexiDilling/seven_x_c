@@ -47,7 +47,7 @@ Future<PointsData> getPoints(
       boulderHoldColourToGradeColour = LinkedHashMap();
   String maxBoulderClimbedColour = "";
   String maxBoulderFlashedColour = "";
-  
+  print(currentProfile.dateBoulderTopped);
   // bool perTimeInterval = false;
   try {
     switch (graphStyle) {
@@ -277,15 +277,9 @@ Future<PointsData> getPoints(
               var monthData =
                   currentProfile.dateBoulderTopped![selectedTime["year"]]
                       [selectedTime["month"]];
+
               if (monthData != null) {
                 {
-                  int lastDay =
-                      DateTime.now().month > int.parse(selectedTime["month"]!)
-                          ? DateTime(int.parse(selectedTime["year"]!),
-                                  int.parse(selectedTime["month"]!) + 1, 0)
-                              .day
-                          : DateTime.now().day;
-
                   var allDaysInMonth = List.generate(
                     DateTime(
                       int.parse(selectedTime["year"]!),
@@ -306,10 +300,11 @@ Future<PointsData> getPoints(
 
                   for (var weeks in monthData.keys) {
                     var weekData = monthData[weeks];
+
                     if (weekData != null) {
                       for (var day in allDaysInMonth) {
                         var dayData = weekData[day];
-                        if (dayData != null && int.parse(day) >= lastDay) {
+                        if (dayData != null) {
                           daysClimbed++;
                           for (var boulder in dayData.keys) {
                             if (boulder != "maxToppedGrade" &&
@@ -364,17 +359,10 @@ Future<PointsData> getPoints(
                           }
                         } else {
                           if (!perTimeInterval) {
-                            if (int.parse(day) <= lastDay) {
-                              boulderClimbedAmount[day] ??= 0;
-                              boulderClimbedMaxClimbed[day] ??= maxClimbed;
-                              boulderClimbedMaxFlashed[day] ??= maxFlash;
-                              boulderClimbedColours[day] ??= {};
-                            } else {
-                              boulderClimbedAmount[day] ??= 0;
-                              boulderClimbedMaxClimbed[day] ??= maxClimbed;
-                              boulderClimbedMaxFlashed[day] ??= maxFlash;
-                              boulderClimbedColours[day] ??= {};
-                            }
+                            boulderClimbedAmount[day] ??= 0;
+                            boulderClimbedMaxClimbed[day] ??= maxClimbed;
+                            boulderClimbedMaxFlashed[day] ??= maxFlash;
+                            boulderClimbedColours[day] ??= {};
                           }
                         }
                       }
@@ -389,12 +377,6 @@ Future<PointsData> getPoints(
                   currentProfile.dateBoulderTopped![selectedTime["year"]]
                       [selectedTime["month"]][selectedTime["week"]];
               // Iterate over all possible days in the week
-              int lastDay =
-                  DateTime.now().month > int.parse(selectedTime["month"]!)
-                      ? DateTime(int.parse(selectedTime["year"]!),
-                              int.parse(selectedTime["month"]!) + 1, 0)
-                          .day
-                      : DateTime.now().day;
               // Calculate the date based on ISO week number and weekday
               int year = int.parse(selectedTime["year"]!);
               int week = int.parse(selectedTime["week"]!);
@@ -424,7 +406,7 @@ Future<PointsData> getPoints(
                   String day = currentDate.day.toString();
                   String dayOfWeek = dateToDay[day]!;
                   var dayData = weekData[day];
-                  if (dayData != null && int.parse(day) >= lastDay) {
+                  if (dayData != null) {
                     daysClimbed++;
                     for (var boulder in dayData.keys) {
                       if (boulder != "maxToppedGrade" &&
@@ -476,17 +458,10 @@ Future<PointsData> getPoints(
                       }
                     }
                   } else {
-                    if (int.parse(day) <= lastDay) {
-                      boulderClimbedAmount[dayOfWeek] ??= 0;
-                      boulderClimbedMaxClimbed[dayOfWeek] ??= maxClimbed;
-                      boulderClimbedMaxFlashed[dayOfWeek] ??= maxFlash;
-                      boulderClimbedColours[dayOfWeek] ??= {};
-                    } else {
-                      boulderClimbedAmount[dayOfWeek] ??= 0;
-                      boulderClimbedMaxClimbed[dayOfWeek] ??= 0;
-                      boulderClimbedMaxFlashed[dayOfWeek] ??= 0;
-                      boulderClimbedColours[dayOfWeek] ??= {};
-                    }
+                    boulderClimbedAmount[dayOfWeek] ??= 0;
+                    boulderClimbedMaxClimbed[dayOfWeek] ??= maxClimbed;
+                    boulderClimbedMaxFlashed[dayOfWeek] ??= maxFlash;
+                    boulderClimbedColours[dayOfWeek] ??= {};
                   }
                 }
               } else {
@@ -625,13 +600,6 @@ Future<PointsData> getPoints(
               var monthData = currentProfile
                   .dateBoulderSet![selectedTime["year"]][selectedTime["month"]];
               {
-                int lastDay =
-                    DateTime.now().month > int.parse(selectedTime["month"]!)
-                        ? DateTime(int.parse(selectedTime["year"]!),
-                                int.parse(selectedTime["month"]!) + 1, 0)
-                            .day
-                        : DateTime.now().day;
-
                 var allDaysInMonth = List.generate(
                   DateTime(
                     int.parse(selectedTime["year"]!),
@@ -659,7 +627,7 @@ Future<PointsData> getPoints(
                     if (weekData != null) {
                       for (var day in allDaysInMonth) {
                         var dayData = weekData[day];
-                        if (dayData != null && int.parse(day) >= lastDay) {
+                        if (dayData != null) {
                           daysSetting++;
                           for (var boulder in dayData.keys) {
                             Map<String, dynamic> boulderData = dayData[boulder];
@@ -681,17 +649,10 @@ Future<PointsData> getPoints(
                           }
                         } else {
                           if (!perTimeInterval) {
-                            if (int.parse(day) <= lastDay) {
-                              boulderClimbedAmount[day] ??= 0;
-                              boulderClimbedMaxClimbed[day] ??= maxClimbed;
-                              boulderClimbedMaxFlashed[day] ??= maxFlash;
-                              boulderClimbedColours[day] ??= {};
-                            } else {
-                              boulderClimbedAmount[day] ??= 0;
-                              boulderClimbedMaxClimbed[day] ??= maxClimbed;
-                              boulderClimbedMaxFlashed[day] ??= maxFlash;
-                              boulderClimbedColours[day] ??= {};
-                            }
+                            boulderClimbedAmount[day] ??= 0;
+                            boulderClimbedMaxClimbed[day] ??= maxClimbed;
+                            boulderClimbedMaxFlashed[day] ??= maxFlash;
+                            boulderClimbedColours[day] ??= {};
                           }
                         }
                       }
@@ -706,12 +667,7 @@ Future<PointsData> getPoints(
                   currentProfile.dateBoulderSet![selectedTime["year"]]
                       [selectedTime["month"]][selectedTime["week"]];
               // Iterate over all possible days in the week
-              int lastDay =
-                  DateTime.now().month > int.parse(selectedTime["month"]!)
-                      ? DateTime(int.parse(selectedTime["year"]!),
-                              int.parse(selectedTime["month"]!) + 1, 0)
-                          .day
-                      : DateTime.now().day;
+
               // Calculate the date based on ISO week number and weekday
               int year = int.parse(selectedTime["year"]!);
               int week = int.parse(selectedTime["week"]!);
@@ -743,7 +699,7 @@ Future<PointsData> getPoints(
                   String day = currentDate.day.toString();
                   String dayOfWeek = dateToDay[day]!;
                   var dayData = weekData[day];
-                  if (dayData != null && int.parse(day) >= lastDay) {
+                  if (dayData != null) {
                     daysSetting++;
                     for (var boulder in dayData.keys) {
                       Map<String, dynamic> boulderData = dayData[boulder];
@@ -1000,5 +956,5 @@ class PointsData {
       required this.boulderGradeColourToHoldColour,
       required this.boulderHoldColourToGrade,
       required this.boulderHoldColourToGradeColour});
-      //todo do something with the last 4... 
+  //todo do something with the last 4...
 }

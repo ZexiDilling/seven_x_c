@@ -169,6 +169,16 @@ DateTime getEndDateOfWeek(int year, int weekNumber) {
   return startDate.add(const Duration(days: 6));
 }
 
+int graLastDayOfMonth(int year, int month) {
+  // Create a DateTime object for the first day of the next month
+  DateTime firstDayOfNextMonth = DateTime(year, month + 1, 1);
+
+  // Subtract one day to get the last day of the current month
+  DateTime lastDayOfMonth = firstDayOfNextMonth.subtract(Duration(days: 1));
+
+  return lastDayOfMonth.day;
+}
+
 String weekLable(Map<String, String> selectedTime) {
   int year = int.parse(selectedTime["year"]!);
   int weekNumber = int.parse(selectedTime["week"]!);
