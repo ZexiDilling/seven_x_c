@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:seven_x_c/helpters/functions.dart' show TimePeriod;
+import '../../helpters/time_calculations.dart' show TimePeriod;
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 import 'package:seven_x_c/utilities/charts/profile_barchart.dart';
 import 'package:seven_x_c/utilities/charts/profile_line_chart_max.dart';
@@ -69,7 +69,6 @@ class LineChartGraph extends StatelessWidget {
         double maxY = (maxYValue + 2).clamp(0, 27);
 
         double minY = (maxY - 6).clamp(0, maxY);
-        print(graphData.boulderClimbedMaxClimbed);
         return LineChart(
           maxGradeChart(
               graphData.boulderClimbedMaxClimbed,

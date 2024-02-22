@@ -1,6 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:seven_x_c/helpters/functions.dart' show TimePeriod;
+import '../../helpters/time_calculations.dart' show TimePeriod;
 import 'package:seven_x_c/utilities/charts/profile_chart_extra.dart';
 
 LineChartData maxGradeChart(
@@ -53,6 +53,7 @@ LineChartData maxGradeChart(
     minY: 0,
     maxY: maxY,
     minX: 0,
+
     lineBarsData: [
       LineChartBarData(
         spots: sortedMapMaxClimbed.entries.map((entry) {
@@ -89,5 +90,6 @@ LineChartData maxGradeChart(
         isStrokeJoinRound: true,
       ),
     ],
+    
   );
 }

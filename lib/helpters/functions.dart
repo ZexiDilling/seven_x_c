@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:seven_x_c/constants/comp_const.dart';
+import 'package:seven_x_c/helpters/time_calculations.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
@@ -52,7 +53,7 @@ Map<String, dynamic> removeDateBoulderToppedMap(
 
   String boulderYear = boulderDate.year.toString();
   String boulderMonth = boulderDate.month.toString();
-  String boulderWeek = getIsoWeekNumber(boulderDate).toString();
+  String boulderWeek = grabIsoWeekNumber(boulderDate).toString();
   String boulderDay = boulderDate.day.toString();
 
   dateBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
@@ -82,7 +83,7 @@ Map<String, dynamic> updateDateBoulderToppedMap({
 
   String boulderYear = boulderDate.year.toString();
   String boulderMonth = boulderDate.month.toString();
-  String boulderWeek = getIsoWeekNumber(boulderDate).toString();
+  String boulderWeek = grabIsoWeekNumber(boulderDate).toString();
   String boulderDay = boulderDate.day.toString();
 
   Map<String, dynamic> newData = {
@@ -189,7 +190,7 @@ Map<String, dynamic> updateBoulderSet(
     DateTime boulderDate = boulderTimeStamp.toDate();
     boulderYear = boulderDate.year.toString();
     boulderMonth = boulderDate.month.toString();
-    boulderWeek = getIsoWeekNumber(boulderDate).toString();
+    boulderWeek = grabIsoWeekNumber(boulderDate).toString();
     boulderDay = boulderDate.day.toString();
 
     holdColour = newBoulder.holdColour;
@@ -203,7 +204,7 @@ Map<String, dynamic> updateBoulderSet(
         setterProfile.setBoulders![boulderId]["setDateBoulder"];
     boulderYear = boulderDate.year.toString();
     boulderMonth = boulderDate.month.toString();
-    boulderWeek = getIsoWeekNumber(boulderDate).toString();
+    boulderWeek = grabIsoWeekNumber(boulderDate).toString();
     boulderDay = boulderDate.day.toString();
     boulderID = boulderId;
     holdColour = setterProfile.setBoulders![boulderId]["holdColour"];
@@ -344,90 +345,6 @@ Map<String, dynamic> updateClimberToppedMap(
   return existingData;
 }
 
-enum TimePeriod { week, month, semester, year }
-
-// Map enum values to display strings
-final Map<TimePeriod, String> timePeriodStrings = {
-  TimePeriod.week: 'Week',
-  TimePeriod.month: 'Month',
-  TimePeriod.semester: 'Semester',
-  TimePeriod.year: 'Year',
-};
-
-DateTime calculateDateThreshold(TimePeriod timePeriod) {
-  DateTime currentTime = DateTime.now();
-
-  switch (timePeriod) {
-    case TimePeriod.week:
-      // Find the last Monday of the current week
-      DateTime lastMonday =
-          currentTime.subtract(Duration(days: currentTime.weekday - 1));
-      // Find the next Sunday
-      return lastMonday;
-
-    case TimePeriod.month:
-      // Return the first day of the current month
-      return DateTime(currentTime.year, currentTime.month, 1);
-
-    case TimePeriod.semester:
-      // Determine the semester start based on the current month
-      if (currentTime.month >= 1 && currentTime.month <= 6) {
-        // Semester starts in January
-        return DateTime(currentTime.year, 1, 1);
-      } else {
-        // Semester starts in August
-        return DateTime(currentTime.year, 8, 1);
-      }
-
-    case TimePeriod.year:
-      // Return the first day of the current month 12 months ago
-      return currentTime.subtract(
-          const Duration(days: 30 * 12)); // Assuming 30 days in a month
-
-    default:
-      return DateTime(0); // Or handle the default case accordingly
-  }
-}
-
-DateTime calculateEndDate(TimePeriod selectedTimePeriod, DateTime startDate) {
-  switch (selectedTimePeriod) {
-    case TimePeriod.week:
-      // Find the next Sunday from the start date
-      return startDate.add(const Duration(days: 7));
-
-    case TimePeriod.month:
-      // Find the last day of the current month
-      return DateTime(startDate.year, startDate.month + 1, 1)
-          .subtract(const Duration(days: 1));
-
-    case TimePeriod.semester:
-      // Determine the end of the semester based on the current month
-      if (startDate.month >= 1 && startDate.month <= 6) {
-        // Semester ends in July
-        return DateTime(startDate.year, 7, 31);
-      } else {
-        // Semester ends in December
-        return DateTime(startDate.year, 12, 31);
-      }
-
-    default:
-      // Default case (handle accordingly)
-      return DateTime.now();
-  }
-}
-
-String getTimePeriodLabel(TimePeriod timePeriod) {
-  switch (timePeriod) {
-    case TimePeriod.week:
-      return 'Week';
-    case TimePeriod.month:
-      return 'Month';
-    case TimePeriod.semester:
-      return 'Semester';
-    case TimePeriod.year:
-      return 'Year';
-  }
-}
 
 Map<String, dynamic> updateCompBoulderMap(
     {required CloudProfile currentProfile,
@@ -591,53 +508,4 @@ int? tryParseInt(String? value) {
 
 String capitalize(String s) {
   return s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
-}
-
-int getIsoWeekNumber(DateTime date) {
-  DateTime january4th = DateTime(date.year, 1, 4);
-  int daysSinceJanuary4th = date.difference(january4th).inDays;
-  int weekNumber = ((daysSinceJanuary4th + january4th.weekday + 6) / 7).floor();
-
-  if (weekNumber == 0) {
-    // If the date is in the last week of the previous year
-    weekNumber = getIsoWeekNumber(DateTime(date.year - 1, 12, 31));
-  }
-
-  return weekNumber;
-}
-
-DateTime getStartDateOfWeek(int year, int weekNumber) {
-  DateTime january4th = DateTime(year, 1, 4);
-  int daysToAdd = (weekNumber - 1) * 7 - january4th.weekday + 1;
-  return january4th.add(Duration(days: daysToAdd));
-}
-
-DateTime getEndDateOfWeek(int year, int weekNumber) {
-  DateTime startDate = getStartDateOfWeek(year, weekNumber);
-  return startDate.add(const Duration(days: 6));
-}
-
-String weekLable(int year, int weekNumber) {
-  DateTime starteDate = getStartDateOfWeek(year, weekNumber);
-
-  String startDay = starteDate.day.toString();
-  String startMonth = starteDate.month.toString();
-  String startYear = starteDate.year.toString().substring(2);
-
-  DateTime endDate = getEndDateOfWeek(year, weekNumber);
-  String endDay = endDate.day.toString();
-  String endMonth = endDate.month.toString();
-  String endYear = endDate.year.toString().substring(2);
-  String weekLable =
-      "$startDay/$startMonth/$startYear - $endDay/$endMonth/$endYear";
-  return weekLable;
-}
-
-Map<String, String> getSelectedTime(DateTime date) {
-  return {
-    "year": date.year.toString(),
-    "semester": (date.month >= 1 && date.month <= 6) ? "spring" : "fall",
-    "month": date.month.toString(),
-    "week": getIsoWeekNumber(date).toString(),
-  };
 }

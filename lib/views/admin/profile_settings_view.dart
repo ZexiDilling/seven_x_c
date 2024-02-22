@@ -6,13 +6,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/constants/routes.dart';
+import 'package:seven_x_c/helpters/general_const_and_info.dart';
 import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_event.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
-
 
 class ProfileSettingsView extends StatefulWidget {
   const ProfileSettingsView({super.key});
@@ -26,6 +26,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
   String get userEmail => AuthService.firebase().currentUser!.email;
   String get userId => AuthService.firebase().currentUser!.id;
   late final FirebaseCloudStorage fireBaseService;
+  late CloudProfile? currentProfile;
 
   bool _isSetter = false;
   bool _isAdmin = false;
@@ -38,9 +39,8 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
   void initState() {
     super.initState();
     fireBaseService = FirebaseCloudStorage();
-    
-    // _initializeCurrentProfile();
-    // Initialize the form fields with current user information
+    _initializeCurrentProfile();
+
   }
 
   @override
@@ -51,21 +51,29 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
     });
   }
 
-  Future<void> _initializeCurrentProfile() async {
+  Future<CloudProfile?> _initializeCurrentProfile() async {
     await for (final profiles
         in fireBaseService.getUser(userID: userId.toString())) {
       if (profiles.isNotEmpty) {
+        currentProfile = profiles.first;
         setState(() {
-          CloudProfile currentProfile = profiles.first;
-          _isAdmin = currentProfile.isAdmin;
-          _isSetter = currentProfile.isSetter;
-          _isAnonymous = currentProfile.isAnonymous;
-          _gradingSystem = currentProfile.gradingSystem;
-          _displayNameController.text = currentProfile.displayName;
-          profileExist = true;
+          currentProfile = currentProfile;
+        _isAdmin = currentProfile!.isAdmin;
+        _isSetter = currentProfile!.isSetter;
+        _isAnonymous = currentProfile!.isAnonymous;
+        _gradingSystem = currentProfile!.gradingSystem;
+        _displayNameController.text = currentProfile!.displayName;
         });
+        
+
+        
+        
+        profileExist = true;
+        
+        return currentProfile;
       }
     }
+    return null;
   }
 
   @override
@@ -149,12 +157,15 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                   const Text('Grading: '),
                   DropdownButton<String>(
                     value: _gradingSystem,
-                    onChanged: (String? newValue) {
+                    onChanged: (String? newValue) async {
                       setState(() {
                         _gradingSystem = newValue ?? 'Coloured';
                       });
+                      await fireBaseService.updateUser(
+                          currentProfile: currentProfile!,
+                          gradingSystem: _gradingSystem);
                     },
-                    items: <String>['Coloured', 'French', 'V-Grade']
+                    items: <String>['Coloured', 'French', 'V_Grade']
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -202,29 +213,20 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                               ),
                               TextButton(
                                 onPressed: () async {
-                                  final profiles = await fireBaseService
-                                      .getUser(userID: userId.toString())
-                                      .first;
-                                  final currentProfile = profiles.isNotEmpty
-                                      ? profiles.first
-                                      : null;
-                                  if (currentProfile != null) {
-                                    try {
-                                      await fireBaseService.updateUser(
-                                        currentProfile: currentProfile,
-                                        boulderPoints: 0.0,
-                                        setterPoints: 0.0,
-                                        challengePoints: 0.0,
-                                      );
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pop();
-                                      context
-                                          .read<AuthBloc>()
-                                          .add(const AuthEventLogOut());
-                                    } catch (error) {
-                                      showErrorDialog(
-                                          context, error.toString());
-                                    }
+                                  try {
+                                    await fireBaseService.updateUser(
+                                      currentProfile: currentProfile!,
+                                      boulderPoints: 0.0,
+                                      setterPoints: 0.0,
+                                      challengePoints: 0.0,
+                                    );
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pop();
+                                    context
+                                        .read<AuthBloc>()
+                                        .add(const AuthEventLogOut());
+                                  } catch (error) {
+                                    showErrorDialog(context, error.toString());
                                   }
                                 },
                                 child: const Text("Confirm"),
@@ -292,7 +294,8 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
         showErrorDialog(context, "Missing Nick-Name");
       } else if (email.isEmpty) {
         showErrorDialog(context, "Missing E-mail");
-      } else if (await fireBaseService.isDisplayNameUnique(displayName, userId)) {
+      } else if (await fireBaseService.isDisplayNameUnique(
+          displayName, userId)) {
         if (profileExist) {
           // User exists, update the user profile information
           await fireBaseService.updateUser(
@@ -339,7 +342,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Anonymous Mode'),
-          content: const Text('Will not show your Nick-name on any lists.'),
+          content: const Text('Will not show your Nick-name on any lists besides comp.'),
           actions: [
             TextButton(
               onPressed: () {
@@ -359,7 +362,11 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Grading System'),
-          content: const Text('This is the grade you will see on the boulder.'),
+          content: Text("This is the gradesystem you will see on the boulder. \n"
+                              "Coloured: Will show an arrow inside the grading colour circle for how hard the boulder is within the grade. \n"
+                              "French: Will show the French grade inside the grading colour circle. \n"
+                              "V-Grade: Will show the French grade inside the grading colour circle. \n"
+                              "Missing a grading system, let us know on $contactMail" ),
           actions: [
             TextButton(
               onPressed: () {

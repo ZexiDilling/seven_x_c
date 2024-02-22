@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_info.dart'
     show allGrading, nameToColor;
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
-import '../../helpters/functions.dart' show TimePeriod;
+import '../../helpters/time_calculations.dart' show TimePeriod;
 
 const double fontChartSize = 10;
 const double chartHeight = 150;

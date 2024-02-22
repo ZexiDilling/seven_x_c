@@ -2,12 +2,16 @@ version 7:
 bug fixes:
     Fixed bug where other ppls top of a boulder, affected the oppasity and size of all boulders on the map
     Fixed bugs with challenges so they should now work
+    Fixed bug where updating Grading system only took effect after app reset. 
+    
 
 Data structure changes:
     Change the way topped data is storred to make it easier to show data
     Change the way setter data is storred to make it easier to show data
+    Updated icons on the map to be more clear
+    Updated grading circle on Boulders, to easierly see the grade
+    Overhault the UI for graphData under Profile
+    Added a way to go back and forward in time for the graphData under Profile
 
-    TODO before updating!!!!
-    change chart data
-    add repeats to the data structure.
+    
     

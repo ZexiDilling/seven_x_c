@@ -6,6 +6,8 @@ class IconManager {
   static const IconData topOut = Icons.arrow_upward;
   static const IconData decreaseNumber = Icons.arrow_downward;
   static const IconData increaseNumber = Icons.arrow_upward;
+static const IconData leftArrow = Icons.arrow_left;
+static const IconData rightArrow = Icons.arrow_right;
   static const IconData showRanking = Icons.list_alt;
   static const IconData femaleRankings = Icons.female;
   static const IconData maleRankings = Icons.male;
@@ -20,7 +22,10 @@ class IconManager {
   static const IconData moveMultipleBoulders = Icons.swap_horiz;
   static const IconData cancel = Icons.close; 
   static const IconData showDeactivatedBoulders = Icons.search; 
+  static const IconData reset = Icons.refresh; 
 }
+
+double iconSizeChart = 40;
 
 class IconManagerColours {
   static const Color inActive = Colors.grey;

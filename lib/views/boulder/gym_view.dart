@@ -84,7 +84,9 @@ class _GymViewState extends State<GymView> {
   }
 
   Stream<Iterable<CloudBoulder>> getFilteredBouldersStream() {
-    return _fireBaseService.getAllBoulders(showDeactivatedBoulders).map((boulders) {
+    return _fireBaseService
+        .getAllBoulders(showDeactivatedBoulders)
+        .map((boulders) {
       if (showAllBouldersFilter) {
         return boulders;
       } else {
@@ -441,7 +443,10 @@ class _GymViewState extends State<GymView> {
               break;
             }
           case MenuAction.settings:
-            Navigator.of(context).pushNamed(profileSettings);
+            Navigator.of(context).pushNamed(profileSettings).then((_) {
+              _initializeData();
+            });
+            break;
 
           case MenuAction.stripping:
             Map<String, WallRegion> wallRegionMap = {

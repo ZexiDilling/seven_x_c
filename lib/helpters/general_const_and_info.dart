@@ -1,0 +1,1 @@
+String contactMail = "info@dtuclimbing.dk";

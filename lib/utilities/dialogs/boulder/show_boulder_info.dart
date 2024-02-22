@@ -112,7 +112,7 @@ Future<bool> showBoulderInformation(
     gradingShow = getArrowFromNumberAndColor(
         boulder.gradeNumberSetter, boulder.gradeColour);
   } else {
-    gradingShow = allGrading[boulder.gradeNumberSetter]![gradingSystem];
+    gradingShow = allGrading[boulder.gradeNumberSetter]![gradingSystem.toLowerCase()];
   }
 
   await showDialog(
@@ -1402,6 +1402,7 @@ SizedBox climberTopList(List<Map<String, dynamic>> toppersList) {
 
 Container gradingInnerCirleDrawing(double circleWidth, double circleHeight,
     CloudBoulder boulder, CloudSettings currentSettings, String? gradingShow) {
+
   return Container(
     width: circleWidth * 0.8,
     height: circleHeight * 0.8,

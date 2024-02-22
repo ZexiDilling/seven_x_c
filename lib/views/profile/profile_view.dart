@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/constants/colours_thems.dart';
 import 'package:seven_x_c/constants/graph_const.dart';
+import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/helpters/functions.dart';
+import 'package:seven_x_c/helpters/time_calculations.dart';
 import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
@@ -272,51 +274,101 @@ class _ProfileViewState extends State<ProfileView> {
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 visualDensity: VisualDensity.compact,
               ),
+              IconButton(
+                onPressed: () {
+                  _showCharExplanation(context);
+                },
+                icon: const Icon(IconManager.info),
+              ),
+               IconButton(
+            onPressed: () {
+              selectedTime = getSelectedTime(DateTime.now());
+              setState(() {
+                selectedTime = selectedTime;
+              });
+            },
+            icon: const Icon(IconManager.reset),
+          ),
             ],
+          ),
+          const SizedBox(
+            height: 25,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              GestureDetector(
-                onTap: () {},
-                child: Icon(Icons.arrow_left),
-              ),
+              
+                  IconButton(
+            onPressed: () {
+              switch (selectedTimePeriod) {
+                    case TimePeriod.week:
+                      selectedTime = weekAdjustment(selectedTime, false);
+
+                    case TimePeriod.month:
+                      selectedTime = montAdjustment(selectedTime, false);
+
+                    case TimePeriod.semester:
+                      selectedTime = semesterAdjustment(selectedTime, false);
+                    case TimePeriod.year:
+                      selectedTime = yearAdjustment(selectedTime, false);
+                  }
+                  setState(() {
+                    selectedTime = selectedTime;
+                  });
+            },
+            icon: const Icon(IconManager.leftArrow),
+            iconSize: iconSizeChart,
+          ),
+
               Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: switch (selectedTimePeriod) {
                     TimePeriod.week => Text(
-                        weekLable(int.parse(selectedTime["year"]!),
-                            int.parse(selectedTime["week"]!)),
-                        style: TextStyle(fontSize: 18.0),
+                        weekLable(selectedTime),
+                        style: const TextStyle(fontSize: 18.0),
                       ),
-
-                    // TODO: Handle this case.
                     TimePeriod.month => Text(
-                        selectedTime[timePeriodStrings[selectedTimePeriod]!
-                            .toLowerCase()]!,
-                        style: TextStyle(fontSize: 18.0),
+                        monthLable(selectedTime),
+                        style: const TextStyle(fontSize: 18.0),
                       ),
-                    // TODO: Handle this case.
                     TimePeriod.semester => Text(
-                        selectedTime[timePeriodStrings[selectedTimePeriod]!
-                            .toLowerCase()]!,
-                        style: TextStyle(fontSize: 18.0),
+                        semesterLable(selectedTime),
+                        style: const TextStyle(fontSize: 18.0),
                       ),
-                    // TODO: Handle this case.
                     TimePeriod.year => Text(
-                        selectedTime[timePeriodStrings[selectedTimePeriod]!
-                            .toLowerCase()]!,
-                        style: TextStyle(fontSize: 18.0),
+                        yearLable(selectedTime),
+                        style: const TextStyle(fontSize: 18.0),
                       ),
                   }),
               Visibility(
                 visible: true,
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Icon(Icons.arrow_right),
-                ),
+                child:  IconButton(
+            onPressed: () {
+              switch (selectedTimePeriod) {
+                    case TimePeriod.week:
+                      selectedTime = weekAdjustment(selectedTime, true);
+
+                    case TimePeriod.month:
+                      selectedTime = montAdjustment(selectedTime, true);
+
+                    case TimePeriod.semester:
+                      selectedTime = semesterAdjustment(selectedTime, false);
+                    case TimePeriod.year:
+                      selectedTime = yearAdjustment(selectedTime, true);
+                  }
+                  setState(() {
+                    selectedTime = selectedTime;
+                  });
+            },
+            icon: const Icon(IconManager.rightArrow),
+            iconSize: iconSizeChart,
+          ),
               ),
             ],
+          ),
+         
+          const SizedBox(
+            height: 25,
           ),
           Expanded(
             child: StreamBuilder<Iterable<CloudProfile>>(
@@ -419,17 +471,20 @@ class _ProfileViewState extends State<ProfileView> {
                               child: SizedBox(
                                 height: 300,
                                 child: currentSettings != null
-                                    ? LineChartGraph(
-                                        currentSettings: currentSettings!,
-                                        chartSelection: chartSelection,
-                                        graphData: pointsData,
-                                        selectedTimePeriod: selectedTimePeriod,
-                                        gradingSystem:
-                                            currentProfile.gradingSystem,
-                                        gradeNumberToColour:
-                                            gradeNumberToColour,
-                                        setterViewGrade: setterViewGrade,
-                                      )
+                                    ? pointsData.gotData
+                                        ? LineChartGraph(
+                                            currentSettings: currentSettings!,
+                                            chartSelection: chartSelection,
+                                            graphData: pointsData,
+                                            selectedTimePeriod:
+                                                selectedTimePeriod,
+                                            gradingSystem:
+                                                currentProfile.gradingSystem,
+                                            gradeNumberToColour:
+                                                gradeNumberToColour,
+                                            setterViewGrade: setterViewGrade,
+                                          )
+                                        : const Text("No Data")
                                     : const Text("Loading"),
                               ),
                             ),
@@ -585,23 +640,6 @@ class _ProfileViewState extends State<ProfileView> {
                                       },
                                     ),
                             ),
-                            const SizedBox(height: 20),
-                            const Text(
-                              "Info dump: \n"
-                              'BP: Boulder Points\n'
-                              'BC: Amount Boulder Climbed\n'
-                              'BF: Amount Boulder Flashed\n'
-                              'MF: Max Flashed Boulder Grade\n'
-                              'MC: Max Climbed Boulder Grade\n'
-                              'DC: Days Climbed\n'
-                              'Challenge is not updated yet\n'
-                              'CP: Challenge Points\n'
-                              'CD: Challenge Done\n'
-                              'CC: Challenge Created',
-                              style: TextStyle(
-                                fontSize: 16.0,
-                              ),
-                            )
                           ],
                         ),
                       );
@@ -613,4 +651,36 @@ class _ProfileViewState extends State<ProfileView> {
       ),
     );
   }
+}
+
+void _showCharExplanation(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text("Chart Explanatiopns"),
+        content: const Text(
+          "Info dump: \n"
+          'BP: Boulder Points\n'
+          'BC: Amount Boulder Climbed\n'
+          'BF: Amount Boulder Flashed\n'
+          'MF: Max Flashed Boulder Grade\n'
+          'MC: Max Climbed Boulder Grade\n'
+          'DC: Days Climbed\n'
+          'Challenge is not updated yet\n'
+          'CP: Challenge Points\n'
+          'CD: Challenge Done\n'
+          'CC: Challenge Created',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
 }

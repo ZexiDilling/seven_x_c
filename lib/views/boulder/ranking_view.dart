@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:seven_x_c/helpters/functions.dart';
+import '../../helpters/time_calculations.dart' show TimePeriod, calculateDateThreshold, getTimePeriodLabel;
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
