@@ -7,6 +7,7 @@ import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
+import 'package:seven_x_c/services/cloude/settings/cloud_gym_data.dart';
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/generics/yes_no.dart';
@@ -24,6 +25,7 @@ Future<void> showAddNewBoulder(
     Map<String, Map<String, int>> colorToGrade,
     FirebaseCloudStorage fireBaseService,
     CloudSettings currentSettings,
+    CloudGymData currentGymData,
     Stream<Iterable<CloudProfile>> settersStream) async {
   bool setterTeam = false;
   bool guestSetterTeam = false;
@@ -80,7 +82,7 @@ Future<void> showAddNewBoulder(
                             items: [
                               const DropdownMenuItem(
                                 value: null,
-                                child: Text('Select Hold Color'),
+                                child: Text('Select Hold Colour'),
                               ),
                               ...currentSettings.settingsHoldColour!.entries
                                   .map((entry) {
@@ -91,7 +93,7 @@ Future<void> showAddNewBoulder(
                                     color: nameToColor(currentSettings
                                         .settingsHoldColour![holdColorName]),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(6.0),
+                                      padding: const EdgeInsets.all(1.0),
                                       child: Text(capitalize(holdColorName)),
                                     ),
                                   ),
@@ -284,10 +286,10 @@ Future<void> showAddNewBoulder(
                             if (selectedGrade == "") {
                               gradeValue = difficultyLevelToArrow(
                                   difficultyLevel!, gradeColorChoice!);
-                            } 
+                            }
                             if (difficultyLevel == null) {
-
-                              var arrow = getArrowFromNumberAndColor(gradeValue, gradeColorChoice!);
+                              var arrow = getArrowFromNumberAndColor(
+                                  gradeValue, gradeColorChoice!);
                               difficultyLevel = getdifficultyFromArrow(arrow);
                             }
                             if (compView && !compBoulder) {
@@ -356,15 +358,13 @@ Future<void> showAddNewBoulder(
                                 }
                               }
                             }
-                            
-                            if (newBoulder != null) {
 
+                            if (newBoulder != null) {
                               if (!setterTeam && !guestSetterTeam) {
-                                
+                                var setterProfiles = await fireBaseService
+                                    .getUserFromDisplayName(selectedSetter)
+                                    .first;
                                 try {
-                                  var setterProfiles = await fireBaseService
-                                      .getUserFromDisplayName(selectedSetter)
-                                      .first;
                                   CloudProfile setterProfile =
                                       setterProfiles.first;
                                   await fireBaseService.updateUser(
@@ -386,6 +386,30 @@ Future<void> showAddNewBoulder(
                                   // ignore: use_build_context_synchronously
                                   showErrorDialog(context, "$e");
                                 }
+                              }
+                              try {
+                                String setterID = "";
+                                Iterable<CloudProfile> setterProfiles =
+                                    await fireBaseService
+                                        .getUserFromDisplayName(selectedSetter)
+                                        .first;
+                                if (setterProfiles.isNotEmpty) {
+                                  CloudProfile setterProfile =
+                                      setterProfiles.first;
+                                  setterID = setterProfile.userID;
+                                } else {
+                                  setterID = selectedSetter;
+                                }
+                                await fireBaseService.updateGymData(
+                                    gymDataID: currentGymData.gymDataID,
+                                    gymDataBoulders: updateGymDataBoulders(
+                                        setterID: setterID,
+                                        newBoulder: newBoulder,
+                                        existingData:
+                                            currentGymData.gymDataBoulders));
+                              } catch (e) {
+                                // ignore: use_build_context_synchronously
+                                showErrorDialog(context, "$e");
                               }
                             }
                           }

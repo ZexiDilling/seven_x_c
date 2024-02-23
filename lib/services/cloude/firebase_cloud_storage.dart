@@ -5,6 +5,7 @@ import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 import 'package:seven_x_c/services/cloude/cloud_storage_exceptions.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
+import 'package:seven_x_c/services/cloude/settings/cloud_gym_data.dart';
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 
 class FirebaseCloudStorage {
@@ -14,6 +15,7 @@ class FirebaseCloudStorage {
   final challengeCollection =
       FirebaseFirestore.instance.collection("challenges");
   final settingsCollection = FirebaseFirestore.instance.collection("settings");
+  final gymDataCollection = FirebaseFirestore.instance.collection("gymData");
 
 // Boulder data
   Future<void> deleteBoulder({required String boulderID}) async {
@@ -103,7 +105,6 @@ class FirebaseCloudStorage {
     }
     return allBoulders;
   }
-
 
   Stream<Iterable<CloudBoulder>> getBoulder({required String boulderID}) {
     final allBoulders = bouldersCollection
@@ -236,6 +237,7 @@ class FirebaseCloudStorage {
     String? settingsID,
     bool? isAnonymous,
     Map<String, dynamic>? climbedBoulders,
+    Map<String, dynamic>? repeatBoulders,
     Map<String, dynamic>? dateBoulderTopped,
     Map<String, dynamic>? dateBoulderSet,
     Map<String, dynamic>? setBoulders,
@@ -246,7 +248,7 @@ class FirebaseCloudStorage {
     String? gradingSystem,
     int? maxFlahsedGrade,
     int? maxToppedGrade,
-  }) async {    
+  }) async {
     try {
       // Create a map to store non-null fields and their values
       final Map<String, dynamic> updatedData = {};
@@ -269,6 +271,10 @@ class FirebaseCloudStorage {
       if (climbedBoulders != null) {
         updatedData[climbedBouldersFieldName] = climbedBoulders;
       }
+      if (repeatBoulders != null) {
+        updatedData[repeatBouldersFieldName] = repeatBoulders;
+      }
+      
       if (dateBoulderTopped != null) {
         updatedData[dateBoulderToppedFieldName] = dateBoulderTopped;
       }
@@ -296,7 +302,6 @@ class FirebaseCloudStorage {
       // Update the document with the non-null fields
       await profileCollection.doc(currentProfile.profileID).update(updatedData);
     } catch (e) {
-  
       throw CouldNotUpdateUserException();
     }
   }
@@ -310,6 +315,7 @@ class FirebaseCloudStorage {
     required String settingsID,
     required bool isAnonymous,
     Map<String, dynamic>? climbedBoulders,
+    Map<String, dynamic>? repeatBoulders,
     Map<String, dynamic>? dateBoulderTopped,
     Map<String, dynamic>? dateBoulderSet,
     Map<String, dynamic>? setBoulders,
@@ -333,6 +339,7 @@ class FirebaseCloudStorage {
       settingsIDFieldName: settingsID,
       isAnonymousFieldName: isAnonymous,
       if (climbedBoulders != null) climbedBouldersFieldName: climbedBoulders,
+      if (repeatBoulders != null) repeatBouldersFieldName: repeatBoulders,
       if (dateBoulderTopped != null)
         dateBoulderToppedFieldName: dateBoulderTopped,
       if (dateBoulderSet != null) dateBoulderSetFieldName: dateBoulderSet,
@@ -358,6 +365,7 @@ class FirebaseCloudStorage {
       settingsID,
       isAnonymous,
       climbedBoulders,
+      repeatBoulders,
       dateBoulderTopped,
       dateBoulderSet,
       setBoulders,
@@ -837,4 +845,77 @@ class FirebaseCloudStorage {
       FirebaseCloudStorage._shareIstance();
   FirebaseCloudStorage._shareIstance();
   factory FirebaseCloudStorage() => _shared;
+
+  Future<CloudGymData> createGymData({
+    required String gymDataID,
+    required String gymDataNameID,
+    required String gymDataName,
+    Map<String, dynamic>? gymDataClimbers,
+    Map<String, dynamic>? gymDataBoulders,
+    Map<String, dynamic>? gymDataBouldersTopped,
+    Map<String, dynamic>? gymDataRoutesTopped,
+  }) async {
+    final document = await gymDataCollection.add({
+      gymDataNameIDFieldName: gymDataNameID,
+      gymDataClimbersFieldName: gymDataClimbers,
+      gymDataBouldersFieldName: gymDataBoulders,
+      gymDataBouldersToppedFieldName: gymDataBouldersTopped,
+      gymDataRoutesToppedFieldName: gymDataRoutesTopped,
+    });
+    final fetchChallenge = await document.get();
+    return CloudGymData(
+      gymDataNameID,
+      gymDataClimbers,
+      gymDataBoulders,
+      gymDataBouldersTopped,
+      gymDataRoutesTopped,
+      gymDataID: fetchChallenge.id,
+    );
+  }
+
+  Future<void> updateGymData({
+    required String gymDataID,
+    String? gymDataNameID,
+    Map<String, dynamic>? gymDataClimbers,
+    Map<String, dynamic>? gymDataBoulders,
+    Map<String, dynamic>? gymDataBouldersTopped,
+    Map<String, dynamic>? gymDataRoutesTopped,
+  }) async {
+    try {
+      // Create a map to store non-null fields and their values
+      final Map<String, dynamic> updatedData = {};
+
+      if (gymDataNameID != null) {
+        updatedData[gymDataNameIDFieldName] = gymDataNameID;
+      }
+
+      if (gymDataClimbers != null) {
+        updatedData[gymDataClimbersFieldName] = gymDataClimbers;
+      }
+      if (gymDataBoulders != null) {
+        updatedData[gymDataBouldersFieldName] = gymDataBoulders;
+      }
+      if (gymDataBouldersTopped != null) {
+        updatedData[gymDataBouldersToppedFieldName] = gymDataBouldersTopped;
+      }
+      if (gymDataRoutesTopped != null) {
+        updatedData[gymDataRoutesToppedFieldName] = gymDataRoutesTopped;
+      }
+      await gymDataCollection.doc(gymDataID).update(updatedData);
+    } catch (e) {
+      throw CouldNotUpdateSettings();
+    }
+  }
+
+  Future<CloudGymData?> getGymData(String? gymDataNameID) async {
+    final querySnapshot = await gymDataCollection
+        .where(gymDataNameIDFieldName, isEqualTo: gymDataNameID)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      return CloudGymData.fromSnapshot(querySnapshot.docs.first);
+    } else {
+      return null;
+    }
+  }
 }

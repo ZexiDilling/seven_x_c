@@ -11,6 +11,7 @@ class CloudProfile {
   final String? settingsID;
   final bool isAnonymous;
   final Map<String, dynamic>? climbedBoulders;
+  final Map<String, dynamic>? repeatBoulders;
   final Map<String, dynamic>? dateBoulderTopped;
   final Map<String, dynamic>? dateBoulderSet;
   final Map<String, dynamic>? setBoulders;
@@ -35,6 +36,7 @@ class CloudProfile {
     this.settingsID,
     this.isAnonymous,
     this.climbedBoulders,
+    this.repeatBoulders,
     this.dateBoulderTopped,
     this.dateBoulderSet,
     this.setBoulders,
@@ -67,6 +69,7 @@ class CloudProfile {
         isAnonymous = snapshot.data()[isAnonymousFieldName] as bool,
         climbedBoulders =
             snapshot.data()[climbedBouldersFieldName] as Map<String, dynamic>?,
+            repeatBoulders = snapshot.data()[repeatBouldersFieldName] as Map<String, dynamic>?,
         dateBoulderTopped = snapshot.data()[dateBoulderToppedFieldName]
             as Map<String, dynamic>?,
             dateBoulderSet = snapshot.data()[dateBoulderSetFieldName]

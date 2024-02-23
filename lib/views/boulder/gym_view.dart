@@ -16,6 +16,7 @@ import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
+import 'package:seven_x_c/services/cloude/settings/cloud_gym_data.dart';
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/logout_dialog.dart';
@@ -60,6 +61,7 @@ class _GymViewState extends State<GymView> {
   bool compView = false;
   CloudComp? currentComp;
   CloudSettings? currentSettings;
+  CloudGymData? currentGymData;
 
   late final FirebaseCloudStorage _fireBaseService;
 
@@ -150,6 +152,7 @@ class _GymViewState extends State<GymView> {
   Future<void> _initializeData() async {
     await _initializeCurrentProfile();
     await _initSettings();
+    await _initGymData();
     _initSettingData();
   }
 
@@ -174,6 +177,15 @@ class _GymViewState extends State<GymView> {
       currentSettings = tempSettings;
     });
     return currentSettings;
+  }
+
+   Future<CloudGymData?> _initGymData() async {
+    final CloudGymData? tempGymData =
+        await _fireBaseService.getGymData(currentProfile!.settingsID);
+    setState(() {
+      currentGymData = tempGymData;
+    });
+    return currentGymData;
   }
 
   Future<CloudProfile?> _initializeCurrentProfile() async {
@@ -633,6 +645,7 @@ class _GymViewState extends State<GymView> {
                   colorToGrade,
                   _fireBaseService,
                   currentSettings!,
+                  currentGymData!,
                   setters);
             });
           } catch (error) {
@@ -669,6 +682,7 @@ class _GymViewState extends State<GymView> {
                 compView,
                 _fireBaseService,
                 currentSettings!,
+                currentGymData!,
                 setters,
                 challengesOverview);
             // setState(() {

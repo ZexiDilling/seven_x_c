@@ -51,7 +51,17 @@ Map<String, dynamic> removeDateBoulderToppedMap(
 
   // Timestamp boulderTimeStamp = boulder.climberTopped![userID]["toppedDate"];
   // DateTime boulderDate = boulderTimeStamp.toDate();
-DateTime boulderDate = boulder.climberTopped![userID]["toppedDate"];
+
+  DateTime boulderDate;
+  if (boulder.climberTopped != null) {
+    try {
+      boulderDate = boulder.climberTopped![userID]["toppedDate"];
+    } on Error {
+      boulderDate = boulder.climberTopped![userID]["toppedDate"].toDate();
+    }
+  } else {
+    boulderDate = DateTime.now();
+  }
   String boulderYear = boulderDate.year.toString();
   String boulderMonth = boulderDate.month.toString();
   String boulderWeek = grabIsoWeekNumber(boulderDate).toString();
@@ -82,8 +92,16 @@ Map<String, dynamic> updateDateBoulderToppedMap({
 
   // Timestamp boulderTimeStamp = boulder.climberTopped![userID]["toppedDate"];
   // DateTime boulderDate = boulderTimeStamp.toDate();
-  DateTime boulderDate = boulder.climberTopped![userID]["toppedDate"];
-
+  DateTime boulderDate;
+  if (boulder.climberTopped != null) {
+    try {
+      boulderDate = boulder.climberTopped![userID]["toppedDate"];
+    } on Error {
+      boulderDate = boulder.climberTopped![userID]["toppedDate"].toDate();
+    }
+  } else {
+    boulderDate = DateTime.now();
+  }
 
   String boulderYear = boulderDate.year.toString();
   String boulderMonth = boulderDate.month.toString();
@@ -146,6 +164,177 @@ double updatePoints({required double points, double? existingData}) {
   } else {
     return points;
   }
+}
+
+Map<String, dynamic> updateRepeatBoulder({
+  required CloudProfile currentUser,
+  required CloudBoulder boulder,
+  Map<String, dynamic>? existingData,
+}) {
+  String indicator = "${currentUser.userID}_${boulder.boulderID}";
+  DateTime tempDate = DateTime.now();
+
+  String tempYear = tempDate.year.toString();
+  String tempMonth = tempDate.month.toString();
+  String tempWeek = grabIsoWeekNumber(tempDate).toString();
+  String tempDay = tempDate.day.toString();
+  int repeats = 0;
+  if (existingData != null) {
+    DateTime boulderDate = DateTime.now();
+    String boulderYear = boulderDate.year.toString();
+    String boulderMonth = boulderDate.month.toString();
+    String boulderWeek = grabIsoWeekNumber(boulderDate).toString();
+    String boulderDay = boulderDate.day.toString();
+
+    if (existingData.containsKey(boulderYear) &&
+        existingData[boulderYear]!.containsKey(boulderMonth) &&
+        existingData[boulderYear]![boulderMonth]!.containsKey(boulderWeek) &&
+        existingData[boulderYear]![boulderMonth]![boulderWeek]!
+            .containsKey(boulderDay) &&
+        existingData[boulderYear]![boulderMonth]![boulderWeek]![boulderDay]!
+            .containsKey(indicator)) {
+      repeats = existingData[boulderYear]![boulderMonth]![boulderWeek]![
+          boulderDay]![indicator]["repeats"];
+    }
+  }
+
+  repeats++;
+
+  Map<String, dynamic> newData = {
+    "gradeColour": boulder.gradeColour,
+    "gradeNumber": boulder.gradeNumberSetter,
+    "holdColour": boulder.holdColour,
+    "repeats": repeats
+  };
+
+  Map<String, dynamic> dateClimbedTopped = existingData ?? {};
+
+  dateClimbedTopped[tempYear] ??= {};
+  dateClimbedTopped[tempYear][tempMonth] ??= {};
+  dateClimbedTopped[tempYear][tempMonth][tempWeek] ??= {};
+  dateClimbedTopped[tempYear][tempMonth][tempWeek][tempDay] ??= {};
+  dateClimbedTopped[tempYear][tempMonth][tempWeek][tempDay][indicator] =
+      newData;
+
+  return dateClimbedTopped;
+}
+
+Map<String, dynamic> removeRepeatFromBoulder({
+  required CloudProfile currentUser,
+  required CloudBoulder boulder,
+  Map<String, dynamic>? existingData,
+}) {
+  String indicator = "${currentUser.userID}_${boulder.boulderID}";
+  DateTime tempDate = DateTime.now();
+
+  String boulderYear = tempDate.year.toString();
+  String boulderMonth = tempDate.month.toString();
+  String boulderWeek = grabIsoWeekNumber(tempDate).toString();
+  String boulderDay = tempDate.day.toString();
+  int repeats = 0;
+  if (existingData != null) {
+    DateTime boulderDate = DateTime.now();
+    boulderYear = boulderDate.year.toString();
+    boulderMonth = boulderDate.month.toString();
+    boulderWeek = grabIsoWeekNumber(boulderDate).toString();
+    boulderDay = boulderDate.day.toString();
+
+    if (existingData.containsKey(boulderYear) &&
+        existingData[boulderYear]!.containsKey(boulderMonth) &&
+        existingData[boulderYear]![boulderMonth]!.containsKey(boulderWeek) &&
+        existingData[boulderYear]![boulderMonth]![boulderWeek]!
+            .containsKey(boulderDay) &&
+        existingData[boulderYear]![boulderMonth]![boulderWeek]![boulderDay]!
+            .containsKey(indicator)) {
+      repeats = existingData[boulderYear]![boulderMonth]![boulderWeek]![
+          boulderDay]![indicator]["repeats"];
+
+
+
+
+    } else {
+      DateTime boulderDate;
+      List<Map<String, String>> indicatorDates = [];
+      if (boulder.climberTopped != null) {
+        try {
+          boulderDate =
+              boulder.climberTopped![currentUser.userID]["toppedDate"];
+        } on Error {
+          boulderDate =
+              boulder.climberTopped![currentUser.userID]["toppedDate"].toDate();
+        }
+      } else {
+        boulderDate = DateTime.now();
+      }
+
+      DateTime currentDate = DateTime.now();
+
+      while (boulderDate.isBefore(currentDate)) {
+        String year = boulderDate.year.toString();
+        String month = boulderDate.month.toString();
+        String week = grabIsoWeekNumber(boulderDate).toString();
+        String day = boulderDate.day.toString();
+
+        if (existingData.containsKey(year) &&
+            existingData[year]!.containsKey(month) &&
+            existingData[year]![month]!.containsKey(week) &&
+            existingData[year]![month]![week]!.containsKey(day) &&
+            existingData[year]![month]![week]![day]!.containsKey(indicator)) {
+          Map<String, String> dateInfo = {
+            'year': year,
+            'month': month,
+            'week': week,
+            'day': day,
+            "repeats": existingData[year]![month]![week]![day][indicator]["repeats"].toString(),
+          };
+          indicatorDates.add(dateInfo);
+        }
+
+        boulderDate = boulderDate.add(Duration(days: 1));
+      }
+
+      // Sort indicatorDates based on the dates in descending order
+      indicatorDates.sort((a, b) {
+        final dateA = DateTime(
+            int.parse(a['year']!), int.parse(a['month']!), int.parse(a['day']!));
+        final dateB = DateTime(
+            int.parse(b['year']!), int.parse(b['month']!), int.parse(b['day']!));
+        return dateB.compareTo(dateA);
+      });
+
+        // Get the latest date from the sorted list
+      if (indicatorDates.isNotEmpty) {
+        Map<String, String> latestDate = indicatorDates.first;
+        boulderYear = latestDate['year']!;
+        boulderMonth = latestDate['month']!;
+        boulderWeek = latestDate['week']!;
+        boulderDay = latestDate['day']!;
+        repeats = int.parse(latestDate["repeats"]!);
+        // Now you have the latest date information (year, month, week, day) in the variables
+        // latestYear, latestMonth, latestWeek, and latestDay.
+      }
+    }
+  }
+
+  repeats--;
+
+  Map<String, dynamic> newData = {
+    "gradeColour": boulder.gradeColour,
+    "gradeNumber": boulder.gradeNumberSetter,
+    "holdColour": boulder.holdColour,
+    "repeats": repeats
+  };
+
+  Map<String, dynamic> dateClimbedTopped = existingData ?? {};
+
+  dateClimbedTopped[boulderYear] ??= {};
+  dateClimbedTopped[boulderYear][boulderMonth] ??= {};
+  dateClimbedTopped[boulderYear][boulderMonth][boulderWeek] ??= {};
+  dateClimbedTopped[boulderYear][boulderMonth][boulderWeek][boulderDay] ??= {};
+  dateClimbedTopped[boulderYear][boulderMonth][boulderWeek][boulderDay][boulder.boulderID] =
+      newData;
+
+  return dateClimbedTopped;
 }
 
 Map<String, dynamic> updateBoulderCompSet({
@@ -322,7 +511,12 @@ Map<String, dynamic> updateClimberToppedMap(
       repeats ??= existingData[userID]["repeats"];
       topped ??= existingData[userID]["topped"];
       flashed ??= existingData[userID]['flashed'];
-      toppedDate ??= existingData[userID]["toppedDate"];
+      try {
+        toppedDate ??= existingData[userID]["toppedDate"];
+      } on Error {
+        toppedDate ??= existingData[userID]["toppedDate"].toDate();
+      }
+
       gradeNumberVoted ??= existingData[userID]["gradeNumber"];
       gradeColourVoted ??= existingData[userID]["gradeColour"];
       gradeArrowVoted ??= existingData[userID]["gradeArrow"];
@@ -511,4 +705,118 @@ int? tryParseInt(String? value) {
 
 String capitalize(String s) {
   return s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+}
+
+Map<String, dynamic> updateGymDataBoulders(
+    {required String setterID,
+    required CloudBoulder newBoulder,
+    Map<String, dynamic>? existingData}) {
+  String boulderYear = "";
+  String boulderMonth = "";
+  String boulderWeek = "";
+  String boulderDay = "";
+  String boulderID = "";
+
+  var holdColour;
+  var gradeColour;
+  var gradeNumberSetter;
+  var gradeDifficulty;
+
+  Timestamp boulderTimeStamp = newBoulder.setDateBoulder;
+  DateTime boulderDate = boulderTimeStamp.toDate();
+  boulderYear = boulderDate.year.toString();
+  boulderMonth = boulderDate.month.toString();
+  boulderWeek = grabIsoWeekNumber(boulderDate).toString();
+  boulderDay = boulderDate.day.toString();
+  holdColour = newBoulder.holdColour;
+  gradeColour = newBoulder.gradeColour;
+  gradeNumberSetter = newBoulder.gradeNumberSetter;
+  gradeDifficulty = newBoulder.gradeDifficulty;
+  boulderID = newBoulder.boulderID;
+
+  Map<String, dynamic> newData = {
+    "holdColour": holdColour,
+    "gradeColour": gradeColour,
+    "gradeNumberSetter": gradeNumberSetter,
+    "gradeDifficulty": gradeDifficulty,
+    "setter": setterID
+  };
+
+  Map<String, dynamic> gymDataBoulders = existingData ?? {};
+
+  gymDataBoulders[boulderYear] ??= {};
+  gymDataBoulders[boulderYear][boulderMonth] ??= {};
+  gymDataBoulders[boulderYear][boulderMonth][boulderWeek] ??= {};
+  gymDataBoulders[boulderYear][boulderMonth][boulderWeek][boulderDay] ??= {};
+  gymDataBoulders[boulderYear][boulderMonth][boulderWeek][boulderDay]
+      [boulderID] = newData;
+
+  return gymDataBoulders;
+}
+
+Map<String, dynamic>? removeBoulderFromGymDataBoulders({
+  required String boulderID,
+  Map<String, dynamic>? existingData,
+}) {
+  if (existingData != null) {
+    DateTime boulderDate = DateTime.now();
+    String boulderYear = boulderDate.year.toString();
+    String boulderMonth = boulderDate.month.toString();
+    String boulderWeek = grabIsoWeekNumber(boulderDate).toString();
+    String boulderDay = boulderDate.day.toString();
+
+    if (existingData.containsKey(boulderYear) &&
+        existingData[boulderYear]!.containsKey(boulderMonth) &&
+        existingData[boulderYear]![boulderMonth]!.containsKey(boulderWeek) &&
+        existingData[boulderYear]![boulderMonth]![boulderWeek]!
+            .containsKey(boulderDay) &&
+        existingData[boulderYear]![boulderMonth]![boulderWeek]![boulderDay]!
+            .containsKey(boulderID)) {
+      existingData[boulderYear]![boulderMonth]![boulderWeek]![boulderDay]!
+          .remove(boulderID);
+    }
+  }
+
+  return existingData;
+}
+
+Map<String, dynamic> updateGymDataToppes(
+    {required CloudProfile currentProfile,
+    required CloudBoulder boulder,
+    required bool flashed,
+    Map<String, dynamic>? existingData}) {
+  String userID = currentProfile.userID;
+  DateTime tempDate;
+
+  if (boulder.climberTopped != null) {
+    try {
+      tempDate = boulder.climberTopped![userID]["toppedDate"];
+    } on Error {
+      tempDate = boulder.climberTopped![userID]["toppedDate"].toDate();
+    }
+  } else {
+    tempDate = DateTime.now();
+  }
+
+  String tempYear = tempDate.year.toString();
+  String tempMonth = tempDate.month.toString();
+  String tempWeek = grabIsoWeekNumber(tempDate).toString();
+  String tempDay = tempDate.day.toString();
+
+  Map<String, dynamic> newData = {
+    "gradeColour": boulder.gradeColour,
+    "gradeNumber": boulder.gradeNumberSetter,
+    "flashed": flashed,
+  };
+
+  Map<String, dynamic> dateClimbedTopped = existingData ?? {};
+
+  dateClimbedTopped[tempYear] ??= {};
+  dateClimbedTopped[tempYear][tempMonth] ??= {};
+  dateClimbedTopped[tempYear][tempMonth][tempWeek] ??= {};
+  dateClimbedTopped[tempYear][tempMonth][tempWeek][tempDay] ??= {};
+  dateClimbedTopped[tempYear][tempMonth][tempWeek][tempDay][boulder.boulderID] =
+      newData;
+
+  return dateClimbedTopped;
 }

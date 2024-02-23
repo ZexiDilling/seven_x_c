@@ -34,6 +34,7 @@ const isAdminFieldName = "isAdmin";
 const settingsIDFieldName = "settingsID";
 const isAnonymousFieldName = "isAnonymous";
 const climbedBouldersFieldName = "climbedBoulders";
+const repeatBouldersFieldName = "repeatBoulders";
 const dateBoulderToppedFieldName = "dateBoulderTopped";
 const dateBoulderSetFieldName = "dateBoulderSet";
 const setBouldersFieldName = "setBoulders";
@@ -93,3 +94,10 @@ const settingsHoldColourFieldName = "settingsHoldColour";
 const settingsGradeColourFieldName = "settingsGradeColour";
 const settingsColorToGradeFieldName = "settingsColorToGrade";
 const settingsWallRegionsFieldName = "settingsWallRegions";
+
+//GymData
+const gymDataNameIDFieldName = "gymDataNameID";
+const gymDataClimbersFieldName = "gymDataClimbers";
+const gymDataBouldersFieldName = "gymDataBoulders";
+const gymDataBouldersToppedFieldName = "gymDataBouldersTopped";
+const gymDataRoutesToppedFieldName = "gymDataRoutesTopped";
