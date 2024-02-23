@@ -6,7 +6,7 @@ import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/constants/boulder_info.dart'; //
 import 'package:seven_x_c/helpters/bonus_functions.dart';
 import 'package:seven_x_c/helpters/functions.dart'
-    show capitalize, removeDateBoulderToppedMap, updateClimberToppedMap, updateDateBoulderToppedMap, updateGymDataToppes, updatePoints, updateRepeatBoulder;
+    show capitalize, removeDateBoulderToppedMap, removeRepeatFromBoulder, updateClimberToppedMap, updateDateBoulderToppedMap, updateGymDataToppes, updatePoints, updateRepeatBoulder;
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart'; //
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart'; //
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
@@ -53,18 +53,27 @@ void updateUserReapet(FirebaseCloudStorage userService,
   if (newRepeats > currentRepeats) {
     repeatPoints = calculateRepeatPoints(
         currentProfile, boulder, newRepeats, orgBoulderPoints);
-  } else {
-    repeatPoints = -calculateRepeatPoints(
-        currentProfile, boulder, newRepeats, orgBoulderPoints);
-  }
-
-  double newRepeatPoints = orgRepeatPoints + repeatPoints;
-  userService.updateUser(
+double newRepeatPoints = orgRepeatPoints + repeatPoints;
+userService.updateUser(
     currentProfile: currentProfile,
       boulderPoints: updatePoints(
           points: newRepeatPoints, existingData: currentProfile.boulderPoints),
       repeatBoulders: updateRepeatBoulder(currentUser: currentProfile, boulder: boulder, existingData: currentProfile.repeatBoulders),
       );
+  } else {
+    repeatPoints = -calculateRepeatPoints(
+        currentProfile, boulder, newRepeats, orgBoulderPoints);
+        double newRepeatPoints = orgRepeatPoints + repeatPoints;
+        userService.updateUser(
+    currentProfile: currentProfile,
+      boulderPoints: updatePoints(
+          points: newRepeatPoints, existingData: currentProfile.boulderPoints),
+      repeatBoulders: removeRepeatFromBoulder(currentUser: currentProfile, boulder: boulder, existingData: currentProfile.repeatBoulders),
+      );
+  }
+
+  
+  
 
 }
 
