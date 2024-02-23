@@ -101,7 +101,7 @@ class GymPainter extends CustomPainter {
             updatedBoulderDate.add(updateBoulderNotice).isAfter(currentTime) &&
             (!userTopped && !userFlashed)) {
           glowColour = updatedBoulderColour;
-        }
+        } else {glowColour = null;}
 
         // Give problems a glow, unless they have been topped
         if (glowColour != null && !userTopped) {

@@ -23,3 +23,5 @@ Data structure changes:
     Data for all tops are now storred n a data structure for the gym
     Data for all boulders sat is now storred
     will work on a way to showcase the two new data thingys.
+
+Version 10:
