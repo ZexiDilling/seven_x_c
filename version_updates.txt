@@ -15,4 +15,11 @@ Data structure changes:
     Added a way to go back and forward in time for the graphData under Profile
 
     
-    
+version 9:
+Bug fixes:
+    Repeats should now be working
+
+Data structure changes:
+    Data for all tops are now storred n a data structure for the gym
+    Data for all boulders sat is now storred
+    will work on a way to showcase the two new data thingys.
