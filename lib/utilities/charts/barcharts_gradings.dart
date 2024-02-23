@@ -58,7 +58,7 @@ List<BarChartGroupData> getGradeNumberChartData(CloudBoulder boulder, CloudSetti
   }
   if (boulder.climberTopped != null && boulder.climberTopped!.isNotEmpty) {
     boulder.climberTopped!.forEach((userId, climbInfo) {
-      if (climbInfo['gradeNumber'] == int) {
+      if (climbInfo['gradeNumber'].runtimeType == int) {
         int gradeNumber = climbInfo['gradeNumber'];
 
         gradeVotes[gradeNumber] = (gradeVotes[gradeNumber] ?? 0) + 1;
@@ -110,7 +110,8 @@ Map<int, int> getSortedGrades(Map<int, int> gradeVotes, int gradeNumberSetter) {
       int maxGrade = sortedGrades.last;
 
       if (!sortedGrades.contains(minGrade - 1)) {
-        sortedGrades.insert(0, minGrade - 1);
+        if (minGrade > 0){
+        sortedGrades.insert(0, minGrade - 1);}
       }
 
       if (!sortedGrades.contains(maxGrade + 1)) {

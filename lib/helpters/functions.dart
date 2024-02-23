@@ -49,8 +49,9 @@ Map<String, dynamic> removeDateBoulderToppedMap(
   String boulderID = boulder.boulderID;
   Map<String, dynamic> dateBoulder = existingData ?? {};
 
-  DateTime boulderDate = boulder.climberTopped![userID]["dateTopped"];
-
+  // Timestamp boulderTimeStamp = boulder.climberTopped![userID]["toppedDate"];
+  // DateTime boulderDate = boulderTimeStamp.toDate();
+DateTime boulderDate = boulder.climberTopped![userID]["toppedDate"];
   String boulderYear = boulderDate.year.toString();
   String boulderMonth = boulderDate.month.toString();
   String boulderWeek = grabIsoWeekNumber(boulderDate).toString();
@@ -79,7 +80,10 @@ Map<String, dynamic> updateDateBoulderToppedMap({
   String gradeColour = boulder.gradeColour;
   int gradeNumberSetter = boulder.gradeNumberSetter;
 
+  // Timestamp boulderTimeStamp = boulder.climberTopped![userID]["toppedDate"];
+  // DateTime boulderDate = boulderTimeStamp.toDate();
   DateTime boulderDate = boulder.climberTopped![userID]["toppedDate"];
+
 
   String boulderYear = boulderDate.year.toString();
   String boulderMonth = boulderDate.month.toString();
@@ -344,7 +348,6 @@ Map<String, dynamic> updateClimberToppedMap(
   existingData[userID] = newData;
   return existingData;
 }
-
 
 Map<String, dynamic> updateCompBoulderMap(
     {required CloudProfile currentProfile,

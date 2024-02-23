@@ -1,8 +1,9 @@
-version 7:
+version 8:
 bug fixes:
     Fixed bug where other ppls top of a boulder, affected the oppasity and size of all boulders on the map
     Fixed bugs with challenges so they should now work
     Fixed bug where updating Grading system only took effect after app reset. 
+    Fixed bug where voted grade did not show for in French or V-grade
     
 
 Data structure changes:

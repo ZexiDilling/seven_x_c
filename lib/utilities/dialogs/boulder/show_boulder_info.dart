@@ -776,7 +776,8 @@ Future<bool> showBoulderInformation(
                                           currentSettings, boulder),
                                     ],
                                   ),
-                            const SizedBox(height: 20),
+
+                            const SizedBox(height: 30),
                             ExpansionPanelList(
                               elevation: 1,
                               expandedHeaderPadding: const EdgeInsets.all(0),
@@ -1213,7 +1214,7 @@ double calculateboulderPoints(CloudProfile currentProfile, CloudBoulder boulder,
   // Check if the user have points from this boulder
   if (boulder.climberTopped != null) {
     if (boulder.climberTopped!.containsKey((currentProfile.userID))) {
-      if (boulder.climberTopped![currentProfile.userID]["topped"]) {
+      if (boulder.climberTopped![currentProfile.userID]["topped"] != null)  {
         boulderPoints = boulderPoints *
             (repeats > 0
                 ? repeatsMultiplier - (repeats - 1) * repeatsDecrement
@@ -1438,9 +1439,10 @@ Container gradingInnerCirleDrawing(double circleWidth, double circleHeight,
 }
 
 SizedBox barGraphColours(CloudBoulder boulder, CloudSettings currentSettings) {
+  print("boulder -$boulder");
   return SizedBox(
     width: 250,
-    height: 150,
+    height: 100,
     child: BarChart(
       BarChartData(
         gridData: const FlGridData(show: false),
@@ -1457,7 +1459,7 @@ SizedBox barChartGradeNumbering(
     String gradingSystem, CloudSettings currentSettings, CloudBoulder boulder) {
   return SizedBox(
     width: 250,
-    height: 200,
+    height: 100,
     child: BarChart(
       BarChartData(
         gridData: const FlGridData(show: false),
