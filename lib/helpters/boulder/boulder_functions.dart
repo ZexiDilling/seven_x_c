@@ -42,10 +42,16 @@ Map<String, dynamic>? updateUsersVotedForGrade(
 
 void updateUserReapet(FirebaseCloudStorage userService,
     CloudProfile currentProfile, CloudBoulder boulder, int newRepeats) {
+  print(newRepeats);
+  print(boulder.climberTopped);
+  print(boulder.climberTopped![currentProfile.userID]);
   int currentRepeats =
-      boulder.climberTopped![currentProfile.userID]["newRepeats"];
-  double orgBoulderPoints =
-      boulder.climberTopped![currentProfile.userID]["boulderPoints"];
+      boulder.climberTopped![currentProfile.userID]["repeats"];
+  double orgBoulderPoints = 0.0;
+  try {
+  orgBoulderPoints =
+      boulder.climberTopped![currentProfile.userID]["boulderPoints"];}
+      on Error {orgBoulderPoints = 0.0;}
   double orgRepeatPoints =
       boulder.climberTopped![currentProfile.userID]["boulderPoints"] ?? 0;
   double repeatPoints;
@@ -259,11 +265,7 @@ void updateUserUndoTop(
       boulderID: boulder.boulderID,
       climberTopped: updateClimberToppedMap(
           currentProfile: currentProfile,
-          attempts: 0,
-          flashed: false,
-          topped: false,
-          repeats: 0,
-          boulderPoints: orgBoulderPoints,
+          undoTop: true,
           existingData: boulder.climberTopped));
 
   firebaseService.updateUser(

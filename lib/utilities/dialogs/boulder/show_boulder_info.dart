@@ -253,8 +253,8 @@ Future<bool> showBoulderInformation(
                                                   flashed,
                                                   attempts);
                                             } else {
-                                              showErrorDialog(context,
-                                                  closeCompStatment);
+                                              showErrorDialog(
+                                                  context, closeCompStatment);
                                             }
                                           }
                                           if (topped) {
@@ -267,12 +267,14 @@ Future<bool> showBoulderInformation(
                                                 topped,
                                                 attempts,
                                                 repeats);
-                                            
                                           } else {
                                             flashed = false;
-
-                                            updateUserUndoTop(fireBaseService,
-                                                currentProfile, boulder, currentGymData);
+                                            repeats = 0;
+                                            updateUserUndoTop(
+                                                fireBaseService,
+                                                currentProfile,
+                                                boulder,
+                                                currentGymData);
                                           }
                                         });
                                       },

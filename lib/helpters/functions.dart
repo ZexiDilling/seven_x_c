@@ -5,6 +5,7 @@ import 'package:seven_x_c/constants/comp_const.dart';
 import 'package:seven_x_c/helpters/time_calculations.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
+import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
@@ -53,7 +54,7 @@ Map<String, dynamic> removeDateBoulderToppedMap(
   // DateTime boulderDate = boulderTimeStamp.toDate();
 
   DateTime boulderDate;
-  if (boulder.climberTopped != null) {
+  if (boulder.climberTopped != null && boulder.climberTopped![userID] != null) {
     try {
       boulderDate = boulder.climberTopped![userID]["toppedDate"];
     } on Error {
@@ -248,10 +249,6 @@ Map<String, dynamic> removeRepeatFromBoulder({
             .containsKey(indicator)) {
       repeats = existingData[boulderYear]![boulderMonth]![boulderWeek]![
           boulderDay]![indicator]["repeats"];
-
-
-
-
     } else {
       DateTime boulderDate;
       List<Map<String, String>> indicatorDates = [];
@@ -285,7 +282,9 @@ Map<String, dynamic> removeRepeatFromBoulder({
             'month': month,
             'week': week,
             'day': day,
-            "repeats": existingData[year]![month]![week]![day][indicator]["repeats"].toString(),
+            "repeats": existingData[year]![month]![week]![day][indicator]
+                    ["repeats"]
+                .toString(),
           };
           indicatorDates.add(dateInfo);
         }
@@ -295,14 +294,14 @@ Map<String, dynamic> removeRepeatFromBoulder({
 
       // Sort indicatorDates based on the dates in descending order
       indicatorDates.sort((a, b) {
-        final dateA = DateTime(
-            int.parse(a['year']!), int.parse(a['month']!), int.parse(a['day']!));
-        final dateB = DateTime(
-            int.parse(b['year']!), int.parse(b['month']!), int.parse(b['day']!));
+        final dateA = DateTime(int.parse(a['year']!), int.parse(a['month']!),
+            int.parse(a['day']!));
+        final dateB = DateTime(int.parse(b['year']!), int.parse(b['month']!),
+            int.parse(b['day']!));
         return dateB.compareTo(dateA);
       });
 
-        // Get the latest date from the sorted list
+      // Get the latest date from the sorted list
       if (indicatorDates.isNotEmpty) {
         Map<String, String> latestDate = indicatorDates.first;
         boulderYear = latestDate['year']!;
@@ -331,8 +330,8 @@ Map<String, dynamic> removeRepeatFromBoulder({
   dateClimbedTopped[boulderYear][boulderMonth] ??= {};
   dateClimbedTopped[boulderYear][boulderMonth][boulderWeek] ??= {};
   dateClimbedTopped[boulderYear][boulderMonth][boulderWeek][boulderDay] ??= {};
-  dateClimbedTopped[boulderYear][boulderMonth][boulderWeek][boulderDay][boulder.boulderID] =
-      newData;
+  dateClimbedTopped[boulderYear][boulderMonth][boulderWeek][boulderDay]
+      [boulder.boulderID] = newData;
 
   return dateClimbedTopped;
 }
@@ -500,31 +499,48 @@ Map<String, dynamic> updateClimberToppedMap(
     int? gradeArrowVoted,
     double? boulderPoints,
     DateTime? toppedDate,
+    bool? undoTop,
     Map<String, dynamic>? existingData}) {
   String displayName = currentProfile.displayName;
   bool isAnonymous = currentProfile.isAnonymous;
   String userID = currentProfile.userID;
-
-  if (existingData != null && existingData.isNotEmpty) {
-    if (existingData[userID] != null) {
-      attempts ??= existingData[userID]['attempts'];
-      repeats ??= existingData[userID]["repeats"];
-      topped ??= existingData[userID]["topped"];
-      flashed ??= existingData[userID]['flashed'];
-      try {
-        toppedDate ??= existingData[userID]["toppedDate"];
-      } on Error {
-        toppedDate ??= existingData[userID]["toppedDate"].toDate();
-      }
-
-      gradeNumberVoted ??= existingData[userID]["gradeNumber"];
-      gradeColourVoted ??= existingData[userID]["gradeColour"];
-      gradeArrowVoted ??= existingData[userID]["gradeArrow"];
-    }
+  if (undoTop != null) {
+    
+    attempts = 0;
+    repeats = 0;
+    topped = false;
+    flashed = false;
+    boulderPoints = 0;
+    gradeNumberVoted ??= existingData![userID]["gradeNumber"];
+    gradeColourVoted ??= existingData![userID]["gradeColour"];
+    gradeArrowVoted ??= existingData![userID]["gradeArrow"];
+    try {
+          toppedDate ??= existingData![userID]["toppedDate"];
+        } on Error {
+          toppedDate ??= existingData![userID]["toppedDate"].toDate();
+        }
   } else {
-    existingData = {};
-  }
+    if (existingData != null && existingData.isNotEmpty) {
+      if (existingData[userID] != null) {
+        attempts ??= existingData[userID]['attempts'];
+        repeats ??= existingData[userID]["repeats"];
+        topped ??= existingData[userID]["topped"];
+        flashed ??= existingData[userID]['flashed'];
+        try {
+          toppedDate ??= existingData[userID]["toppedDate"];
+        } on Error {
+          toppedDate ??= existingData[userID]["toppedDate"].toDate();
+        }
 
+        gradeNumberVoted ??= existingData[userID]["gradeNumber"];
+        gradeColourVoted ??= existingData[userID]["gradeColour"];
+        gradeArrowVoted ??= existingData[userID]["gradeArrow"];
+        boulderPoints ??= existingData[userID]["boulderPoints"];
+      }
+    } else {
+      existingData = {};
+    }
+  }
   Map<String, dynamic> newData = {
     "displayName": displayName,
     "isAnonymous": isAnonymous,
@@ -539,7 +555,8 @@ Map<String, dynamic> updateClimberToppedMap(
     "toppedDate": toppedDate,
   };
 
-  existingData[userID] = newData;
+  existingData![userID] = newData;
+  print(existingData[userID]);
   return existingData;
 }
 
