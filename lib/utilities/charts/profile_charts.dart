@@ -47,7 +47,6 @@ class LineChartGraph extends StatelessWidget {
 
     List<String> holdColourOrder =
         currentSettings.settingsHoldColour!.keys.toList();
-
     switch (chartSelection) {
       case "maxGrade":
         List<FlSpot> climbedEntries =

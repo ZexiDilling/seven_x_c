@@ -41,9 +41,9 @@ Future<PointsData> getPoints(
       LinkedHashMap();
   LinkedHashMap<String, Map<String, Map<String, int>>>
       boulderGradeColourToHoldColour = LinkedHashMap();
+  LinkedHashMap<String, Map<String, Map<int, int>>> boulderHoldColourToGrade =
+      LinkedHashMap();
   LinkedHashMap<String, Map<String, Map<String, int>>>
-      boulderHoldColourToGrade = LinkedHashMap();
-  LinkedHashMap<String, Map<String, Map<int, int>>>
       boulderHoldColourToGradeColour = LinkedHashMap();
   String maxBoulderClimbedColour = "";
   String maxBoulderFlashedColour = "";
@@ -474,6 +474,7 @@ Future<PointsData> getPoints(
             case TimePeriod.year:
               var yearData =
                   currentProfile.dateBoulderSet![selectedTime["year"]];
+
               int latestMonth =
                   DateTime.now().year > int.parse(selectedTime["year"]!)
                       ? 12
@@ -508,6 +509,7 @@ Future<PointsData> getPoints(
 
                               pointsSetter += boulderData["points"] ?? 0;
                               amountSetter++;
+
                               setterGraphSetup(
                                   month,
                                   boulderClimbedAmount,
@@ -720,7 +722,10 @@ Future<PointsData> getPoints(
                     }
                   }
                 }
+              } else {
+                gotData = false;
               }
+
             default:
               gotData = false;
               pointsBoulder = 0;
@@ -812,9 +817,8 @@ void setterGraphSetup(
     LinkedHashMap<String, Map<int, Map<String, int>>> boulderGradeToHoldColour,
     LinkedHashMap<String, Map<String, Map<String, int>>>
         boulderGradeColourToHoldColour,
+    LinkedHashMap<String, Map<String, Map<int, int>>> boulderHoldColourToGrade,
     LinkedHashMap<String, Map<String, Map<String, int>>>
-        boulderHoldColourToGrade,
-    LinkedHashMap<String, Map<String, Map<int, int>>>
         boulderHoldColourToGradeColour,
     LinkedHashMap<String, int> boulderSetAmount) {
   boulderSetAmount[timePeriode] ??= 0;
@@ -832,7 +836,6 @@ void setterGraphSetup(
   boulderSetHoldColours[timePeriode]![boulderData["holdColour"]] ??= 0;
   boulderSetHoldColours[timePeriode]![boulderData["holdColour"]] =
       (boulderSetHoldColours[timePeriode]![boulderData["holdColour"]] ?? 0) + 1;
-
   boulderGradeToHoldColour[timePeriode] ??= {};
   boulderGradeToHoldColour[timePeriode]![boulderData["gradeNumberSetter"]] ??=
       {};
@@ -843,7 +846,6 @@ void setterGraphSetup(
               boulderData["gradeNumberSetter"]]![boulderData["holdColour"]] ??
           0) +
       1;
-
   boulderGradeColourToHoldColour[timePeriode] ??= {};
   boulderGradeColourToHoldColour[timePeriode]![boulderData["gradeColour"]] ??=
       {};
@@ -857,16 +859,18 @@ void setterGraphSetup(
           1;
 
   boulderHoldColourToGrade[timePeriode] ??= {};
+
   boulderHoldColourToGrade[timePeriode]![boulderData["holdColour"]] ??= {};
+
   boulderHoldColourToGrade[timePeriode]![boulderData["holdColour"]]![
       boulderData["gradeNumberSetter"]] ??= 0;
+
   boulderHoldColourToGrade[timePeriode]![boulderData["holdColour"]]![
           boulderData["gradeNumberSetter"]] =
       (boulderHoldColourToGrade[timePeriode]![boulderData["holdColour"]]![
                   boulderData["gradeNumberSetter"]] ??
               0) +
           1;
-
   boulderHoldColourToGradeColour[timePeriode] ??= {};
   boulderHoldColourToGradeColour[timePeriode]![boulderData["holdColour"]] ??=
       {};
@@ -922,9 +926,9 @@ class PointsData {
       LinkedHashMap();
   LinkedHashMap<String, Map<String, Map<String, int>>>
       boulderGradeColourToHoldColour = LinkedHashMap();
+  LinkedHashMap<String, Map<String, Map<int, int>>> boulderHoldColourToGrade =
+      LinkedHashMap();
   LinkedHashMap<String, Map<String, Map<String, int>>>
-      boulderHoldColourToGrade = LinkedHashMap();
-  LinkedHashMap<String, Map<String, Map<int, int>>>
       boulderHoldColourToGradeColour = LinkedHashMap();
 
   PointsData(

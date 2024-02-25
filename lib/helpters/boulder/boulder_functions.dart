@@ -42,9 +42,6 @@ Map<String, dynamic>? updateUsersVotedForGrade(
 
 void updateUserReapet(FirebaseCloudStorage userService,
     CloudProfile currentProfile, CloudBoulder boulder, int newRepeats) {
-  print(newRepeats);
-  print(boulder.climberTopped);
-  print(boulder.climberTopped![currentProfile.userID]);
   int currentRepeats =
       boulder.climberTopped![currentProfile.userID]["repeats"];
   double orgBoulderPoints = 0.0;

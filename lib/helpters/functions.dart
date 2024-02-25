@@ -5,7 +5,6 @@ import 'package:seven_x_c/constants/comp_const.dart';
 import 'package:seven_x_c/helpters/time_calculations.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
-import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
@@ -289,7 +288,7 @@ Map<String, dynamic> removeRepeatFromBoulder({
           indicatorDates.add(dateInfo);
         }
 
-        boulderDate = boulderDate.add(Duration(days: 1));
+        boulderDate = boulderDate.add(const Duration(days: 1));
       }
 
       // Sort indicatorDates based on the dates in descending order
@@ -556,7 +555,6 @@ Map<String, dynamic> updateClimberToppedMap(
   };
 
   existingData![userID] = newData;
-  print(existingData[userID]);
   return existingData;
 }
 

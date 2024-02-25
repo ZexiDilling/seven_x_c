@@ -410,7 +410,6 @@ class _ProfileViewState extends State<ProfileView> {
 
                       // Access the PointsData object from the snapshot
                       PointsData pointsData = pointsSnapshot.data!;
-                      
                       // Render your UI with the updated points information
                       return SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
@@ -467,7 +466,9 @@ class _ProfileViewState extends State<ProfileView> {
                                   const EdgeInsets.only(right: 16, left: 6),
                               child: SizedBox(
                                 height: 300,
-                                child: currentSettings != null
+                                child: 
+                                
+                                currentSettings != null
                                     ? pointsData.gotData
                                         ? LineChartGraph(
                                             currentSettings: currentSettings!,
