@@ -359,7 +359,7 @@ Map<String, dynamic> updateBoulderCompSet({
   return boulderComp;
 }
 
-Map<String, dynamic> updateBoulderSet(
+Map<String, dynamic> updateDateBoulderSet(
     {required CloudProfile setterProfile,
     required String boulderId,
     CloudBoulder? newBoulder,
@@ -504,7 +504,6 @@ Map<String, dynamic> updateClimberToppedMap(
   bool isAnonymous = currentProfile.isAnonymous;
   String userID = currentProfile.userID;
   if (undoTop != null) {
-    
     attempts = 0;
     repeats = 0;
     topped = false;
@@ -514,10 +513,10 @@ Map<String, dynamic> updateClimberToppedMap(
     gradeColourVoted ??= existingData![userID]["gradeColour"];
     gradeArrowVoted ??= existingData![userID]["gradeArrow"];
     try {
-          toppedDate ??= existingData![userID]["toppedDate"];
-        } on Error {
-          toppedDate ??= existingData![userID]["toppedDate"].toDate();
-        }
+      toppedDate ??= existingData![userID]["toppedDate"];
+    } on Error {
+      toppedDate ??= existingData![userID]["toppedDate"].toDate();
+    }
   } else {
     if (existingData != null && existingData.isNotEmpty) {
       if (existingData[userID] != null) {
@@ -771,10 +770,16 @@ Map<String, dynamic> updateGymDataBoulders(
 
 Map<String, dynamic>? removeBoulderFromGymDataBoulders({
   required String boulderID,
+  DateTime? removeDate,
   Map<String, dynamic>? existingData,
 }) {
   if (existingData != null) {
-    DateTime boulderDate = DateTime.now();
+    DateTime boulderDate;
+    if (removeDate == null) {
+      boulderDate = DateTime.now();
+    } else {
+      boulderDate = removeDate;
+    }
     String boulderYear = boulderDate.year.toString();
     String boulderMonth = boulderDate.month.toString();
     String boulderWeek = grabIsoWeekNumber(boulderDate).toString();

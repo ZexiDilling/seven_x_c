@@ -67,7 +67,7 @@ class _ProfileViewState extends State<ProfileView> {
 
         firebaseService.updateUser(
             currentProfile: currentProfile!,
-            dateBoulderSet: updateBoulderSet(
+            dateBoulderSet: updateDateBoulderSet(
                 setterProfile: currentProfile!,
                 boulderId: currentBoulderID,
                 setterPoints: setterPoints,

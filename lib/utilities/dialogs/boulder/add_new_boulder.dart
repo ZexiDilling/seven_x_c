@@ -369,7 +369,7 @@ Future<void> showAddNewBoulder(
                                       setterProfiles.first;
                                   await fireBaseService.updateUser(
                                     currentProfile: setterProfile,
-                                    dateBoulderSet: updateBoulderSet(
+                                    dateBoulderSet: updateDateBoulderSet(
                                       setterProfile: setterProfile,
                                       boulderId: newBoulder.boulderID,
                                       newBoulder: newBoulder,

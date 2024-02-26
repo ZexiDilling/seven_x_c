@@ -151,17 +151,28 @@ Profile
 boulders
 	update a boulder 
 		Should delete all users from the climberstopped and be showen on the map as an updated boulder
-	
+
+Fix challenges to work.	
+Fix states on profile view
 ------------------------------------------------------------------------------------------------------------------------
 
 
 ToDO:
 ------------------------------------------------------------------------------------------
 
-Fix challenges to work.
+new bar - grah:
+	Filter:
+		By section / wall
+		By Setdate
+		By Setter
+
+	Show:
+		HoldColour vs GradeColour/grade
+		GradeColour/grade vs HoldColour
+		gradeColour vs grade
+		grade vs gradeColour
 
 
-Fix states on profile view
 
 Remove setter points and re-calc + update on the new setter if they are differet than "DTU Setter Team" and "Geust setters"
 

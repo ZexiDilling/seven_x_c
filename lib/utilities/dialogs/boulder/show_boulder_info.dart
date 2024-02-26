@@ -481,21 +481,11 @@ Future<bool> showBoulderInformation(
                                                   ),
                                                   TextButton(
                                                     onPressed: () {
-                                                      fireBaseService.updateGymData(
-                                                          gymDataID:
-                                                              currentGymData
-                                                                  .gymDataID,
-                                                          gymDataBoulders: removeBoulderFromGymDataBoulders(
-                                                              boulderID: boulder
-                                                                  .boulderID,
-                                                              existingData:
-                                                                  currentGymData
-                                                                      .gymDataBoulders));
-
-                                                      fireBaseService
-                                                          .deleteBoulder(
-                                                              boulderID: boulder
-                                                                  .boulderID);
+                                                      deletionOfTheBoulder(
+                                                          fireBaseService,
+                                                          currentGymData,
+                                                          currentProfile,
+                                                          boulder);
                                                       Navigator.of(context)
                                                           .pop();
                                                       Navigator.of(context)
@@ -838,6 +828,34 @@ Future<bool> showBoulderInformation(
     },
   );
   return moveBoulder;
+}
+
+void deletionOfTheBoulder(
+    FirebaseCloudStorage fireBaseService,
+    CloudGymData currentGymData,
+    CloudProfile currentProfile,
+    CloudBoulder boulder) {
+  DateTime boulderData = boulder.setDateBoulder.toDate();
+
+  if (DateTime.now().difference(boulderData).inDays < 2) {
+    double setterPoints = boulder.setterPoint?? 0;
+
+    fireBaseService.updateUser(
+        currentProfile: currentProfile,
+        setterPoints: updatePoints(points: -setterPoints, existingData: currentProfile.setterPoints),
+        dateBoulderSet: removeBoulderFromGymDataBoulders(
+            boulderID: boulder.boulderID,
+            removeDate: boulder.setDateBoulder.toDate(),
+            existingData: currentProfile.dateBoulderSet));
+  }
+
+  fireBaseService.updateGymData(
+      gymDataID: currentGymData.gymDataID,
+      gymDataBoulders: removeBoulderFromGymDataBoulders(
+          boulderID: boulder.boulderID,
+          existingData: currentGymData.gymDataBoulders));
+
+  fireBaseService.deleteBoulder(boulderID: boulder.boulderID);
 }
 
 ExpansionPanelList challangePanel(
