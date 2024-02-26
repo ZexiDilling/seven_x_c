@@ -55,6 +55,7 @@ dependencies:
   google_fonts: ^6.1.0
   flutter_colorpicker: ^1.0.3
   recaptcha_enterprise_flutter: ^18.4.0
+  sliding_up_panel: ^2.0.0+1
 
 dev_dependencies:
   flutter_test:

@@ -165,7 +165,6 @@ new bar - grah:
 		By section / wall
 		By Setdate
 		By Setter
-
 	Show:
 		HoldColour vs GradeColour/grade
 		GradeColour/grade vs HoldColour

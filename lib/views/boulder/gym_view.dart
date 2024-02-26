@@ -28,7 +28,9 @@ import 'package:seven_x_c/utilities/dialogs/slides/comp_slide.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/add_new_boulder.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/show_boulder_info.dart';
 import 'package:seven_x_c/utilities/dialogs/slides/filter_silde.dart';
+import 'package:seven_x_c/utilities/dialogs/slides/slideUp.dart';
 import 'package:vector_math/vector_math_64.dart' as VM;
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 GlobalKey _gymKey = GlobalKey();
 
@@ -179,7 +181,7 @@ class _GymViewState extends State<GymView> {
     return currentSettings;
   }
 
-   Future<CloudGymData?> _initGymData() async {
+  Future<CloudGymData?> _initGymData() async {
     final CloudGymData? tempGymData =
         await _fireBaseService.getGymData(currentProfile!.settingsID);
     setState(() {
@@ -363,72 +365,82 @@ class _GymViewState extends State<GymView> {
           dropDownMenu(context, currentSettings)
         ],
       ),
-      body: LayoutBuilder(builder: (context, constraints) {
-        return StreamBuilder(
-          stream: getFilteredBouldersStream(),
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.waiting:
-              case ConnectionState.active:
-                if (snapshot.hasData) {
-                  final allBoulders = snapshot.data as Iterable<CloudBoulder>;
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return StreamBuilder(
+            stream: getFilteredBouldersStream(),
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                case ConnectionState.active:
+                  if (snapshot.hasData) {
+                    final allBoulders = snapshot.data as Iterable<CloudBoulder>;
 
-                  return GestureDetector(
-                    key: _gymKey,
-                    onTapUp: (details) {
-                      _tapping(context, constraints, details, allBoulders,
-                          currentProfile, _fireBaseService);
-                    },
-                    onDoubleTapDown: (details) {
-                      _doubleTapping(context, constraints, details);
-                      setState(() {
-                        currentScale = _controller.value.getMaxScaleOnAxis();
-                      });
-                    },
-                    child: InteractiveViewer(
-                      transformationController: _controller,
-                      minScale: 0.5,
-                      maxScale: 5.0,
-                      onInteractionEnd: (details) {
-                        setState(() {
-                          currentScale = _controller.value.getMaxScaleOnAxis();
-                        });
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(
-                                'assets/background/dtu_climbing.png'),
-                            fit: BoxFit.fill,
+                    return SlidingUpPanel(
+                      minHeight: 50,
+                      maxHeight: MediaQuery.of(context).size.height * 0.5,
+                      panel: slideUpContent(currentSettings!, currentProfile!, allBoulders),
+                      collapsed: slideUpCollapsContent(),
+                      body: GestureDetector(
+                        key: _gymKey,
+                        onTapUp: (details) {
+                          _tapping(context, constraints, details, allBoulders,
+                              currentProfile, _fireBaseService);
+                        },
+                        onDoubleTapDown: (details) {
+                          _doubleTapping(context, constraints, details);
+                          setState(() {
+                            currentScale =
+                                _controller.value.getMaxScaleOnAxis();
+                          });
+                        },
+                        child: InteractiveViewer(
+                          transformationController: _controller,
+                          minScale: 0.5,
+                          maxScale: 5.0,
+                          onInteractionEnd: (details) {
+                            setState(() {
+                              currentScale =
+                                  _controller.value.getMaxScaleOnAxis();
+                            });
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(
+                                    'assets/background/dtu_climbing.png'),
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                            child: currentSettings == null
+                                ? null
+                                : CustomPaint(
+                                    painter: GymPainter(
+                                        context,
+                                        constraints,
+                                        allBoulders,
+                                        currentProfile!,
+                                        currentSettings!,
+                                        currentScale,
+                                        compView,
+                                        showWallRegions),
+                                  ),
                           ),
                         ),
-                        child: currentSettings == null
-                            ? null
-                            : CustomPaint(
-                                painter: GymPainter(
-                                    context,
-                                    constraints,
-                                    allBoulders,
-                                    currentProfile!,
-                                    currentSettings!,
-                                    currentScale,
-                                    compView,
-                                    showWallRegions),
-                              ),
                       ),
-                    ),
-                  );
-                } else {
+                    );
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                default:
                   return const CircularProgressIndicator();
-                }
-              default:
-                return const CircularProgressIndicator();
-            }
-          },
-        );
-      }),
+              }
+            },
+          );
+        },
+      ),
       drawer: compView
           ? currentProfile!.isAdmin
               ? compDrawer(context, setState, currentComp!, _fireBaseService)
@@ -439,6 +451,7 @@ class _GymViewState extends State<GymView> {
                   context, setState, currentProfile!, currentSettings!),
     );
   }
+
 
   PopupMenuButton<MenuAction> dropDownMenu(
       BuildContext context, CloudSettings? currentSettings) {

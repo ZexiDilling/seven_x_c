@@ -135,6 +135,8 @@ RangeSlider gradeFilterSlider(
 }
 
 Set<String> selectedColors = {};
+
+
 List<Widget> _createColorRows(setState, CloudSettings currentSettings) {
   List<Widget> colorRows = [];
 
