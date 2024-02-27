@@ -107,8 +107,14 @@ Future<bool> showBoulderInformation(
   }
 
   if (gradingSystem == "coloured") {
+    try {
+      gradingShow = arrowDict()[boulder.gradeDifficulty]!["arrow"];
+    } on Error {
+    
     gradingShow = getArrowFromNumberAndColor(
-        boulder.gradeNumberSetter, boulder.gradeColour);
+        boulder.gradeNumberSetter, boulder.gradeColour);}
+
+    
   } else {
     gradingShow =
         allGrading[boulder.gradeNumberSetter]![gradingSystem.toLowerCase()];

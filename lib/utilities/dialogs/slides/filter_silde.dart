@@ -19,7 +19,7 @@ Drawer filterDrawer(
   if (currentProfile.gradingSystem == "Coloured") {
     gradingSystem = "french";
   } else {
-    gradingSystem = currentProfile.gradingSystem;
+    gradingSystem = currentProfile.gradingSystem.toLowerCase();
   }
 
   String mapLabelToValue(double label) {

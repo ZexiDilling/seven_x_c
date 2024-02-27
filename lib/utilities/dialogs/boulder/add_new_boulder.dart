@@ -36,7 +36,7 @@ Future<void> showAddNewBoulder(
   String selectedGrade = '';
   double setterPoints = 0.0;
 
-  int? difficultyLevel;
+  int? difficultyLevel = 3;
   // const gradingSystem = "colour";
   // const gradingSystem = "french";
   // const gradingSystem = "v_grade";
@@ -130,7 +130,7 @@ Future<void> showAddNewBoulder(
                                                     colorName]),
                                                 child: Padding(
                                                   padding:
-                                                      const EdgeInsets.all(8.0),
+                                                      const EdgeInsets.all(1.0),
                                                   child: Text(
                                                       capitalize(colorName)),
                                                 )),

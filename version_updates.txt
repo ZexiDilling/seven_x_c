@@ -1,27 +1,32 @@
 version 8:
-bug fixes:
-    Fixed bug where other ppls top of a boulder, affected the oppasity and size of all boulders on the map
-    Fixed bugs with challenges so they should now work
-    Fixed bug where updating Grading system only took effect after app reset. 
-    Fixed bug where voted grade did not show for in French or V-grade
-    
+    bug fixes:
+        Fixed bug where other ppls top of a boulder, affected the oppasity and size of all boulders on the map
+        Fixed bugs with challenges so they should now work
+        Fixed bug where updating Grading system only took effect after app reset. 
+        Fixed bug where voted grade did not show for in French or V-grade
+        
 
-Data structure changes:
-    Change the way topped data is storred to make it easier to show data
-    Change the way setter data is storred to make it easier to show data
-    Updated icons on the map to be more clear
-    Updated grading circle on Boulders, to easierly see the grade
-    Overhault the UI for graphData under Profile
-    Added a way to go back and forward in time for the graphData under Profile
+    Data structure changes:
+        Change the way topped data is storred to make it easier to show data
+        Change the way setter data is storred to make it easier to show data
+        Updated icons on the map to be more clear
+        Updated grading circle on Boulders, to easierly see the grade
+        Overhault the UI for graphData under Profile
+        Added a way to go back and forward in time for the graphData under Profile
 
     
 version 9:
-Bug fixes:
-    Repeats should now be working
+    Bug fixes:
+        Repeats should now be working
 
-Data structure changes:
-    Data for all tops are now storred n a data structure for the gym
-    Data for all boulders sat is now storred
-    will work on a way to showcase the two new data thingys.
+    Data structure changes:
+        Data for all tops are now storred n a data structure for the gym
+        Data for all boulders sat is now storred
+        will work on a way to showcase the two new data thingys.
 
 Version 10:
+    bug fix:
+        Did not show "grade" in filter when V-grade or French grade was selected.
+
+    new feauturs:
+        

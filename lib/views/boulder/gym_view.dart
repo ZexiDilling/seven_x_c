@@ -1,12 +1,14 @@
 // ignore_for_file: library_prefixes
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/constants/colours_thems.dart';
 import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/constants/routes.dart';
+import 'package:seven_x_c/constants/slide_up_const.dart';
 import 'package:seven_x_c/enums/menu_action.dart';
 import 'package:seven_x_c/helpters/painter.dart';
 import 'package:seven_x_c/services/auth/auth_service.dart';
@@ -28,7 +30,7 @@ import 'package:seven_x_c/utilities/dialogs/slides/comp_slide.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/add_new_boulder.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/show_boulder_info.dart';
 import 'package:seven_x_c/utilities/dialogs/slides/filter_silde.dart';
-import 'package:seven_x_c/utilities/dialogs/slides/slideUp.dart';
+import 'package:seven_x_c/utilities/dialogs/slides/slide_up.dart';
 import 'package:vector_math/vector_math_64.dart' as VM;
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -377,9 +379,11 @@ class _GymViewState extends State<GymView> {
                     final allBoulders = snapshot.data as Iterable<CloudBoulder>;
 
                     return SlidingUpPanel(
-                      minHeight: 50,
-                      maxHeight: MediaQuery.of(context).size.height * 0.5,
-                      panel: slideUpContent(currentSettings!, currentProfile!, allBoulders),
+                      minHeight: slideUpMinHeight,
+                      maxHeight:
+                          MediaQuery.of(context).size.height * slideUpMaxHeight,
+                      panel: slideUpContent(currentSettings!, currentProfile!,
+                          allBoulders, _controller, constraints),
                       collapsed: slideUpCollapsContent(),
                       body: GestureDetector(
                         key: _gymKey,
@@ -404,6 +408,7 @@ class _GymViewState extends State<GymView> {
                                   _controller.value.getMaxScaleOnAxis();
                             });
                           },
+
                           child: Container(
                             width: double.infinity,
                             height: double.infinity,
@@ -431,6 +436,35 @@ class _GymViewState extends State<GymView> {
                         ),
                       ),
                     );
+
+
+                    //       child: Container(
+                    //         width: double.infinity,
+                    //         height: double.infinity,
+                    //         child: Stack( children: [
+                    //           SvgPicture.asset(
+                    //             'assets/background/dtu_climbing1.svg',
+                    //             semanticsLabel: "background",
+                    //             fit: BoxFit.fill,
+                                                     
+                    //           ),
+                    //        if (currentSettings != null)
+                                
+                    //              CustomPaint(
+                    //                 painter: GymPainter(
+                    //                     context,
+                    //                     constraints,
+                    //                     allBoulders,
+                    //                     currentProfile!,
+                    //                     currentSettings!,
+                    //                     currentScale,
+                    //                     compView,
+                    //                     showWallRegions),
+                    //               ),
+                    //       ]),
+                    //     ),
+                    //   ),
+                    // ));
                   } else {
                     return const CircularProgressIndicator();
                   }
@@ -451,7 +485,6 @@ class _GymViewState extends State<GymView> {
                   context, setState, currentProfile!, currentSettings!),
     );
   }
-
 
   PopupMenuButton<MenuAction> dropDownMenu(
       BuildContext context, CloudSettings? currentSettings) {
@@ -601,17 +634,19 @@ class _GymViewState extends State<GymView> {
         }
 
         String? wall;
-
+        String lowestWall = "";
+        double wallTestValue= 1;
         for (final region in wallRegions) {
           double regionTop = region.wallYMaX;
           double regionBottom = region.wallYMin;
+          if (regionBottom <wallTestValue) {wallTestValue=regionBottom; lowestWall=region.wallName;}
           if (tempCenterY / constraints.maxHeight >= regionBottom &&
               tempCenterY / constraints.maxHeight <= regionTop) {
             wall = region.wallName;
             break;
           }
         }
-
+        wall ??= lowestWall;
         if (moveBoulder) {
           fireBaseService.updateBoulder(
               boulderID: selectedBoulder,
@@ -621,6 +656,7 @@ class _GymViewState extends State<GymView> {
             moveBoulder = false;
             selectedBoulder = "";
           });
+
         } else if (moveMultipleBoulders) {
           CloudBoulder? closestBoulder;
           for (final boulders in allBoulders) {
@@ -643,7 +679,9 @@ class _GymViewState extends State<GymView> {
             }
           }
         } else {
+              
           try {
+              
             setState(() {
               showAddNewBoulder(
                   context,
@@ -751,7 +789,6 @@ class _GymViewState extends State<GymView> {
       ((nearestWall.wallYMaX + nearestWall.wallYMin) / 2) *
           constraints.maxHeight,
     );
-
     _controller.value = Matrix4.identity()
       ..translate(-center.dx * 2.0, -center.dy * 2.0)
       ..scale(3.0);
