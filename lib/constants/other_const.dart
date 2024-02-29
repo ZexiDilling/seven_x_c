@@ -23,6 +23,9 @@ static const IconData rightArrow = Icons.arrow_right;
   static const IconData cancel = Icons.close; 
   static const IconData showDeactivatedBoulders = Icons.search; 
   static const IconData reset = Icons.refresh; 
+  static const IconData flashed = Icons.flash_on; 
+  static const IconData topped = Icons.keyboard_double_arrow_up; 
+  
 }
 
 double iconSizeChart = 40;

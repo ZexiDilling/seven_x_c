@@ -10,6 +10,7 @@ import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/constants/routes.dart';
 import 'package:seven_x_c/constants/slide_up_const.dart';
 import 'package:seven_x_c/enums/menu_action.dart';
+import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/helpters/painter.dart';
 import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
@@ -70,6 +71,16 @@ class _GymViewState extends State<GymView> {
   late final FirebaseCloudStorage _fireBaseService;
 
   late Stream<Iterable<CloudBoulder>> filteredBouldersStream;
+
+  Map<String, dynamic>? settingsGradeColour = {};
+  List<MapEntry<String, dynamic>> colorEntries = [];
+  Map<String, int> colourSplit = {};
+  Map<String, List> colourBoulderSplit = {};
+  List<String> boulderList = [];
+
+  bool topped = true;
+  bool flashed = true;
+  bool boulderSelector = false;
 
   void setCompView(bool value) {
     setState(() {
@@ -247,7 +258,6 @@ class _GymViewState extends State<GymView> {
                 }
               }
             }
-
             return compView
                 ? Text(
                     currentComp!.compName,
@@ -382,8 +392,12 @@ class _GymViewState extends State<GymView> {
                       minHeight: slideUpMinHeight,
                       maxHeight:
                           MediaQuery.of(context).size.height * slideUpMaxHeight,
-                      panel: slideUpContent(currentSettings!, currentProfile!,
-                          allBoulders, _controller, constraints),
+                      panel: currentSettings != null && currentProfile != null
+                          ? boulderOverviewSlidingUpPanel(
+                              allBoulders, currentProfile!, constraints)
+                          : const Center(
+                              child: CircularProgressIndicator(),
+                            ),
                       collapsed: slideUpCollapsContent(),
                       body: GestureDetector(
                         key: _gymKey,
@@ -408,7 +422,6 @@ class _GymViewState extends State<GymView> {
                                   _controller.value.getMaxScaleOnAxis();
                             });
                           },
-
                           child: Container(
                             width: double.infinity,
                             height: double.infinity,
@@ -437,7 +450,6 @@ class _GymViewState extends State<GymView> {
                       ),
                     );
 
-
                     //       child: Container(
                     //         width: double.infinity,
                     //         height: double.infinity,
@@ -446,10 +458,10 @@ class _GymViewState extends State<GymView> {
                     //             'assets/background/dtu_climbing1.svg',
                     //             semanticsLabel: "background",
                     //             fit: BoxFit.fill,
-                                                     
+
                     //           ),
                     //        if (currentSettings != null)
-                                
+
                     //              CustomPaint(
                     //                 painter: GymPainter(
                     //                     context,
@@ -483,6 +495,125 @@ class _GymViewState extends State<GymView> {
               ? const CircularProgressIndicator()
               : filterDrawer(
                   context, setState, currentProfile!, currentSettings!),
+    );
+  }
+
+  Center boulderOverviewSlidingUpPanel(Iterable<CloudBoulder> allBoulders,
+      CloudProfile currentProfile, BoxConstraints constraints) {
+    for (final CloudBoulder boulder in allBoulders) {
+      if (boulder.active && !boulderList.contains(boulder.boulderID)) {
+        if (boulder.hiddenGrade) {
+          colourBoulderSplit[hiddenGradeColorName] = [
+            ...(colourBoulderSplit[hiddenGradeColorName] ?? []),
+            boulder
+          ];
+        } else {
+          colourBoulderSplit[boulder.gradeColour] = [
+            ...(colourBoulderSplit[boulder.gradeColour] ?? []),
+            boulder
+          ];
+        }
+
+        colourSplit[boulder.gradeColour] =
+            (colourSplit[boulder.gradeColour] ?? 0) + 1;
+        boulderList.add(boulder.boulderID);
+      }
+    }
+
+    settingsGradeColour = currentSettings?.settingsGradeColour;
+
+    colorEntries = settingsGradeColour!.entries.toList(growable: false);
+
+    // Sort the color entries based on the "min" value
+    colorEntries.sort((a, b) => a.value['min'].compareTo(b.value['min']));
+    // colorEntries.add(hiddenGradeColorEntry);
+
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              slideUpPanelHeadling,
+              const SizedBox(height: 16.0),
+              const Divider(height: 0),
+              for (var entry in colorEntries)
+                boulderOverviewExpansionTile(currentProfile, entry, constraints)
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  ExpansionTile boulderOverviewExpansionTile(CloudProfile currentProfile,
+      MapEntry<String, dynamic> entry, BoxConstraints constraints) {
+    return ExpansionTile(
+      title: Text(capitalize(entry.key)),
+      collapsedBackgroundColor: closedExpansionColor,
+      backgroundColor:
+          boulderSelector ? openExpansionColor : closedExpansionColor,
+      subtitle: Text(
+        currentProfile.gradingSystem.toLowerCase() == "coloured"
+            ? '${allGrading[entry.value['min']]!["french"]} - ${allGrading[entry.value['max']]!["french"]}'
+            : '${allGrading[entry.value['min']]![currentProfile.gradingSystem.toLowerCase()]} - ${allGrading[entry.value['max']]![currentProfile.gradingSystem.toLowerCase()]}',
+      ),
+      leading: gradingColourCircle(currentSettings!, entry, colourSplit),
+      children: [
+        for (CloudBoulder boulder in colourBoulderSplit[entry.key] ?? [])
+          boulderTileList(boulder, currentProfile, constraints)
+      ],
+    );
+  }
+
+  Material boulderTileList(CloudBoulder boulder, CloudProfile currentProfile,
+      BoxConstraints constraints) {
+    bool topped = false;
+    bool flashed = false;
+    if (boulder.climberTopped != null &&
+        boulder.climberTopped!.containsKey(currentProfile.userID)) {
+      topped = true;
+
+      if (boulder.climberTopped![currentProfile.userID]["flashed"] != null &&
+          boulder.climberTopped![currentProfile.userID]["flashed"]) {
+        flashed = true;
+      } else {
+        flashed = false;
+      }
+    } else {
+      topped = false;
+    }
+    int amontTops = 0;
+    if (boulder.climberTopped != null && boulder.climberTopped!.isNotEmpty) {
+      amontTops = boulder.climberTopped!.length;
+    }
+
+    return Material(
+      child: ListTile(
+        leading: holdColourCircle(currentSettings!, boulder, currentProfile),
+        title: Text("${boulder.wall} - ${boulder.setter}"),
+        subtitle: Text("Top Out: ${boulder.topOut} - Topped by: $amontTops"),
+        isThreeLine: true,
+        dense: true,
+        trailing: topped
+            ? flashed
+                ? const Icon(IconManager.flashed)
+                : const Icon(IconManager.topped)
+            : const Text(""),
+        tileColor: topped ? toppedColor : defaultColor,
+        onTap: () {
+          zoomToBoulder(boulder, _controller, constraints);
+          setState(() {
+            currentScale = _controller.value.getMaxScaleOnAxis();
+          });
+        },
+        onLongPress: () {
+          setState(() {
+            boulderSelector = !boulderSelector;
+          });
+        },
+      ),
     );
   }
 
@@ -635,11 +766,14 @@ class _GymViewState extends State<GymView> {
 
         String? wall;
         String lowestWall = "";
-        double wallTestValue= 1;
+        double wallTestValue = 1;
         for (final region in wallRegions) {
           double regionTop = region.wallYMaX;
           double regionBottom = region.wallYMin;
-          if (regionBottom <wallTestValue) {wallTestValue=regionBottom; lowestWall=region.wallName;}
+          if (regionBottom < wallTestValue) {
+            wallTestValue = regionBottom;
+            lowestWall = region.wallName;
+          }
           if (tempCenterY / constraints.maxHeight >= regionBottom &&
               tempCenterY / constraints.maxHeight <= regionTop) {
             wall = region.wallName;
@@ -656,7 +790,6 @@ class _GymViewState extends State<GymView> {
             moveBoulder = false;
             selectedBoulder = "";
           });
-
         } else if (moveMultipleBoulders) {
           CloudBoulder? closestBoulder;
           for (final boulders in allBoulders) {
@@ -679,9 +812,7 @@ class _GymViewState extends State<GymView> {
             }
           }
         } else {
-              
           try {
-              
             setState(() {
               showAddNewBoulder(
                   context,

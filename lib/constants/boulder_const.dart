@@ -13,6 +13,19 @@ const double boulderSingleShow = 2.5;
 const double boulderNewGlowRadius = 5.0;
 const double boulderUpdatedGlowRadius = boulderNewGlowRadius;
 const Color hiddenGradeColor = Colors.white;
+const String hiddenGradeColorName = "white";
+const MapEntry<String, dynamic> hiddenGradeColorEntry = MapEntry(
+  "hiddenGradeColorName",
+  {
+    "alpha": 255,
+    "red": 255,
+    "blue": 255,
+    "green": 255,
+    "min": 0,
+    "max": 27,
+  },
+);
+
 const Color newBoulderColour = Colors.purple;
 const Color updatedBoulderColour = Colors.yellow;
 const Color deactivateBoulderColor = Colors.red;
