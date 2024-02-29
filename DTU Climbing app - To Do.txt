@@ -100,6 +100,9 @@ Admin page:
 
 Done - Fix transparentcy on boulders, so that only the current users topped boulder are less transparentcy
 Done - Fix colour on "grade" in the grading circles
+Profile
+	fix graph
+		deal with different time intervals
 ------------------------------------------------------------------------------------------------------------------------
 
 Missing testing:
@@ -143,9 +146,7 @@ Challenges:
 Challenges:
 	Done - Make it possible to add old challenges to boulders. 
 
-Profile
-	fix graph
-		deal with different time intervals
+
 
 
 boulders

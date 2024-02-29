@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'package:seven_x_c/constants/boulder_const.dart'
-    show hiddenGradeColorEntry, hiddenGradeColorName;
 import 'package:seven_x_c/constants/boulder_info.dart'
     show allGrading, arrowDict, getArrowFromNumberAndColor, nameToColor;
-import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/constants/slide_up_const.dart';
 import 'package:seven_x_c/helpters/bonus_functions.dart';
-import 'package:seven_x_c/helpters/functions.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
-
 
 Container slideUpCollapsContent() {
   return Container(
@@ -21,8 +16,6 @@ Container slideUpCollapsContent() {
         child: slideUpText,
       ));
 }
-
-
 
 SizedBox gradingColourCircle(CloudSettings currentSettings,
     MapEntry<String, dynamic> entry, Map<String, int> colourSplit) {
@@ -57,7 +50,6 @@ SizedBox gradingColourCircle(CloudSettings currentSettings,
     ]),
   );
 }
-
 
 SizedBox holdColourCircle(CloudSettings currentSettings, CloudBoulder boulder,
     CloudProfile currentProfile) {

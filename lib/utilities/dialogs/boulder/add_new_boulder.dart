@@ -27,7 +27,7 @@ Future<void> showAddNewBoulder(
     CloudSettings currentSettings,
     CloudGymData currentGymData,
     Stream<Iterable<CloudProfile>> settersStream) async {
-  bool setterTeam = false;
+  bool gymSetterTeam = false;
   bool guestSetterTeam = false;
   bool topOut = false;
   bool gotZone = false;
@@ -228,21 +228,21 @@ Future<void> showAddNewBoulder(
                                 labelText: 'Choose Setter'),
                           ),
                           CheckboxListTile(
-                              title: const Text(dtuSetterName),
-                              value: setterTeam,
+                              title: const Text(gymSetterName),
+                              value: gymSetterTeam,
                               onChanged: (bool? value) {
                                 setState(() {
-                                  setterTeam = value ?? false;
+                                  gymSetterTeam = value ?? false;
                                   guestSetterTeam = false;
                                 });
                               }),
                           CheckboxListTile(
-                              title: const Text(guestSetter),
+                              title: const Text(guestSetterName),
                               value: guestSetterTeam,
                               onChanged: (bool? value) {
                                 setState(() {
                                   guestSetterTeam = value ?? false;
-                                  setterTeam = false;
+                                  gymSetterTeam = false;
                                 });
                               }),
                           CheckboxListTile(
@@ -313,10 +313,10 @@ Future<void> showAddNewBoulder(
                                   setterProfile, gradeColorChoice!);
                               newBoulder =
                                   await fireBaseService.createNewBoulder(
-                                      setter: setterTeam == true
-                                          ? dtuSetterName
+                                      setter: gymSetterTeam == true
+                                          ? gymSetterName
                                           : (guestSetterTeam == true
-                                              ? guestSetter
+                                              ? guestSetterName
                                               : selectedSetter),
                                       cordX: centerX / constraints.maxWidth,
                                       cordY: centerY / constraints.maxHeight,
@@ -360,7 +360,7 @@ Future<void> showAddNewBoulder(
                             }
 
                             if (newBoulder != null) {
-                              if (!setterTeam && !guestSetterTeam) {
+                              if (!gymSetterTeam && !guestSetterTeam) {
                                 var setterProfiles = await fireBaseService
                                     .getUserFromDisplayName(selectedSetter)
                                     .first;
@@ -389,17 +389,26 @@ Future<void> showAddNewBoulder(
                               }
                               try {
                                 String setterID = "";
-                                Iterable<CloudProfile> setterProfiles =
-                                    await fireBaseService
-                                        .getUserFromDisplayName(selectedSetter)
-                                        .first;
-                                if (setterProfiles.isNotEmpty) {
-                                  CloudProfile setterProfile =
-                                      setterProfiles.first;
-                                  setterID = setterProfile.userID;
+                                if (gymSetterTeam || guestSetterTeam) {
+                                  gymSetterTeam
+                                      ? setterID = gymSetterName
+                                      : setterID = guestSetterName;
                                 } else {
-                                  setterID = selectedSetter;
+                                  Iterable<CloudProfile> setterProfiles =
+                                      await fireBaseService
+                                          .getUserFromDisplayName(
+                                              selectedSetter)
+                                          .first;
+
+                                  if (setterProfiles.isNotEmpty) {
+                                    CloudProfile setterProfile =
+                                        setterProfiles.first;
+                                    setterID = setterProfile.userID;
+                                  } else {
+                                    setterID = selectedSetter;
+                                  }
                                 }
+
                                 await fireBaseService.updateGymData(
                                     gymDataID: currentGymData.gymDataID,
                                     gymDataBoulders: updateGymDataBoulders(

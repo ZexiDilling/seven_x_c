@@ -2,8 +2,9 @@ import 'package:flutter/material.dart' show Color, Colors;
 
 const String constSettingsID = "dtu_climbing";
 
-const String dtuSetterName = "DTU Setter Team";
-const String guestSetter = "Guest Setter";
+const String gymSetterName = "DTU Setter Team";
+const String guestSetterName = "Guest Setter";
+//ToDO move to settings
 
 // drawing Constants
 const double boulderRadius = 2.5;
