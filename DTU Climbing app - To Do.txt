@@ -103,6 +103,12 @@ Done - Fix colour on "grade" in the grading circles
 Profile
 	fix graph
 		deal with different time intervals
+
+Done grap:
+	Done - HoldColour vs GradeColour/grade
+	Done - GradeColour/grade vs HoldColour
+	Done - gradeColour vs grade
+	Done - grade vs gradeColour
 ------------------------------------------------------------------------------------------------------------------------
 
 Missing testing:
@@ -166,11 +172,7 @@ new bar - grah:
 		By section / wall
 		By Setdate
 		By Setter
-	Show:
-		HoldColour vs GradeColour/grade
-		GradeColour/grade vs HoldColour
-		gradeColour vs grade
-		grade vs gradeColour
+
 
 
 
