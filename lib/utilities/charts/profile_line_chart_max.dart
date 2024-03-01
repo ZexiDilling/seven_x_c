@@ -25,7 +25,7 @@ LineChartData maxGradeChart(
             reservedSize: 32,
             getTitlesWidget: (double value, TitleMeta meta) {
               return bottomTitles(
-                  value, meta, selectedTimePeriod, chartSelection);
+                  value, meta, selectedTimePeriod, chartSelection, null);
             }),
       ),
       leftTitles: AxisTitles(

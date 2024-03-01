@@ -904,7 +904,6 @@ Future<PointsData> getPoints(
                   DateTime currentDate =
                       startOfWeek.add(Duration(days: dayNumber - 1));
                   String day = currentDate.day.toString();
-                  String dayOfWeek = dateToDay[day]!;
                   var dayData = weekData[day];
                   if (dayData != null) {
                     daysSetting++;

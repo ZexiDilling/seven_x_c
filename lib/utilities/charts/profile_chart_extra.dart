@@ -45,17 +45,19 @@ List<BarChartRodStackItem> generateRodStackItems(
     List<double> values,
     List<String> colorOrder,
     bool isTouched,
-    bool setterViewGrade) {
+    bool? setterViewGrade, Map<int, Color>? gradeColors) {
+  
   List<BarChartRodStackItem> rodStackItems = [];
   double startValue = 0;
 
   for (int counter = 0; counter < values.length; counter++) {
+    
     double endValue = startValue + values[counter];
     rodStackItems.add(
       BarChartRodStackItem(
         startValue,
         endValue,
-        setterViewGrade
+        setterViewGrade == null ? gradeColors![counter.toInt()]! : setterViewGrade
             ? nameToColor(
                 currentSettings.settingsGradeColour![colorOrder[counter]])
             : nameToColor(
@@ -87,8 +89,10 @@ BarChartGroupData generateGroup(
   int x,
   List<double> values,
   List<String> colorOrder,
-  bool setterViewGrade,
+  bool? setterViewGrade,
+  Map<int, Color>? gradeColors
 ) {
+  
   final sum = values.reduce((a, b) => a + b);
   final isTouched = touchedIndex == x;
   final isTop = findTopIndex(values);
@@ -110,7 +114,7 @@ BarChartGroupData generateGroup(
                 bottomRight: Radius.circular(6),
               ),
         rodStackItems: generateRodStackItems(
-            currentSettings, values, colorOrder, isTouched, setterViewGrade),
+            currentSettings, values, colorOrder, isTouched, setterViewGrade, gradeColors),
       ),
       BarChartRodData(
         toY: isTop >= 0 ? -sum : sum,
@@ -135,88 +139,94 @@ Widget bottomTitles(
   TitleMeta meta,
   TimePeriod selectedTimePeriod,
   String chartSelection,
+  Map<String, String>? yValueTranslator
 ) {
   const style = TextStyle(color: textColour, fontSize: fontChartSize);
   String text = '';
-  // Format the date based on the selected time period
-  switch (selectedTimePeriod) {
-    case TimePeriod.week:
-      // Display the day of the week for each entry number
-      switch (value.toInt().toString()) {
-        case "0":
-          text = "Mon";
-          break;
-        case "1":
-          text = "Tue";
-          break;
-        case "2":
-          text = "Wed";
-          break;
-        case "3":
-          text = "Thu";
-          break;
-        case "4":
-          text = "Fri";
-          break;
-        case "5":
-          text = "Sat";
-          break;
-        case "6":
-          text = "Sun";
-          break;
-      }
-      break;
-    case TimePeriod.month:
-      if (value.toInt() % 2 == 1) {
-        text = value.toInt().toString(); // Odd value
-      } else {
-        text = ""; // Even value
-      }
-      break;
-    case TimePeriod.year:
-    case TimePeriod.semester:
-      switch (value.toInt().toString()) {
-        case "1":
-          text = "Jan";
-          break;
-        case "2":
-          text = "Feb";
-          break;
-        case "3":
-          text = "Mar";
-          break;
-        case "4":
-          text = "Apr";
-          break;
-        case "5":
-          text = "May";
-          break;
-        case "6":
-          text = "Jun";
-          break;
-        case "7":
-          text = "Jul";
-          break;
-        case "8":
-          text = "Aug";
-          break;
-        case "9":
-          text = "Sep";
-          break;
-        case "10":
-          text = "Oct";
-          break;
-        case "11":
-          text = "Nov";
-          break;
-        case "12":
-          text = "Dec";
-          break;
-      }
-      break;
 
-    default:
-      break;
+  // Format the date based on the selected time period
+  if (yValueTranslator != null) {
+    text = yValueTranslator[value.toInt().toString()]!;
+  } else {
+    switch (selectedTimePeriod) {
+      case TimePeriod.week:
+        // Display the day of the week for each entry number
+        switch (value.toInt().toString()) {
+          case "0":
+            text = "Mon";
+            break;
+          case "1":
+            text = "Tue";
+            break;
+          case "2":
+            text = "Wed";
+            break;
+          case "3":
+            text = "Thu";
+            break;
+          case "4":
+            text = "Fri";
+            break;
+          case "5":
+            text = "Sat";
+            break;
+          case "6":
+            text = "Sun";
+            break;
+        }
+        break;
+      case TimePeriod.month:
+        if (value.toInt() % 2 == 1) {
+          text = value.toInt().toString(); // Odd value
+        } else {
+          text = ""; // Even value
+        }
+        break;
+      case TimePeriod.year:
+      case TimePeriod.semester:
+        switch (value.toInt().toString()) {
+          case "1":
+            text = "Jan";
+            break;
+          case "2":
+            text = "Feb";
+            break;
+          case "3":
+            text = "Mar";
+            break;
+          case "4":
+            text = "Apr";
+            break;
+          case "5":
+            text = "May";
+            break;
+          case "6":
+            text = "Jun";
+            break;
+          case "7":
+            text = "Jul";
+            break;
+          case "8":
+            text = "Aug";
+            break;
+          case "9":
+            text = "Sep";
+            break;
+          case "10":
+            text = "Oct";
+            break;
+          case "11":
+            text = "Nov";
+            break;
+          case "12":
+            text = "Dec";
+            break;
+        }
+        break;
+
+      default:
+        break;
+    }
   }
 
   return SideTitleWidget(

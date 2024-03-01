@@ -1,4 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 import '../../helpters/time_calculations.dart' show TimePeriod;
 import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
 import 'package:seven_x_c/utilities/charts/profile_chart_extra.dart';
@@ -9,7 +10,7 @@ BarChartData boulderBarChart(
     double maxYValue,
     List<String> colorOrder,
     TimePeriod selectedTimePeriod,
-    String chartSelection, bool setterViewGrade) {
+    String chartSelection, bool? setterViewGrade, String? sortingSetup, Map<String, String>? yValueTranslator, Map<int, Color>? gradeColors) {
   return BarChartData(
     titlesData: FlTitlesData(
       show: true,
@@ -24,7 +25,7 @@ BarChartData boulderBarChart(
             reservedSize: 32,
             getTitlesWidget: (double value, TitleMeta meta) {
               return bottomTitles(
-                  value, meta, selectedTimePeriod, chartSelection);
+                  value, meta, selectedTimePeriod, chartSelection, yValueTranslator);
             }),
       ), 
       leftTitles: const AxisTitles(
@@ -54,7 +55,7 @@ BarChartData boulderBarChart(
               currentSettings,
               int.parse(entry.key),
               entry.value,
-              colorOrder, setterViewGrade,
+              colorOrder, setterViewGrade, gradeColors
             ))
         .toList(),
   );
