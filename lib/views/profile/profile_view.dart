@@ -535,7 +535,7 @@ class _ProfileViewState extends State<ProfileView> {
                                 child: currentSettings != null
                                     ? pointsData.gotData
                                         ? LineChartGraph(
-                                          currentProfile: currentProfile,
+                                            currentProfile: currentProfile,
                                             currentSettings: currentSettings!,
                                             chartSelection: chartSelection,
                                             graphData: pointsData,
@@ -656,16 +656,20 @@ class _ProfileViewState extends State<ProfileView> {
                                     );
                                   },
                                 ),
-                              "setter" => Column(
-                                children: [
-                                  Row(children: [const Text("Grade/Holds"),
-                                        Checkbox(
-                                            value: setterViewGrade,
-                                            onChanged: (value) {setState(() {
-                                              setterViewGrade = !setterViewGrade;
+                              "setter" => Column(children: [
+                                  Row(
+                                    children: [
+                                      const Text("Grade/Holds"),
+                                      Checkbox(
+                                          value: setterViewGrade,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              setterViewGrade =
+                                                  !setterViewGrade;
                                             });
-                                              
-                                            }),],),
+                                          }),
+                                    ],
+                                  ),
                                   GridView.builder(
                                     shrinkWrap: true,
                                     gridDelegate:
@@ -682,16 +686,19 @@ class _ProfileViewState extends State<ProfileView> {
                                       Color? diffBoxColour;
                                       switch (index) {
                                         case 0:
-                                          text = 'SP: ${pointsData.pointsSetter}';
+                                          text =
+                                              'SP: ${pointsData.pointsSetter}';
                                           break;
                                         case 1:
-                                          text = 'BC: ${pointsData.amountSetter}';
+                                          text =
+                                              'BC: ${pointsData.amountSetter}';
                                           break;
                                         case 2:
-                                          text = 'BF: ${pointsData.daysSetting}';
+                                          text =
+                                              'BF: ${pointsData.daysSetting}';
                                           break;
                                       }
-                                
+
                                       // Customize the content of each grid item as needed
                                       return Container(
                                         color: diffBoxColour ??
@@ -711,8 +718,8 @@ class _ProfileViewState extends State<ProfileView> {
                                         ),
                                       );
                                     },
-                                  ),]
-                              ),
+                                  ),
+                                ]),
                               "allSetterData" => Column(
                                   children: [
                                     Row(
@@ -721,10 +728,12 @@ class _ProfileViewState extends State<ProfileView> {
                                         Checkbox(
                                             value: gradeVsColour,
                                             onChanged: (value) {
-                                              setState(() {
-                                              gradeVsColour = !gradeVsColour;  
-                                              },);
-                                              
+                                              setState(
+                                                () {
+                                                  gradeVsColour =
+                                                      !gradeVsColour;
+                                                },
+                                              );
                                             }),
                                       ],
                                     ),
@@ -734,10 +743,12 @@ class _ProfileViewState extends State<ProfileView> {
                                         Checkbox(
                                             value: colourVsValue,
                                             onChanged: (value) {
-                                              setState(() {
-                                              colourVsValue = !colourVsValue;  
-                                              },);
-                                              
+                                              setState(
+                                                () {
+                                                  colourVsValue =
+                                                      !colourVsValue;
+                                                },
+                                              );
                                             }),
                                       ],
                                     ),
@@ -776,16 +787,28 @@ class _ProfileViewState extends State<ProfileView> {
                                         switch (index) {
                                           case 0:
                                             text =
-                                                'SP: ${pointsData.pointsSetter}';
+                                                'Green: ${pointsData.boulderSetGradeColours["all"]!["green"] ?? 0}';
                                             break;
                                           case 1:
                                             text =
-                                                'BC: ${pointsData.amountSetter}';
+                                                'Yellow: ${pointsData.boulderSetGradeColours["all"]!["yellow"] ?? 0}';
                                             break;
                                           case 2:
                                             text =
-                                                'BF: ${pointsData.daysSetting}';
+                                                'Blue: ${pointsData.boulderSetGradeColours["all"]!["blue"] ?? 0}';
                                             break;
+                                          case 3:
+                                            text =
+                                                'Purple: ${pointsData.boulderSetGradeColours["all"]!["purple"] ?? 0}';
+                                          case 4:
+                                            text =
+                                                'Red: ${pointsData.boulderSetGradeColours["all"]!["red"] ?? 0}';
+                                          case 5:
+                                            text =
+                                                'Black: ${pointsData.boulderSetGradeColours["all"]!["black"] ?? 0}';
+                                          case 6:
+                                            text =
+                                                'Silver: ${pointsData.boulderSetGradeColours["all"]!["silver"] ?? 0}';
                                         }
 
                                         // Customize the content of each grid item as needed

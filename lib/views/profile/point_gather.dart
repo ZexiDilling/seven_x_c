@@ -741,7 +741,7 @@ Future<PointsData> getPoints(
         }
 
       case "allSetterData":
-      
+        boulderSetGradeColours["all"] = {};
         if (currentGymData.gymDataBoulders != null) {
           switch (selectedTimePeriod) {
             case TimePeriod.year:
@@ -776,6 +776,7 @@ Future<PointsData> getPoints(
                                   boulderGradeColourToHoldColour,
                                   boulderHoldColourToGrade,
                                   boulderHoldColourToGradeColour,
+                                  boulderSetGradeColours,
                                   allSetters);
                             }
                           }
@@ -794,7 +795,7 @@ Future<PointsData> getPoints(
                   DateTime.now().year > int.parse(selectedTime["year"]!)
                       ? 12
                       : DateTime.now().month;
-              
+
               if (yearData != null) {
                 for (var month
                     in List.generate(12, (index) => (index + 1).toString())) {
@@ -802,14 +803,13 @@ Future<PointsData> getPoints(
                   if (semesterMap[selectedTime["semester"]]!.contains(month)) {
                     if (int.parse(month) <= latestMonth) {
                       if (monthData != null) {
-                                                for (var weeks in monthData.keys) {
+                        for (var weeks in monthData.keys) {
                           var weekData = monthData[weeks];
                           if (weekData != null) {
-                                                        for (var days in weekData.keys) {
+                            for (var days in weekData.keys) {
                               var dayData = weekData[days];
                               if (dayData != null) {
-                                
-                                                                daysSetting++;
+                                daysSetting++;
                                 for (var boulder in dayData.keys) {
                                   Map<String, dynamic> boulderData =
                                       dayData[boulder];
@@ -822,6 +822,7 @@ Future<PointsData> getPoints(
                                       boulderGradeColourToHoldColour,
                                       boulderHoldColourToGrade,
                                       boulderHoldColourToGradeColour,
+                                      boulderSetGradeColours,
                                       allSetters);
                                 }
                               }
@@ -836,8 +837,9 @@ Future<PointsData> getPoints(
                 gotData = false;
               }
             case TimePeriod.month:
-              var monthData = currentGymData
-                  .gymDataBoulders![selectedTime["year"]][selectedTime["month"]];
+              var monthData =
+                  currentGymData.gymDataBoulders![selectedTime["year"]]
+                      [selectedTime["month"]];
               {
                 var allDaysInMonth = List.generate(
                   DateTime(
@@ -868,6 +870,7 @@ Future<PointsData> getPoints(
                                 boulderGradeColourToHoldColour,
                                 boulderHoldColourToGrade,
                                 boulderHoldColourToGradeColour,
+                                boulderSetGradeColours,
                                 allSetters);
                           }
                         }
@@ -918,6 +921,7 @@ Future<PointsData> getPoints(
                           boulderGradeColourToHoldColour,
                           boulderHoldColourToGrade,
                           boulderHoldColourToGradeColour,
+                          boulderSetGradeColours,
                           allSetters);
                     }
                   }
@@ -977,7 +981,6 @@ Future<PointsData> getPoints(
       maxBoulderFlashedColour: maxBoulderFlashedColour,
     );
   } catch (e) {
-    
     return PointsData(
       gotData: false,
       pointsBoulder: 0,
@@ -1019,11 +1022,16 @@ void allSetterGraphSetup(
     LinkedHashMap<String, Map<String, Map<int, int>>> boulderHoldColourToGrade,
     LinkedHashMap<String, Map<String, Map<String, int>>>
         boulderHoldColourToGradeColour,
+    LinkedHashMap<String, Map<String, int>> boulderSetGradeColours,
     List allSetters) {
   String currentSetter = boulderData["setter"];
   if (!allSetters.contains(currentSetter)) {
     allSetters.add(currentSetter);
   }
+
+  boulderSetGradeColours["all"]![boulderData["gradeColour"]] =
+      (boulderSetGradeColours["all"]![boulderData["gradeColour"]] ?? 0) + 1;
+
   boulderGradeToHoldColour[currentSetter] ??= {};
   boulderGradeToHoldColour[currentSetter]![boulderData["gradeNumberSetter"]] ??=
       {};

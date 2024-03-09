@@ -262,7 +262,6 @@ class LineChartGraph extends StatelessWidget {
             for (var gradeOrColourX in allSetterDataMap[setter]!.keys) {
               if (gradeOrColourX.runtimeType == int) {
                 xValue = allGrading[gradeOrColourX]![gradingSystem]!;
-
                 gradingComparitor[xValue] = gradeOrColourX;
               } else {
                 xValue = gradeOrColourX;
@@ -281,14 +280,12 @@ class LineChartGraph extends StatelessWidget {
                 int counter =
                     allSetterDataMap[setter]![gradeOrColourX]![gradeOrColourY]!;
 
-                (allSetterGraphData[xValue]![yValue] =
-                        allSetterGraphData[xValue]![yValue] ?? counter) +
-                    counter;
+                allSetterGraphData[xValue]![yValue] =
+                    (allSetterGraphData[xValue]![yValue] ?? 0) + counter;
               }
             }
           }
         }
-
         List<String> xValuesOrder = [];
         bool? setterViewGradeNew;
         Map<int, Color>? gradeColors;
@@ -476,18 +473,32 @@ Map<int, Color> generateGradeColors(Map<int, Map<String, String>> allGrading,
           break;
         } else {
           // Find the next available darker shade
-//todo Change this to be darker 
-          gradeColors[gradeInt] = Color.fromRGBO(
-            settings[color]['red'],
-            settings[color]['green'],
-            settings[color]['blue'],
-            1,
+          double darkenFactor =
+              0.2; // Adjust this factor based on how much darker you want the shade to be
+          gradeColors[gradeInt] = getDarkerShade(
+            Color.fromRGBO(
+              settings[color]['red'],
+              settings[color]['green'],
+              settings[color]['blue'],
+              1,
+            ),
+            darkenFactor,
           );
           break;
         }
       }
     }
   }
-  
+
   return gradeColors;
+}
+
+Color getDarkerShade(Color originalColor, double factor) {
+  assert(factor >= 0 && factor <= 1, 'Factor should be between 0 and 1');
+
+  int red = (originalColor.red * (1 - factor)).round();
+  int green = (originalColor.green * (1 - factor)).round();
+  int blue = (originalColor.blue * (1 - factor)).round();
+
+  return Color.fromRGBO(red, green, blue, 1);
 }
