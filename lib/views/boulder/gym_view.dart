@@ -26,7 +26,6 @@ import 'package:seven_x_c/utilities/dialogs/auth/logout_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/comp/comp_rank_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/comp/comp_signup_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/stripping_boulder.dart';
-import 'package:seven_x_c/utilities/dialogs/info/grading_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/slides/comp_slide.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/add_new_boulder.dart';
 import 'package:seven_x_c/utilities/dialogs/boulder/show_boulder_info.dart';
@@ -670,8 +669,6 @@ class _GymViewState extends State<GymView> {
               setCompView: setCompView,
               setComp: setCurrentComp,
             );
-          case MenuAction.info:
-            showGradeInfo(context, currentSettings!, currentProfile!);
         }
       },
       itemBuilder: (context) {
@@ -701,10 +698,6 @@ class _GymViewState extends State<GymView> {
           const PopupMenuItem(
             value: MenuAction.comp,
             child: Text("Comp"),
-          ),
-          const PopupMenuItem(
-            value: MenuAction.info,
-            child: Text("Info"),
           ),
           const PopupMenuItem(
             value: MenuAction.logout,
