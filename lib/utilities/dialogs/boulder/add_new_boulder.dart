@@ -443,7 +443,7 @@ Future<void> showAddNewBoulder(
       });
 }
 
-double calculateSetterPoints(setterProfile, String boulderGradeColour) {
+double calculateSetterPoints(CloudProfile setterProfile, String boulderGradeColour) {
   // Calculate points based on the conditions
   double points = defaultSetterPoints;
   // Get the setBoulders map from the setterProfile

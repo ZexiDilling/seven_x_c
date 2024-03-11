@@ -392,6 +392,19 @@ class FirebaseCloudStorage {
     return setters;
   }
 
+  Future<CloudProfile?> getSetter(setterName) async {
+    final querySnapshot = await profileCollection
+        .where(displayNameFieldName, isEqualTo: setterName)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      return CloudProfile.fromSnapshot(querySnapshot.docs.first);
+    } else {
+      return null;
+    }
+  }
+
+
   Stream<Iterable<CloudProfile>> getUserFromEmail(String profileEmail) {
     try {
       final currentProfile = profileCollection

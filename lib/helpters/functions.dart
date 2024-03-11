@@ -359,6 +359,37 @@ Map<String, dynamic> updateBoulderCompSet({
   return boulderComp;
 }
 
+Map<String, dynamic> removeDateBoulderSet(
+    {required CloudProfile setterProfile,
+    CloudBoulder? boulder,
+    Map<String, dynamic>? existingData}) {
+  Map<String, dynamic> setBoulder = existingData ?? {};
+  String boulderYear = "";
+  String boulderMonth = "";
+  String boulderWeek = "";
+  String boulderDay = "";
+
+  String boulderID = boulder!.boulderID;
+ 
+    
+    DateTime boulderDate =
+        setterProfile.setBoulders![boulderID]["setDateBoulder"];
+    boulderYear = boulderDate.year.toString();
+    boulderMonth = boulderDate.month.toString();
+    boulderWeek = grabIsoWeekNumber(boulderDate).toString();
+    boulderDay = boulderDate.day.toString();
+
+    setterProfile.setBoulders![boulderID]["gradeNumberSetter"];
+
+    setterProfile.setBoulders![boulderID]["gradeDifficulty"] ?? 1;
+  
+
+  setBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
+      .remove(boulderID.toString());
+
+  return setBoulder;
+}
+
 Map<String, dynamic> updateDateBoulderSet(
     {required CloudProfile setterProfile,
     required String boulderId,

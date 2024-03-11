@@ -19,6 +19,8 @@ import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/challenge/add_exisiting.dart';
 import 'package:seven_x_c/utilities/dialogs/generics/info_popup.dart';
 import 'package:seven_x_c/utilities/dialogs/generics/yes_no.dart';
+import 'package:seven_x_c/utilities/dialogs/boulder/add_new_boulder.dart'
+    show calculateSetterPoints;
 
 Future<bool> showBoulderInformation(
     BuildContext context,
@@ -110,11 +112,9 @@ Future<bool> showBoulderInformation(
     try {
       gradingShow = arrowDict()[boulder.gradeDifficulty]!["arrow"];
     } on Error {
-    
-    gradingShow = getArrowFromNumberAndColor(
-        boulder.gradeNumberSetter, boulder.gradeColour);}
-
-    
+      gradingShow = getArrowFromNumberAndColor(
+          boulder.gradeNumberSetter, boulder.gradeColour);
+    }
   } else {
     gradingShow =
         allGrading[boulder.gradeNumberSetter]![gradingSystem.toLowerCase()];
@@ -524,6 +524,10 @@ Future<bool> showBoulderInformation(
                                           onChanged: (bool? value) {
                                             setState(() {
                                               updatedBoulder = value ?? false;
+                                              fireBaseService.updateBoulder(
+                                                  boulderID: boulder.boulderID,
+                                                  updateDateBoulder:
+                                                      Timestamp.now());
                                             });
                                           },
                                         ),
@@ -537,6 +541,9 @@ Future<bool> showBoulderInformation(
                                           onChanged: (bool? value) {
                                             setState(() {
                                               topOut = value ?? false;
+                                              fireBaseService.updateBoulder(
+                                                  boulderID: boulder.boulderID,
+                                                  topOut: topOut);
                                             });
                                           },
                                         ),
@@ -595,6 +602,9 @@ Future<bool> showBoulderInformation(
                                           onChanged: (bool? value) {
                                             setState(() {
                                               hiddenGrade = value ?? false;
+                                              fireBaseService.updateBoulder(
+                                                  boulderID: boulder.boulderID,
+                                                  hiddenGrade: hiddenGrade);
                                             });
                                           },
                                         ),
@@ -604,9 +614,54 @@ Future<bool> showBoulderInformation(
                                     DropdownButtonFormField<String>(
                                       value: selectedSetter,
                                       onChanged: (String? value) {
-                                        setState(() {
+                                        setState(() async {
+                                          String oldSetter = selectedSetter;
                                           selectedSetter =
                                               value ?? setters.first;
+                                          CloudProfile? tempSetter =
+                                              await fireBaseService
+                                                  .getSetter(oldSetter);
+                                          if (tempSetter != null) {
+                                            fireBaseService.updateUser(
+                                                currentProfile: tempSetter,
+                                                setterPoints: updatePoints(
+                                                    points:
+                                                        -boulder.setterPoint!),
+                                                dateBoulderSet:
+                                                    removeDateBoulderSet(
+                                                        setterProfile:
+                                                            tempSetter,
+                                                        boulder: boulder,
+                                                        existingData: tempSetter
+                                                            .dateBoulderSet));
+                                          }
+
+                                          CloudProfile? newSetter =
+                                              await fireBaseService
+                                                  .getSetter(selectedSetter);
+                                          if (newSetter != null) {
+                                            double setterPoints =
+                                                calculateSetterPoints(newSetter,
+                                                    boulder.gradeColour);
+                                            fireBaseService.updateUser(
+                                                currentProfile: newSetter,
+                                                setterPoints: updatePoints(
+                                                    points: setterPoints),
+                                                dateBoulderSet:
+                                                    updateDateBoulderSet(
+                                                  setterProfile: newSetter,
+                                                  boulderId: boulder.boulderID,
+                                                  newBoulder: boulder,
+                                                  setterPoints: setterPoints,
+                                                  existingData:
+                                                      newSetter.dateBoulderSet,
+                                                ));
+
+                                            fireBaseService.updateBoulder(
+                                                boulderID: boulder.boulderID,
+                                                setter: selectedSetter,
+                                                setterPoint: setterPoints);
+                                          }
                                         });
                                       },
                                       items: setters.map((String setter) {
@@ -844,11 +899,12 @@ void deletionOfTheBoulder(
   DateTime boulderData = boulder.setDateBoulder.toDate();
 
   if (DateTime.now().difference(boulderData).inDays < 2) {
-    double setterPoints = boulder.setterPoint?? 0;
+    double setterPoints = boulder.setterPoint ?? 0;
 
     fireBaseService.updateUser(
         currentProfile: currentProfile,
-        setterPoints: updatePoints(points: -setterPoints, existingData: currentProfile.setterPoints),
+        setterPoints: updatePoints(
+            points: -setterPoints, existingData: currentProfile.setterPoints),
         dateBoulderSet: removeBoulderFromGymDataBoulders(
             boulderID: boulder.boulderID,
             removeDate: boulder.setDateBoulder.toDate(),
@@ -1129,5 +1185,5 @@ ElevatedButton edditApplyButton(
           Navigator.of(context).pop();
         }
       },
-      child: const Text("Apply"));
+      child: const Text("Change Grade"));
 }
