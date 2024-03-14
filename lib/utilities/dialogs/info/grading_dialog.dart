@@ -3,7 +3,7 @@ import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/helpters/bonus_functions.dart';
 import 'package:seven_x_c/helpters/functions.dart' show capitalize;
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
-import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
+import 'package:seven_x_c/services/cloude/gym_data/cloud_settings.dart';
 
 //todo delete this ? I do not think I will need it anymore.
 

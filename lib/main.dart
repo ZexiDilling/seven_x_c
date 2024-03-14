@@ -13,6 +13,7 @@ import 'package:seven_x_c/views/auth_user/register_view.dart';
 import 'package:seven_x_c/views/auth_user/verify_email_view.dart';
 import 'package:seven_x_c/views/boulder/gym_view.dart';
 import 'package:seven_x_c/views/boulder/ranking_view.dart';
+import 'package:seven_x_c/views/change_location.dart';
 import 'package:seven_x_c/views/comp/comp_result_view.dart';
 import 'package:seven_x_c/views/comp/comp_setup_view.dart';
 import 'package:seven_x_c/views/profile/profile_view.dart';
@@ -41,6 +42,7 @@ void main() {
         gymView: (context) => const GymView(),
         rankView: (context) => const RankView(),
         profileView: (context) => const ProfileView(),
+        locationView: (context) => const LocationView(),
         compCreatView: (context) => const CompCreationView(),
         compResultView: (context) => const CompResultsView(),
       },

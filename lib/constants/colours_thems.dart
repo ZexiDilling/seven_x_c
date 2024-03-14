@@ -13,4 +13,6 @@ const compBarStyle  =  TextStyle(color: Colors.black);
 // editing Colours
 const Color editingAppBarColors = Color.fromARGB(255, 193, 18, 209);
 
-
+// choose location
+const Color locationAppBarColor = Color.fromARGB(255, 92, 132, 165);
+const locationAppBarStyle = TextStyle(color: Colors.black);

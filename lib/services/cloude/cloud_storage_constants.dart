@@ -101,3 +101,15 @@ const gymDataClimbersFieldName = "gymDataClimbers";
 const gymDataBouldersFieldName = "gymDataBoulders";
 const gymDataBouldersToppedFieldName = "gymDataBouldersTopped";
 const gymDataRoutesToppedFieldName = "gymDataRoutesTopped";
+
+//Location data
+const locationNameIDFieldName = "locationName";
+const infoFieldName = "info";
+const boulderingFieldName = "bouldering";
+const ropeFieldName = "rope";
+const indoorFieldName = "indoor";
+const outdoorFieldName = "outdoor";
+const locationXCordinateFieldName = "locationXCordinate";
+const locationYCordinateFieldName = "locationYCordinate";
+const countryFieldName = "country";
+const adresseFieldName = "adresse";

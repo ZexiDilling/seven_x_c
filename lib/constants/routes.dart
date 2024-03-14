@@ -5,3 +5,4 @@ const rankView = "/rankings/rank-view/";
 const profileView = "/profile/profile-view/";
 const compCreatView = "comp/comp-creation/";
 const compResultView = "comp/comp-results/";
+const locationView = "loction/location-view";

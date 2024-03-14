@@ -19,8 +19,8 @@ import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
-import 'package:seven_x_c/services/cloude/settings/cloud_gym_data.dart';
-import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
+import 'package:seven_x_c/services/cloude/gym_data/cloud_gym_data.dart';
+import 'package:seven_x_c/services/cloude/gym_data/cloud_settings.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/error_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/logout_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/comp/comp_rank_dialog.dart';
@@ -669,6 +669,12 @@ class _GymViewState extends State<GymView> {
               setCompView: setCompView,
               setComp: setCurrentComp,
             );
+          
+          case MenuAction.location:
+ Navigator.of(context).pushNamed(
+              locationView,
+              arguments: currentSettings!,
+            );
         }
       },
       itemBuilder: (context) {
@@ -695,6 +701,10 @@ class _GymViewState extends State<GymView> {
               value: MenuAction.adminPanel,
               child: Text("Admin"),
             ),
+          if (currentProfile!.isAdmin)
+          const PopupMenuItem(
+            value: MenuAction.location,
+            child: Text("Change Location")),
           const PopupMenuItem(
             value: MenuAction.comp,
             child: Text("Comp"),

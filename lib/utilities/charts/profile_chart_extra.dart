@@ -2,7 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_info.dart'
     show allGrading, nameToColor;
-import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
+import 'package:seven_x_c/services/cloude/gym_data/cloud_settings.dart';
 import '../../helpters/time_calculations.dart' show TimePeriod;
 
 const double fontChartSize = 10;

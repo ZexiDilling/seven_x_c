@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/boulder_info.dart' show nameToColor;
 
-import 'package:seven_x_c/services/cloude/settings/cloud_settings.dart';
+import 'package:seven_x_c/services/cloude/gym_data/cloud_settings.dart';
 import 'package:seven_x_c/utilities/charts/profile_chart_extra.dart';
 
 List<PieChartSectionData> showingSections(CloudSettings currentSettings,
