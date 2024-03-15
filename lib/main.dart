@@ -11,9 +11,10 @@ import 'package:seven_x_c/views/auth_user/forgot_password_view.dart';
 import 'package:seven_x_c/views/auth_user/login_view.dart';
 import 'package:seven_x_c/views/auth_user/register_view.dart';
 import 'package:seven_x_c/views/auth_user/verify_email_view.dart';
-import 'package:seven_x_c/views/boulder/gym_view.dart';
-import 'package:seven_x_c/views/boulder/ranking_view.dart';
-import 'package:seven_x_c/views/change_location.dart';
+import 'package:seven_x_c/views/location/create_location.dart';
+import 'package:seven_x_c/views/location/gym_view.dart';
+import 'package:seven_x_c/views/location/ranking_view.dart';
+import 'package:seven_x_c/views/location/change_location.dart';
 import 'package:seven_x_c/views/comp/comp_result_view.dart';
 import 'package:seven_x_c/views/comp/comp_setup_view.dart';
 import 'package:seven_x_c/views/profile/profile_view.dart';
@@ -43,6 +44,7 @@ void main() {
         rankView: (context) => const RankView(),
         profileView: (context) => const ProfileView(),
         locationView: (context) => const LocationView(),
+        createLocationView: (context) => const CreateLocationView(),
         compCreatView: (context) => const CompCreationView(),
         compResultView: (context) => const CompResultsView(),
       },

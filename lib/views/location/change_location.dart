@@ -115,92 +115,145 @@ class _LocationViewState extends State<LocationView> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Checkbox(
-                value: indoorSelecter,
-                onChanged: (value) {
-                  setState(() {
-                    indoorSelecter = value!;
-                    if (indoorSelecter) {
-                      locations.add('Indoor');
-                    } else {
-                      locations.remove('Indoor');
-                    }
-                  });
-                },
-              ),
-              const Text('Indoor'),
-              const SizedBox(width: 20),
-              Checkbox(
-                value: outdoorSelecter,
-                onChanged: (value) {
-                  setState(() {
-                    outdoorSelecter = value!;
-                    if (outdoorSelecter) {
-                      locations.add('Outdoor');
-                    } else {
-                      locations.remove('Outdoor');
-                    }
-                  });
-                },
-              ),
-              const Text('Outdoor'),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Checkbox(
-                value: boulderingSelecter,
-                onChanged: (value) {
-                  setState(() {
-                    boulderingSelecter = value!;
-                    if (boulderingSelecter) {
-                      locations.add('Bouldering');
-                    } else {
-                      locations.remove('Bouldering');
-                    }
-                  });
-                },
-              ),
-              const Text('Bouldering'),
-              const SizedBox(width: 20),
-              Checkbox(
-                value: ropeSelecter,
-                onChanged: (value) {
-                  setState(() {
-                    ropeSelecter = value!;
-                    if (ropeSelecter) {
-                      locations.add('Rope');
-                    } else {
-                      locations.remove('Rope');
-                    }
-                  });
-                },
-              ),
-              const Text('Rope'),
-            ],
-          ),
-          const SizedBox(height: 20),
-          DropdownButton<String>(
-            hint: const Text('Select Location'),
-            value: locations.isNotEmpty ? locations.first : null,
-            onChanged: (String? newValue) {
-              setState(() {
-                // Update selected location
-              });
-            },
-            items: locations.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          ),
+          placementRow(),
+          activityRow(),
+          searchRow(),
+          const SizedBox(height: 20,),
+          StreamBuilder<Iterable<CloudGymLocation>>(
+          stream: getFilterGymLocations(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            }
+
+            final locations = snapshot.data?.toList() ?? [];
+
+            return Expanded(
+              child: locationListView(locations),
+            );
+          },
+        ),
         ],
       ),
+    );
+  }
+
+  Row placementRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Checkbox(
+          value: indoorSelecter,
+          onChanged: (value) {
+            setState(() {
+              indoorSelecter = value!;
+              if (indoorSelecter) {
+                locations.add('Indoor');
+              } else {
+                locations.remove('Indoor');
+              }
+            });
+          },
+        ),
+        const Text('Indoor'),
+        const SizedBox(width: 20),
+        Checkbox(
+          value: outdoorSelecter,
+          onChanged: (value) {
+            setState(() {
+              outdoorSelecter = value!;
+              if (outdoorSelecter) {
+                locations.add('Outdoor');
+              } else {
+                locations.remove('Outdoor');
+              }
+            });
+          },
+        ),
+        const Text('Outdoor'),
+      ],
+    );
+  }
+
+  Row activityRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Checkbox(
+          value: boulderingSelecter,
+          onChanged: (value) {
+            setState(() {
+              boulderingSelecter = value!;
+              if (boulderingSelecter) {
+                locations.add('Bouldering');
+              } else {
+                locations.remove('Bouldering');
+              }
+            });
+          },
+        ),
+        const Text('Bouldering'),
+        const SizedBox(width: 20),
+        Checkbox(
+          value: ropeSelecter,
+          onChanged: (value) {
+            setState(() {
+              ropeSelecter = value!;
+              if (ropeSelecter) {
+                locations.add('Rope');
+              } else {
+                locations.remove('Rope');
+              }
+            });
+          },
+        ),
+        const Text('Rope'),
+      ],
+    );
+  }
+
+  Row searchRow() {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            decoration: const InputDecoration(
+              hintText: 'Search',
+              border: OutlineInputBorder(),
+            ),
+            onChanged: (value) {
+              // Implement search functionality
+            },
+          ),
+        ),
+        const SizedBox(width: 10), // Adjust spacing as needed
+        ElevatedButton(
+          onPressed: () {
+            // Implement search action
+          },
+          child: const Text('Search'),
+        ),
+      ],
+    );
+  }
+
+  Widget locationListView(List<CloudGymLocation> locations) {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: locations.length,
+      itemBuilder: (context, index) {
+        final location = locations[index];
+        return ListTile(
+          title: Text(location.locationNameID), // Adjust based on your data
+          onTap: () {
+            // Implement action when location is tapped
+          },
+        );
+      },
     );
   }
 
@@ -231,6 +284,10 @@ class _LocationViewState extends State<LocationView> {
               profileView,
               arguments: currentSettings!,
             );
+          case MenuActionLocation.createLocation:
+            Navigator.of(context).pushNamed(
+              createLocationView,
+            );
         }
       },
       itemBuilder: (context) {
@@ -248,6 +305,10 @@ class _LocationViewState extends State<LocationView> {
               value: MenuActionLocation.adminPanel,
               child: Text("Admin"),
             ),
+          const PopupMenuItem(
+            value: MenuActionLocation.createLocation,
+            child: Text("Create new Location"),
+          ),
           const PopupMenuItem(
             value: MenuActionLocation.logout,
             child: Text("Log out"),

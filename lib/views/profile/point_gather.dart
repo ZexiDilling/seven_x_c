@@ -2,7 +2,6 @@ import 'dart:collection';
 import 'package:seven_x_c/helpters/time_calculations.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/services/cloude/gym_data/cloud_gym_data.dart';
-import 'package:seven_x_c/views/boulder/ranking_view.dart' show semesterMap;
 
 Future<PointsData> getPoints(
   CloudProfile currentProfile,

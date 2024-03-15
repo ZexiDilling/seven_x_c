@@ -219,6 +219,8 @@ String yearLable(Map<String, String> selectedTime) {
   return selectedTime["year"]!;
 }
 
+Map<String, List> semesterMap = {"spring": ["2", "3", "4", "5", "6", "7"],"fall": ["8", "9", "10", "11", "12", "1"]};
+
 Map<String, String> getSelectedTime(DateTime date) {
   return {
     "year": date.year.toString(),
