@@ -9,7 +9,7 @@ import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/services/cloude/gym_data/cloud_gym_data.dart';
 import 'package:seven_x_c/services/cloude/gym_data/cloud_settings.dart';
 
-class FirebaseCloudStorage {  
+class FirebaseCloudStorage {
   final bouldersCollection = FirebaseFirestore.instance.collection("boulders");
   final profileCollection = FirebaseFirestore.instance.collection("profile");
   final compCollection = FirebaseFirestore.instance.collection("comp");
@@ -736,7 +736,10 @@ class FirebaseCloudStorage {
     required String settingsLocation,
     required String settingsStyle,
     required List settingsActivites,
-    required List settingsGradingSystem,
+    Map<String, dynamic>? appBarMain,
+    Map<String, dynamic>? appBarComp,
+    Map<String, dynamic>? appBarEditing,
+    Map<String, dynamic>? mainTexstStyle,
     bool? settingsHoldsFollowsGrade,
     Map<String, dynamic>? settingsHoldColour,
     Map<String, dynamic>? settingsGradeColour,
@@ -750,7 +753,10 @@ class FirebaseCloudStorage {
       settingsLocationFieldName: settingsLocation,
       settingsStyleFieldName: settingsStyle,
       settingsActivitesFieldName: settingsActivites,
-      settingsGradingSystemFieldName: settingsGradingSystem,
+      appBarMainFieldName: appBarMain,
+      appBarCompFieldName: appBarComp,
+      appBarEditingFieldName: appBarEditing,
+      mainTexstStyleFieldName: mainTexstStyle,
       settingsHoldsFollowsGradeFieldName: settingsHoldsFollowsGrade,
       settingsHoldColourFieldName: settingsHoldColour,
       settingsGradeColourFieldName: settingsGradeColour,
@@ -765,7 +771,10 @@ class FirebaseCloudStorage {
       settingsLocation,
       settingsStyle,
       settingsActivites,
-      settingsGradingSystem,
+      appBarMain,
+      appBarComp,
+      appBarEditing,
+      mainTexstStyle,
       settingsHoldsFollowsGrade,
       settingsHoldColour,
       settingsGradeColour,
@@ -782,7 +791,10 @@ class FirebaseCloudStorage {
     String? settingsLocation,
     String? settingsStyle,
     List? settingsActivites,
-    List? settingsGradingSystem,
+    Map<String, dynamic>? appBarMain,
+    Map<String, dynamic>? appBarComp,
+    Map<String, dynamic>? appBarEditing,
+    Map<String, dynamic>? mainTexstStyle,
     bool? settingsHoldsFollowsGrade,
     Map<String, dynamic>? settingsHoldColour,
     Map<String, dynamic>? settingsGradeColour,
@@ -808,8 +820,17 @@ class FirebaseCloudStorage {
       if (settingsActivites != null) {
         updatedData[settingsActivitesFieldName] = settingsActivites;
       }
-      if (settingsGradingSystem != null) {
-        updatedData[settingsGradingSystemFieldName] = settingsGradingSystem;
+      if (appBarMain != null) {
+        updatedData[appBarMainFieldName] = appBarMain;
+      }
+      if (appBarComp != null) {
+        updatedData[appBarCompFieldName] = appBarComp;
+      }
+      if (appBarEditing != null) {
+        updatedData[appBarEditingFieldName] = appBarEditing;
+      }
+      if (mainTexstStyle != null) {
+        updatedData[mainTexstStyleFieldName] = mainTexstStyle;
       }
       if (settingsHoldsFollowsGrade != null) {
         updatedData[settingsHoldsFollowsGradeFieldName] =
@@ -1046,7 +1067,4 @@ class FirebaseCloudStorage {
         (event) => event.docs.map((doc) => CloudGymLocation.fromSnapshot(doc)));
     return allLocations;
   }
-
 }
-
-

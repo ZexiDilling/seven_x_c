@@ -161,6 +161,7 @@ boulders
 
 Fix challenges to work.	
 Fix states on profile view
+Remove setter points and re-calc + update on the new setter if they are differet than "DTU Setter Team" and "Geust setters"
 ------------------------------------------------------------------------------------------------------------------------
 
 
@@ -174,9 +175,48 @@ new bar - grah:
 		By Setter
 
 
+Make it possible to change settings for the gym. 
+	Appbar colours
+	text style
+	setting activitys. 
+	hold and grade colours.
+	
+Make a overall admin account to create gyms and make ppl admin for the gym
+Change where the colours from the different appBars are pulled from. 
 
+Make it possible to change location 
+	to different gyms
+	to outside places
+	store coordinates 
 
-Remove setter points and re-calc + update on the new setter if they are differet than "DTU Setter Team" and "Geust setters"
+for outside.
+	Mark outside problems
+		boulders
+		High boulders
+		Rope 
+		bolted / trad
+
+	Store map of different areas ? 
+	make an overview map 
+		change map when zoomed in ? 
+		change the frontal view to make it easier to see where the routes/boulders are
+		
+	add info to each route
+		Where to start end ? 
+		First top
+		"Setter" 
+		story ? 
+	Make it possible to add comments
+		Make this toggleable 
+		Start with being disabled.
+	Set-up default colours for outside
+		make it possible for the users to enable disable colours
+	Grade the outside problems by difficulty
+	Grade them by quality ? 
+	add tags ? 
+
+	
+
 
 
 Make it possible to adjust the sections. 

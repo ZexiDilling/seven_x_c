@@ -1,7 +1,6 @@
 const ownerUserIdFieldName = "user_id";
 const textFieldName = "text";
 
-
 // boulder
 const wallFieldName = "wall";
 const coordinateXFieldName = "cordX";
@@ -88,7 +87,10 @@ const settingsCountryFieldName = "settingsCountry";
 const settingsLocationFieldName = "settingsLocation";
 const settingsStyleFieldName = "settingsStyle";
 const settingsActivitesFieldName = "settingsActivites";
-const settingsGradingSystemFieldName = "settingsGradingSystem";
+const appBarMainFieldName = "appBarMain";
+const appBarCompFieldName = "appBarComp";
+const appBarEditingFieldName = "appBarEditing";
+const mainTexstStyleFieldName = "mainTexstStyle";
 const settingsHoldsFollowsGradeFieldName = "settingsHoldsFollowsGrade";
 const settingsHoldColourFieldName = "settingsHoldColour";
 const settingsGradeColourFieldName = "settingsGradeColour";

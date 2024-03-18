@@ -616,12 +616,12 @@ class _GymViewState extends State<GymView> {
     );
   }
 
-  PopupMenuButton<MenuAction> dropDownMenu(
+  PopupMenuButton<MenuActionMain> dropDownMenu(
       BuildContext context, CloudSettings? currentSettings) {
-    return PopupMenuButton<MenuAction>(
+    return PopupMenuButton<MenuActionMain>(
       onSelected: (value) async {
         switch (value) {
-          case MenuAction.logout:
+          case MenuActionMain.logout:
             final shouldLogout = await showLogOutDialog(context);
             if (shouldLogout) {
               // ignore: use_build_context_synchronously
@@ -630,13 +630,13 @@ class _GymViewState extends State<GymView> {
                   );
               break;
             }
-          case MenuAction.settings:
+          case MenuActionMain.settings:
             Navigator.of(context).pushNamed(profileSettings).then((_) {
               _initializeData();
             });
             break;
 
-          case MenuAction.stripping:
+          case MenuActionMain.stripping:
             Map<String, WallRegion> wallRegionMap = {
               for (var region in wallRegions) region.wallID: region
             };
@@ -651,16 +651,16 @@ class _GymViewState extends State<GymView> {
             for (WallRegion wall in wallRegions) {
               wallRegionMap[wall.wallID]!.isSelected = false;
             }
-          case MenuAction.adminPanel:
+          case MenuActionMain.adminPanel:
             Navigator.of(context).pushNamed(adminPanel);
-          case MenuAction.rankings:
+          case MenuActionMain.rankings:
             Navigator.of(context).pushNamed(rankView);
-          case MenuAction.profile:
+          case MenuActionMain.profile:
             Navigator.of(context).pushNamed(
               profileView,
               arguments: currentSettings!,
             );
-          case MenuAction.comp:
+          case MenuActionMain.comp:
             showComp(
               context,
               currentProfile: currentProfile,
@@ -670,7 +670,7 @@ class _GymViewState extends State<GymView> {
               setComp: setCurrentComp,
             );
           
-          case MenuAction.location:
+          case MenuActionMain.location:
  Navigator.of(context).pushNamed(
               locationView,
               arguments: currentSettings!,
@@ -680,37 +680,37 @@ class _GymViewState extends State<GymView> {
       itemBuilder: (context) {
         return [
           const PopupMenuItem(
-            value: MenuAction.profile,
+            value: MenuActionMain.profile,
             child: Text("Profile"),
           ),
           const PopupMenuItem(
-            value: MenuAction.rankings,
+            value: MenuActionMain.rankings,
             child: Text("Rankings"),
           ),
           const PopupMenuItem(
-            value: MenuAction.settings,
+            value: MenuActionMain.settings,
             child: Text("Settings"),
           ),
           if (currentProfile!.isSetter | currentProfile!.isAdmin)
             const PopupMenuItem(
-              value: MenuAction.stripping,
+              value: MenuActionMain.stripping,
               child: Text("Stripping"),
             ),
           if (currentProfile!.isAdmin)
             const PopupMenuItem(
-              value: MenuAction.adminPanel,
+              value: MenuActionMain.adminPanel,
               child: Text("Admin"),
             ),
           if (currentProfile!.isAdmin)
           const PopupMenuItem(
-            value: MenuAction.location,
+            value: MenuActionMain.location,
             child: Text("Change Location")),
           const PopupMenuItem(
-            value: MenuAction.comp,
+            value: MenuActionMain.comp,
             child: Text("Comp"),
           ),
           const PopupMenuItem(
-            value: MenuAction.logout,
+            value: MenuActionMain.logout,
             child: Text("Log out"),
           ),
         ];

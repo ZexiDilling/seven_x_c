@@ -11,8 +11,13 @@ class CloudSettings {
   final String settingsLocation;
   final String settingsStyle;
   final List settingsActivites;
-  final List settingsGradingSystem;
-  
+
+  // themes and colours
+  final Map<String, dynamic>? appBarMain;
+  final Map<String, dynamic>? appBarComp;
+  final Map<String, dynamic>? appBarEditing;
+  final Map<String, dynamic>? mainTexstStyle;
+
   // Indoor gyms
   final bool? settingsHoldsFollowsGrade;
   final Map<String, dynamic>? settingsHoldColour;
@@ -27,7 +32,10 @@ class CloudSettings {
     this.settingsLocation,
     this.settingsStyle,
     this.settingsActivites,
-    this.settingsGradingSystem,
+    this.appBarMain,
+    this.appBarComp,
+    this.appBarEditing,
+    this.mainTexstStyle,
     this.settingsHoldsFollowsGrade,
     this.settingsHoldColour,
     this.settingsGradeColour,
@@ -39,24 +47,28 @@ class CloudSettings {
   CloudSettings.fromSnapshot(
       QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
       : settingsID = snapshot.id,
-      settingsNameID = snapshot.data()[settingsNameIDFieldName] as String,
+        settingsNameID = snapshot.data()[settingsNameIDFieldName] as String,
         settingsName = snapshot.data()[settingsNameFieldName] as String,
         settingsCountry = snapshot.data()[settingsCountryFieldName] as String,
         settingsLocation = snapshot.data()[settingsLocationFieldName] as String,
         settingsStyle = snapshot.data()[settingsStyleFieldName] as String,
         settingsActivites = snapshot.data()[settingsActivitesFieldName] as List,
-        settingsGradingSystem =
-            snapshot.data()[settingsGradingSystemFieldName] as List,
+        appBarMain =
+            snapshot.data()[appBarMainFieldName] as Map<String, dynamic>?,
+        appBarComp =
+            snapshot.data()[appBarCompFieldName] as Map<String, dynamic>?,
+        appBarEditing =
+            snapshot.data()[appBarEditingFieldName] as Map<String, dynamic>?,
+        mainTexstStyle =
+            snapshot.data()[mainTexstStyleFieldName] as Map<String, dynamic>?,
         settingsHoldsFollowsGrade =
             snapshot.data()[settingsHoldsFollowsGradeFieldName] as bool?,
-        settingsHoldColour =
-            snapshot.data()[settingsHoldColourFieldName] as Map<String, dynamic>?,
-        settingsGradeColour =
-            snapshot.data()[settingsGradeColourFieldName] as Map<String, dynamic>?,
+        settingsHoldColour = snapshot.data()[settingsHoldColourFieldName]
+            as Map<String, dynamic>?,
+        settingsGradeColour = snapshot.data()[settingsGradeColourFieldName]
+            as Map<String, dynamic>?,
         settingsColorToGrade = snapshot.data()[settingsColorToGradeFieldName]
             as Map<String, dynamic>?,
         settingsWallRegions = snapshot.data()[settingsWallRegionsFieldName]
             as Map<String, dynamic>?;
 }
-
-
