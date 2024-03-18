@@ -96,6 +96,7 @@ const settingsHoldColourFieldName = "settingsHoldColour";
 const settingsGradeColourFieldName = "settingsGradeColour";
 const settingsColorToGradeFieldName = "settingsColorToGrade";
 const settingsWallRegionsFieldName = "settingsWallRegions";
+const contactEmailFildName = "contactEmail";
 
 //GymData
 const gymDataNameIDFieldName = "gymDataNameID";

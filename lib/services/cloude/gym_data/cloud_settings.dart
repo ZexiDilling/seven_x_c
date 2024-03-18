@@ -24,6 +24,7 @@ class CloudSettings {
   final Map<String, dynamic>? settingsGradeColour;
   final Map<String, dynamic>? settingsColorToGrade;
   final Map<String, dynamic>? settingsWallRegions;
+  final String? contactEmail;
 
   const CloudSettings(
     this.settingsNameID,
@@ -40,7 +41,8 @@ class CloudSettings {
     this.settingsHoldColour,
     this.settingsGradeColour,
     this.settingsColorToGrade,
-    this.settingsWallRegions, {
+    this.settingsWallRegions, 
+    this.contactEmail, {
     required this.settingsID,
   });
 
@@ -70,5 +72,7 @@ class CloudSettings {
         settingsColorToGrade = snapshot.data()[settingsColorToGradeFieldName]
             as Map<String, dynamic>?,
         settingsWallRegions = snapshot.data()[settingsWallRegionsFieldName]
-            as Map<String, dynamic>?;
+            as Map<String, dynamic>?,
+            contactEmail = snapshot.data()[contactEmailFildName]
+            as String?;
 }

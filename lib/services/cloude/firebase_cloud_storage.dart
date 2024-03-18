@@ -745,6 +745,7 @@ class FirebaseCloudStorage {
     Map<String, dynamic>? settingsGradeColour,
     Map<String, dynamic>? settingsColorToGrade,
     Map<String, dynamic>? settingsWallRegions,
+    String? contactEmail,
   }) async {
     final document = await settingsCollection.add({
       settingsNameIDFieldName: settingsNameID,
@@ -762,6 +763,7 @@ class FirebaseCloudStorage {
       settingsGradeColourFieldName: settingsGradeColour,
       settingsColorToGradeFieldName: settingsColorToGrade,
       settingsWallRegionsFieldName: settingsWallRegions,
+      contactEmailFildName: contactEmail,
     });
     final fetchChallenge = await document.get();
     return CloudSettings(
@@ -780,6 +782,7 @@ class FirebaseCloudStorage {
       settingsGradeColour,
       settingsColorToGrade,
       settingsWallRegions,
+      contactEmail,
       settingsID: fetchChallenge.id,
     );
   }
@@ -800,6 +803,7 @@ class FirebaseCloudStorage {
     Map<String, dynamic>? settingsGradeColour,
     Map<String, dynamic>? settingsColorToGrade,
     Map<String, dynamic>? settingsWallRegions,
+    String? contactEmail,
   }) async {
     try {
       // Create a map to store non-null fields and their values
@@ -848,6 +852,7 @@ class FirebaseCloudStorage {
       if (settingsWallRegions != null) {
         updatedData[settingsWallRegionsFieldName] = settingsWallRegions;
       }
+      if (contactEmail != null) {updatedData[contactEmailFildName] = contactEmail;}
 
       // Add non-null fields to the map
 
