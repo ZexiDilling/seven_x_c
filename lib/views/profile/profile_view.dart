@@ -809,6 +809,9 @@ class _ProfileViewState extends State<ProfileView> {
                                           case 6:
                                             text =
                                                 'Silver: ${pointsData.boulderSetGradeColours["all"]!["silver"] ?? 0}';
+                                          case 7:
+                                            text =
+                                                'Total: ${pointsData.boulderSetGradeColours["all"]!["total"] ?? 0}';
                                         }
 
                                         // Customize the content of each grid item as needed

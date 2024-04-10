@@ -83,8 +83,6 @@ const challengeDifficultyFieldName = "challengeDifficulty";
 //Settings
 const settingsNameIDFieldName = "settingsNameID";
 const settingsNameFieldName = "settingsName";
-const settingsCountryFieldName = "settingsCountry";
-const settingsLocationFieldName = "settingsLocation";
 const settingsStyleFieldName = "settingsStyle";
 const settingsActivitesFieldName = "settingsActivites";
 const appBarMainFieldName = "appBarMain";
@@ -106,13 +104,16 @@ const gymDataBouldersToppedFieldName = "gymDataBouldersTopped";
 const gymDataRoutesToppedFieldName = "gymDataRoutesTopped";
 
 //Location data
-const locationNameIDFieldName = "locationName";
-const infoFieldName = "info";
+const locationNameIDFieldName = "locationNameID";
 const boulderingFieldName = "bouldering";
-const ropeFieldName = "rope";
-const indoorFieldName = "indoor";
-const outdoorFieldName = "outdoor";
+const sportFieldName = "sport";
+const tradFieldName = "trad";
+const isGymFieldName = "isGym";
 const locationXCordinateFieldName = "locationXCordinate";
 const locationYCordinateFieldName = "locationYCordinate";
-const countryFieldName = "country";
-const adresseFieldName = "adresse";
+const locationCountryFieldName = "locationCountry";
+const locationAdresseFieldName = "locationAdresse";
+const locationHomepageFieldName = "locationHomepage";
+const locationEmailFieldName = "locationEmail";
+const locationInfoFieldName = "locationInfo";
+const locationAccessFieldName = "locationAccess";

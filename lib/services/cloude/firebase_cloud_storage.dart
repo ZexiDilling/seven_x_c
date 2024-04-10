@@ -750,8 +750,6 @@ class FirebaseCloudStorage {
     final document = await settingsCollection.add({
       settingsNameIDFieldName: settingsNameID,
       settingsNameFieldName: settingsName,
-      settingsCountryFieldName: settingsCountry,
-      settingsLocationFieldName: settingsLocation,
       settingsStyleFieldName: settingsStyle,
       settingsActivitesFieldName: settingsActivites,
       appBarMainFieldName: appBarMain,
@@ -769,8 +767,6 @@ class FirebaseCloudStorage {
     return CloudSettings(
       settingsNameID,
       settingsName,
-      settingsCountry,
-      settingsLocation,
       settingsStyle,
       settingsActivites,
       appBarMain,
@@ -790,8 +786,6 @@ class FirebaseCloudStorage {
   Future<void> updateSettings({
     required String settingsID,
     String? settingsName,
-    String? settingsCountry,
-    String? settingsLocation,
     String? settingsStyle,
     List? settingsActivites,
     Map<String, dynamic>? appBarMain,
@@ -811,12 +805,6 @@ class FirebaseCloudStorage {
 
       if (settingsName != null) {
         updatedData[settingsNameFieldName] = settingsName;
-      }
-      if (settingsCountry != null) {
-        updatedData[settingsCountryFieldName] = settingsCountry;
-      }
-      if (settingsLocation != null) {
-        updatedData[settingsLocationFieldName] = settingsLocation;
       }
       if (settingsStyle != null) {
         updatedData[settingsStyleFieldName] = settingsStyle;
@@ -852,7 +840,9 @@ class FirebaseCloudStorage {
       if (settingsWallRegions != null) {
         updatedData[settingsWallRegionsFieldName] = settingsWallRegions;
       }
-      if (contactEmail != null) {updatedData[contactEmailFildName] = contactEmail;}
+      if (contactEmail != null) {
+        updatedData[contactEmailFildName] = contactEmail;
+      }
 
       // Add non-null fields to the map
 
@@ -963,40 +953,49 @@ class FirebaseCloudStorage {
   Future<CloudGymLocation> createGymLocation({
     required String locationID,
     required String locationNameID,
-    String? info,
     required bool bouldering,
-    required bool rope,
-    required bool indoor,
-    required bool outdoor,
+    required bool sport,
+    required bool trad,
+    required bool isGym,
     required double locationXCordinate,
     required double locationYCordinate,
-    required String country,
-    String? adresse,
+    required String locationCountry,
+    String? locationAdresse,
+    String? locationHomepage,
+    String? locationEmail,
+    String? locationInfo,
+    String? locationAccess,
   }) async {
     final document = await gymLocationCollection.add({
       locationNameIDFieldName: locationNameID,
-      infoFieldName: info,
       boulderingFieldName: bouldering,
-      ropeFieldName: rope,
-      indoorFieldName: indoor,
-      outdoorFieldName: outdoor,
+      sportFieldName: sport,
+      tradFieldName: trad,
+      isGymFieldName: isGym,
       locationXCordinateFieldName: locationXCordinate,
       locationYCordinateFieldName: locationYCordinate,
-      countryFieldName: country,
-      adresseFieldName: adresse,
+      locationCountryFieldName: locationCountry,
+      locationAdresseFieldName: locationAdresse,
+      locationHomepageFieldName: locationHomepage,
+      locationEmailFieldName: locationEmail,
+      locationInfoFieldName: locationInfo,
+      locationAccessFieldName: locationAccess,
     });
     final fetchGymLocation = await document.get();
     return CloudGymLocation(
       locationNameID,
-      info,
       bouldering,
-      rope,
-      indoor,
-      outdoor,
+      sport,
+      trad,
+      isGym,
       locationXCordinate,
       locationYCordinate,
-      country,
-      adresse,
+      locationCountry,
+      locationAdresse,
+      locationHomepage,
+      locationEmail,
+      locationInfo,
+      locationAccess,
       locationID: fetchGymLocation.id,
     );
   }
@@ -1004,15 +1003,18 @@ class FirebaseCloudStorage {
   Future<void> updateGymLocation({
     required String locationID,
     String? locationNameID,
-    String? info,
     bool? bouldering,
-    bool? rope,
-    bool? indoor,
-    bool? outdoor,
+    bool? sport,
+    bool? trad,
+    bool? isGym,
     double? locationXCordinate,
     double? locationYCordinate,
-    String? country,
-    String? adresse,
+    String? locationCountry,
+    String? locationAdresse,
+    String? locationHomepage,
+    String? locationEmail,
+    String? locationInfo,
+    String? locationAccess,
   }) async {
     try {
       // Create a map to store non-null fields and their values
@@ -1021,20 +1023,17 @@ class FirebaseCloudStorage {
       if (locationNameID != null) {
         updatedData[locationNameIDFieldName] = locationNameID;
       }
-      if (info != null) {
-        updatedData[infoFieldName] = info;
-      }
       if (bouldering != null) {
         updatedData[boulderingFieldName] = bouldering;
       }
-      if (rope != null) {
-        updatedData[ropeFieldName] = rope;
+      if (sport != null) {
+        updatedData[sportFieldName] = sport;
       }
-      if (indoor != null) {
-        updatedData[indoorFieldName] = indoor;
+      if (trad != null) {
+        updatedData[tradFieldName] = trad;
       }
-      if (outdoor != null) {
-        updatedData[outdoorFieldName] = outdoor;
+      if (isGym != null) {
+        updatedData[isGymFieldName] = isGym;
       }
       if (locationXCordinate != null) {
         updatedData[locationXCordinateFieldName] = locationXCordinate;
@@ -1042,11 +1041,23 @@ class FirebaseCloudStorage {
       if (locationYCordinate != null) {
         updatedData[locationYCordinateFieldName] = locationYCordinate;
       }
-      if (country != null) {
-        updatedData[countryFieldName] = country;
+      if (locationCountry != null) {
+        updatedData[locationCountryFieldName] = locationCountry;
       }
-      if (adresse != null) {
-        updatedData[adresseFieldName] = adresse;
+      if (locationAdresse != null) {
+        updatedData[locationAdresseFieldName] = locationAdresse;
+      }
+      if (locationHomepage != null) {
+        updatedData[locationHomepageFieldName] = locationHomepage;
+      }
+      if (locationEmail != null) {
+        updatedData[locationEmailFieldName] = locationEmail;
+      }
+      if (locationInfo != null) {
+        updatedData[locationInfoFieldName] = locationInfo;
+      }
+      if (locationAccess != null) {
+        updatedData[locationAccessFieldName] = locationAccess;
       }
 
       await gymDataCollection.doc(locationID).update(updatedData);

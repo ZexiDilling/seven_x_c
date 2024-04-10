@@ -7,8 +7,6 @@ class CloudSettings {
   final String settingsID;
   final String settingsNameID;
   final String settingsName;
-  final String settingsCountry;
-  final String settingsLocation;
   final String settingsStyle;
   final List settingsActivites;
 
@@ -29,8 +27,6 @@ class CloudSettings {
   const CloudSettings(
     this.settingsNameID,
     this.settingsName,
-    this.settingsCountry,
-    this.settingsLocation,
     this.settingsStyle,
     this.settingsActivites,
     this.appBarMain,
@@ -51,8 +47,6 @@ class CloudSettings {
       : settingsID = snapshot.id,
         settingsNameID = snapshot.data()[settingsNameIDFieldName] as String,
         settingsName = snapshot.data()[settingsNameFieldName] as String,
-        settingsCountry = snapshot.data()[settingsCountryFieldName] as String,
-        settingsLocation = snapshot.data()[settingsLocationFieldName] as String,
         settingsStyle = snapshot.data()[settingsStyleFieldName] as String,
         settingsActivites = snapshot.data()[settingsActivitesFieldName] as List,
         appBarMain =

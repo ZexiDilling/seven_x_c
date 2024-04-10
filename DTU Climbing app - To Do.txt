@@ -192,9 +192,8 @@ Make it possible to change location
 for outside.
 	Mark outside problems
 		boulders
-		High boulders
-		Rope 
-		bolted / trad
+		sports climbing 
+		trad climbing
 
 	Store map of different areas ? 
 	make an overview map 

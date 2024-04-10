@@ -9,43 +9,53 @@ class CloudGymLocation {
   final String locationNameID;
 
   // Tracking information
-  final String? info;
   final bool bouldering;
-  final bool rope;
-  final bool indoor;
-  final bool outdoor;
+  final bool sport;
+  final bool trad;
+  final bool isGym;
   final double locationXCordinate;
   final double locationYCordinate;
-  final String country;
-  final String? adresse;
+  final String locationCountry;
+  final String? locationAdresse;
+  final String? locationHomepage;
+  final String? locationEmail;
+  final String? locationInfo;
+  final String? locationAccess;
 
   const CloudGymLocation(
     this.locationNameID,
-    this.info,
     this.bouldering,
-    this.rope,
-    this.indoor,
-    this.outdoor,
+    this.sport,
+    this.trad,
+    this.isGym,
     this.locationXCordinate,
     this.locationYCordinate,
-    this.country,
-    this.adresse, {
+    this.locationCountry,
+    this.locationAdresse,
+    this.locationHomepage,
+    this.locationEmail,
+    this.locationInfo,
+    this.locationAccess, {
     required this.locationID,
   });
 
   CloudGymLocation.fromSnapshot(
       QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
       : locationID = snapshot.id,
-        locationNameID = snapshot.data()[locationNameIDFieldName] as String,
-        info = snapshot.data()[infoFieldName] as String?,
+        locationNameID = snapshot.data()[locationCountryFieldName] as String,
         bouldering = snapshot.data()[boulderingFieldName] as bool,
-        rope = snapshot.data()[ropeFieldName] as bool,
-        indoor = snapshot.data()[indoorFieldName] as bool,
-        outdoor = snapshot.data()[outdoorFieldName] as bool,
+        sport = snapshot.data()[sportFieldName] as bool,
+        trad = snapshot.data()[tradFieldName] as bool,
+        isGym = snapshot.data()[isGymFieldName] as bool,
         locationXCordinate =
             snapshot.data()[locationXCordinateFieldName] as double,
         locationYCordinate =
             snapshot.data()[locationYCordinateFieldName] as double,
-        country = snapshot.data()[countryFieldName] as String,
-        adresse = snapshot.data()[adresseFieldName] as String?;
+        locationCountry = snapshot.data()[locationCountryFieldName] as String,
+        locationAdresse = snapshot.data()[locationAdresseFieldName] as String?,
+        locationHomepage =
+            snapshot.data()[locationHomepageFieldName] as String?,
+        locationEmail = snapshot.data()[locationEmailFieldName] as String?,
+        locationInfo = snapshot.data()[locationInfoFieldName] as String?,
+        locationAccess = snapshot.data()[locationAccessFieldName] as String?;
 }

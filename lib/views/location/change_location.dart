@@ -75,10 +75,10 @@ class _LocationViewState extends State<LocationView> {
   }
 
   // view_data
-  bool indoorSelecter = false;
-  bool outdoorSelecter = false;
+  bool isGymSelecter = false;
   bool boulderingSelecter = false;
-  bool ropeSelecter = false;
+  bool  sportsClimbingSelecter = false;
+  bool tradClimbingSelector = false;
   bool showAllLocations = true;
   List<String> locations = [];
 
@@ -147,34 +147,34 @@ class _LocationViewState extends State<LocationView> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Checkbox(
-          value: indoorSelecter,
+          value: isGymSelecter,
           onChanged: (value) {
             setState(() {
-              indoorSelecter = value!;
-              if (indoorSelecter) {
-                locations.add('Indoor');
+              isGymSelecter = value!;
+              if (isGymSelecter) {
+                locations.add('isGym');
               } else {
-                locations.remove('Indoor');
+                locations.remove('isGym');
               }
             });
           },
         ),
-        const Text('Indoor'),
+        const Text('Is Gym ?'),
         const SizedBox(width: 20),
         Checkbox(
-          value: outdoorSelecter,
+          value: sportsClimbingSelecter,
           onChanged: (value) {
             setState(() {
-              outdoorSelecter = value!;
-              if (outdoorSelecter) {
-                locations.add('Outdoor');
+              sportsClimbingSelecter = value!;
+              if (sportsClimbingSelecter) {
+                locations.add('SportsClimbing');
               } else {
-                locations.remove('Outdoor');
+                locations.remove('SportsClimbing');
               }
             });
           },
         ),
-        const Text('Outdoor'),
+        const Text('SportsClimbing'),
       ],
     );
   }
@@ -199,19 +199,19 @@ class _LocationViewState extends State<LocationView> {
         const Text('Bouldering'),
         const SizedBox(width: 20),
         Checkbox(
-          value: ropeSelecter,
+          value: tradClimbingSelector,
           onChanged: (value) {
             setState(() {
-              ropeSelecter = value!;
-              if (ropeSelecter) {
-                locations.add('Rope');
+              tradClimbingSelector = value!;
+              if (tradClimbingSelector) {
+                locations.add('TradeClimbing');
               } else {
-                locations.remove('Rope');
+                locations.remove('TradeClimbing');
               }
             });
           },
         ),
-        const Text('Rope'),
+        const Text('Trade Climbing'),
       ],
     );
   }
@@ -324,9 +324,10 @@ class _LocationViewState extends State<LocationView> {
         return locations;
       } else {
         locations = locations.where((location) =>
-            location.indoor == indoorSelecter &&
-            location.outdoor == outdoorSelecter &&
-            location.rope == ropeSelecter &&
+            location.isGym == isGymSelecter &&
+            location.bouldering == boulderingSelecter &&
+            location.sport == sportsClimbingSelecter &&
+            location.trad == tradClimbingSelector &&
             location.bouldering == boulderingSelecter);
         return locations;
       }

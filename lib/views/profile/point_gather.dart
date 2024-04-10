@@ -1031,6 +1031,10 @@ void allSetterGraphSetup(
   boulderSetGradeColours["all"]![boulderData["gradeColour"]] =
       (boulderSetGradeColours["all"]![boulderData["gradeColour"]] ?? 0) + 1;
 
+boulderSetGradeColours["all"]!["total"] =
+      (boulderSetGradeColours["all"]!["total"] ?? 0) + 1;
+
+
   boulderGradeToHoldColour[currentSetter] ??= {};
   boulderGradeToHoldColour[currentSetter]![boulderData["gradeNumberSetter"]] ??=
       {};
