@@ -53,7 +53,6 @@ Future<bool> showBoulderInformation(
   List<String> allGradeColorChoice = [];
   String labelText = "Vote a Grade";
   bool expandPanelState = false;
-  List<String> tags = [];
 
   // size of grading circle:
   double circleWidth = 40;
