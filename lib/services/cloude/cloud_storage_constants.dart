@@ -18,6 +18,7 @@ const activeFieldName = "active";
 const hiddenGradeFieldName = "hiddenGrade";
 const compBoulderFieldName = "compBoulder";
 const gotZoneFieldName = "gotZone";
+const tagsFieldName = "tagas";
 const setterPointFieldName = "setterPoint";
 const boulderNameFieldName = "boulderName";
 const setDateBoulderFiledName = "setDateBoulder";

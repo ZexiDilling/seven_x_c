@@ -3,17 +3,17 @@ import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/services/cloude/gym_data/cloud_settings.dart';
 
-
 String? filterDropdownValue;
 bool missingFilter = false;
 bool newFilter = false;
 bool updateFilter = false;
 bool compFilter = false;
+List<String> tagFilter = [];
 RangeValues gradeSliderRange = RangeValues(
     allGrading.keys.first.toDouble(), allGrading.keys.last.toDouble());
 
-Drawer filterDrawer(
-    BuildContext context, setState, CloudProfile currentProfile, CloudSettings currentSettings) {
+Drawer filterDrawer(BuildContext context, setState, CloudProfile currentProfile,
+    CloudSettings currentSettings) {
   String gradingSystem = "";
 
   if (currentProfile.gradingSystem == "Coloured") {
@@ -60,6 +60,7 @@ Drawer filterDrawer(
               newFilter = false;
               updateFilter = false;
               compFilter = false;
+              tagFilter = [];
             });
             // Navigator.pop(context); // Close the Drawer
           },
@@ -71,7 +72,6 @@ Drawer filterDrawer(
 
 ListTile specFilterCheck(setState) {
   return ListTile(
-    
     subtitle: Column(
       children: [
         CheckboxListTile(
@@ -110,6 +110,59 @@ ListTile specFilterCheck(setState) {
             });
           },
         ),
+        SizedBox(
+          height: 250,
+          width: 1000,
+          child: GridView.count(
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 5,
+            crossAxisCount: 3,
+            childAspectRatio: 3,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: List.generate(climbTags().length, (index) {
+              String tagName = climbTags()[index];
+              bool isSelected = tagFilter.contains(tagName);
+              return ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    if (isSelected) {
+                      tagFilter.remove(tagName);
+                    } else {
+                      tagFilter.add(tagName);
+                    }
+                  });
+                },
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                      isSelected
+                          ? Colors.green
+                          : Colors.blue, // Change colors as needed
+                    ),
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                            10.0), // Adjust radius as needed
+                      ),
+                    ),
+                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                      EdgeInsets.zero,
+                    ),
+                    minimumSize: MaterialStateProperty.all<Size>(
+                      const Size(double.infinity, 40.0),
+                    )),
+                child: Padding(
+                  padding: const EdgeInsets.all(0.0),
+                  child: Text(
+                    tagName,
+                    style: const TextStyle(fontSize: 10.0, color: Colors.black),
+                    // Adjust font size as needed
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
       ],
     ),
   );
@@ -136,11 +189,11 @@ RangeSlider gradeFilterSlider(
 
 Set<String> selectedColors = {};
 
-
 List<Widget> _createColorRows(setState, CloudSettings currentSettings) {
   List<Widget> colorRows = [];
 
-  Map<String, dynamic>? settingsGradeColour = currentSettings.settingsGradeColour;
+  Map<String, dynamic>? settingsGradeColour =
+      currentSettings.settingsGradeColour;
 
   if (settingsGradeColour == null || settingsGradeColour.isEmpty) {
     // Handle the case where settingsGradeColour is null or empty
@@ -160,7 +213,8 @@ List<Widget> _createColorRows(setState, CloudSettings currentSettings) {
         colorEntries.skip(i).take(colorsPerRow).toList(growable: false);
 
     List<Widget> buttons = rowColors.map((entry) {
-      Color color = nameToColor(currentSettings.settingsGradeColour![entry.key]);
+      Color color =
+          nameToColor(currentSettings.settingsGradeColour![entry.key]);
       String label = entry.key;
 
       bool isSelected = selectedColors.contains(label.toLowerCase());
@@ -192,7 +246,9 @@ List<Widget> _createColorRows(setState, CloudSettings currentSettings) {
               child: Text(
                 "",
                 style: TextStyle(
-                  color: isSelected ? nameToColor(currentSettings.settingsGradeColour![label]) : Colors.black,
+                  color: isSelected
+                      ? nameToColor(currentSettings.settingsGradeColour![label])
+                      : Colors.black,
                   fontSize: 12,
                 ),
               ),
@@ -207,5 +263,3 @@ List<Widget> _createColorRows(setState, CloudSettings currentSettings) {
 
   return colorRows;
 }
-
-

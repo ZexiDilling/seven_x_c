@@ -1,11 +1,8 @@
-
 import 'package:flutter/material.dart';
 
 double calculateDistance(double x1, double y1, double x2, double y2) {
   return ((x2 - x1).abs() + (y2 - y1).abs());
 }
-
-
 
 // Define maps for holds and grades, where the key is the color and the value is the name
 // Map<Color, String> holdColorMap = {
@@ -24,7 +21,7 @@ double calculateDistance(double x1, double y1, double x2, double y2) {
 //   Colors.tealAccent: "turquoise",
 // };
 
-  Color nameToColor(Map<String, dynamic> data) {
+Color nameToColor(Map<String, dynamic> data) {
   return Color.fromARGB(
     data["alpha"] ?? 255,
     data["red"] ?? 0,
@@ -257,16 +254,16 @@ class WallRegion {
     required this.wallName,
     required this.section,
     required this.isSelected,
-
   });
 }
+
 const double xMax = 0.88;
 const double xMin = 0.18;
 List<WallRegion> wallRegions = [
   WallRegion(
     wallID: 'slap',
-    wallYMaX: 1,
-    wallYMin: 0.9408721359940871,
+    wallYMaX: 0.9198,
+    wallYMin: 0.8573,
     wallXMax: xMax,
     wallXMin: xMin,
     wallName: 'Slap',
@@ -275,8 +272,8 @@ List<WallRegion> wallRegions = [
   ),
   WallRegion(
     wallID: 'dyno',
-    wallYMaX: 0.9408721359940871,
-    wallYMin: 0.8181818181818181,
+    wallYMaX: 0.8573,
+    wallYMin: 0.7765,
     wallXMax: xMax,
     wallXMin: xMin,
     wallName: 'Dyno',
@@ -285,8 +282,8 @@ List<WallRegion> wallRegions = [
   ),
   WallRegion(
     wallID: 'chimney',
-    wallYMaX: 0.8181818181818181,
-    wallYMin: 0.7893569844789357,
+    wallYMaX: 0.7765,
+    wallYMin: 0.7531,
     wallXMax: xMax,
     wallXMin: xMin,
     wallName: 'Chimney',
@@ -295,8 +292,8 @@ List<WallRegion> wallRegions = [
   ),
   WallRegion(
     wallID: 'diamond',
-    wallYMaX: 0.7893569844789357,
-    wallYMin: 0.7006651884700665,
+    wallYMaX: 0.7531,
+    wallYMin: 0.6851,
     wallXMax: xMax,
     wallXMin: xMin,
     wallName: 'Diamond',
@@ -305,8 +302,8 @@ List<WallRegion> wallRegions = [
   ),
   WallRegion(
     wallID: 'face',
-    wallYMaX: 0.7006651884700665,
-    wallYMin: 0.6201034737620104,
+    wallYMaX: 0.6851,
+    wallYMin: 0.6284,
     wallXMax: xMax,
     wallXMin: xMin,
     wallName: 'Face',
@@ -315,8 +312,8 @@ List<WallRegion> wallRegions = [
   ),
   WallRegion(
     wallID: 'shroom',
-    wallYMaX: 0.6201034737620104,
-    wallYMin: 0.5314116777531411,
+    wallYMaX: 0.6284,
+    wallYMin: 0.5585,
     wallXMax: xMax,
     wallXMin: xMin,
     wallName: 'Shroom',
@@ -325,8 +322,8 @@ List<WallRegion> wallRegions = [
   ),
   WallRegion(
     wallID: 'onyd',
-    wallYMaX: 0.5314116777531411,
-    wallYMin: 0.376940133037694,
+    wallYMaX: 0.5585,
+    wallYMin: 0.4061,
     wallXMax: xMax,
     wallXMin: xMin,
     wallName: 'Onyd',
@@ -335,18 +332,18 @@ List<WallRegion> wallRegions = [
   ),
   WallRegion(
     wallID: 'door',
-    wallYMaX: 0.376940133037694,
-    wallYMin: 0.3444198078344419,
+    wallYMaX: 0.4061,
+    wallYMin: 0.3819,
     wallXMax: xMax,
     wallXMin: xMin,
     wallName: 'Door',
     section: 2,
     isSelected: false,
-  ),  
+  ),
   WallRegion(
     wallID: 'arg',
-    wallYMaX: 0.3444198078344419,
-    wallYMin: 0.2845528455284552,
+    wallYMaX: 0.3819,
+    wallYMin: 0.3240,
     wallXMax: xMax,
     wallXMin: xMin,
     wallName: 'ARG',
@@ -355,29 +352,28 @@ List<WallRegion> wallRegions = [
   ),
   WallRegion(
     wallID: 'roof',
-    wallYMaX: 0.2845528455284552,
-    wallYMin: 0.2121212121212121,
+    wallYMaX: 0.3240,
+    wallYMin: 0.2570,
     wallXMax: xMax,
     wallXMin: xMin,
     wallName: 'Roof',
     section: 3,
     isSelected: false,
   ),
-    WallRegion(
+  WallRegion(
     wallID: 'top out',
-    wallYMaX: 0.2121212121212121,
-    wallYMin: 0.1507760532150776,
+    wallYMaX: 0.2570,
+    wallYMin: 0.1989,
     wallXMax: xMax,
     wallXMin: xMin,
     wallName: 'Top Out',
     section: 3,
     isSelected: false,
-    
   ),
   WallRegion(
     wallID: 'cave',
-    wallYMaX: 0.1507760532150776,
-    wallYMin: 0,
+    wallYMaX: 0.1989,
+    wallYMin: 0.0342,
     wallXMax: xMax,
     wallXMin: xMin,
     wallName: 'Cave',
@@ -401,10 +397,11 @@ List<WallSection> wallSections = [
     sectionID: 1,
     sectionName: "1",
   ),
-    WallSection(
+  WallSection(
     sectionID: 2,
     sectionName: "2",
-  ),  WallSection(
+  ),
+  WallSection(
     sectionID: 3,
     sectionName: "3",
   )
@@ -444,4 +441,26 @@ int findNumberFromDate(DateTime date, Map<int, DateTime> numberToDateMap) {
 
   // Ensure the result is non-negative
   return daysDifference >= 0 ? daysDifference : 0;
+}
+
+List climbTags() {
+  return [
+    "Crimpy",
+    "Juggy",
+    "Dyno",
+    "Compression",
+    "Cut Feet",
+    "Dead Point",
+    "Layback",
+    "Lock Off",
+    "Pinchy",
+    "Pocket",
+    "Powerfull",
+    "Pumpy",
+    "Slopey",
+    "Technical",
+    "Reachy",
+    "Short Friendly",
+    "Undercling"
+  ];
 }

@@ -35,6 +35,8 @@ Future<void> showAddNewBoulder(
   bool compBoulder = compView;
   String selectedGrade = '';
   double setterPoints = 0.0;
+  List tags = [];
+  bool knownSetter = false;
 
   int? difficultyLevel = 3;
   // const gradingSystem = "colour";
@@ -61,7 +63,7 @@ Future<void> showAddNewBoulder(
               final List<String> setters = profiles.isNotEmpty
                   ? profiles.map((profile) => profile.displayName).toList()
                   : [];
-
+              setters.addAll([gymSetterName, guestSetterName]);
               String selectedSetter = setters.isNotEmpty ? setters.first : '';
               return StatefulBuilder(
                 builder: (BuildContext context, StateSetter setState) {
@@ -228,32 +230,6 @@ Future<void> showAddNewBoulder(
                                 labelText: 'Choose Setter'),
                           ),
                           CheckboxListTile(
-                              title: const Text(gymSetterName),
-                              value: gymSetterTeam,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  gymSetterTeam = value ?? false;
-                                  guestSetterTeam = false;
-                                });
-                              }),
-                          CheckboxListTile(
-                              title: const Text(guestSetterName),
-                              value: guestSetterTeam,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  guestSetterTeam = value ?? false;
-                                  gymSetterTeam = false;
-                                });
-                              }),
-                          CheckboxListTile(
-                              title: const Text('Top Out'),
-                              value: topOut,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  topOut = value ?? false;
-                                });
-                              }),
-                          CheckboxListTile(
                             title: const Text('Comp'),
                             value: compBoulder,
                             onChanged: (bool? value) {
@@ -271,6 +247,66 @@ Future<void> showAddNewBoulder(
                                 hiddenGrade = value ?? false;
                               });
                             },
+                          ),
+                          SizedBox(
+                            height: 500,
+                            width: 1000,
+                            child: GridView.count(
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 5,
+                              crossAxisCount: 3,
+                              childAspectRatio: 3,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              children:
+                                  List.generate(climbTags().length, (index) {
+                                String tagName = climbTags()[index];
+                                bool isSelected = tags.contains(tagName);
+                                return ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      if (isSelected) {
+                                        tags.remove(tagName);
+                                      } else {
+                                        tags.add(tagName);
+                                      }
+                                    });
+                                  },
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                        isSelected
+                                            ? Colors.green
+                                            : Colors
+                                                .blue, // Change colors as needed
+                                      ),
+                                      shape: MaterialStateProperty.all<
+                                          OutlinedBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              10.0), // Adjust radius as needed
+                                        ),
+                                      ),
+                                      padding: MaterialStateProperty.all<
+                                          EdgeInsetsGeometry>(
+                                        EdgeInsets.zero,
+                                      ),
+                                      minimumSize:
+                                          MaterialStateProperty.all<Size>(
+                                        Size(double.infinity, 40.0),
+                                      )),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(0.0),
+                                    child: Text(
+                                      tagName,
+                                      style: TextStyle(
+                                          fontSize: 10.0, color: Colors.black),
+                                      // Adjust font size as needed
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ),
                           ),
                         ],
                       ),
@@ -307,10 +343,14 @@ Future<void> showAddNewBoulder(
                               var setterProfiles = await fireBaseService
                                   .getUserFromDisplayName(selectedSetter)
                                   .first;
-                              CloudProfile setterProfile = setterProfiles.first;
+                              if (setterProfiles.isNotEmpty) {
+                                knownSetter = true;
+                                CloudProfile setterProfile =
+                                    setterProfiles.first;
+                                setterPoints = calculateSetterPoints(
+                                    setterProfile, gradeColorChoice!);
+                              }
 
-                              setterPoints = calculateSetterPoints(
-                                  setterProfile, gradeColorChoice!);
                               newBoulder =
                                   await fireBaseService.createNewBoulder(
                                       setter: gymSetterTeam == true
@@ -330,6 +370,7 @@ Future<void> showAddNewBoulder(
                                       hiddenGrade: hiddenGrade,
                                       compBoulder: compBoulder,
                                       gotZone: gotZone,
+                                      tags: tags,
                                       setterPoint: setterPoints,
                                       setDateBoulder: Timestamp.now());
                             } catch (e) {
@@ -360,7 +401,7 @@ Future<void> showAddNewBoulder(
                             }
 
                             if (newBoulder != null) {
-                              if (!gymSetterTeam && !guestSetterTeam) {
+                              if (knownSetter) {
                                 var setterProfiles = await fireBaseService
                                     .getUserFromDisplayName(selectedSetter)
                                     .first;
@@ -389,24 +430,18 @@ Future<void> showAddNewBoulder(
                               }
                               try {
                                 String setterID = "";
-                                if (gymSetterTeam || guestSetterTeam) {
-                                  gymSetterTeam
-                                      ? setterID = gymSetterName
-                                      : setterID = guestSetterName;
-                                } else {
-                                  Iterable<CloudProfile> setterProfiles =
-                                      await fireBaseService
-                                          .getUserFromDisplayName(
-                                              selectedSetter)
-                                          .first;
 
-                                  if (setterProfiles.isNotEmpty) {
-                                    CloudProfile setterProfile =
-                                        setterProfiles.first;
-                                    setterID = setterProfile.userID;
-                                  } else {
-                                    setterID = selectedSetter;
-                                  }
+                                Iterable<CloudProfile> setterProfiles =
+                                    await fireBaseService
+                                        .getUserFromDisplayName(selectedSetter)
+                                        .first;
+
+                                if (setterProfiles.isNotEmpty) {
+                                  CloudProfile setterProfile =
+                                      setterProfiles.first;
+                                  setterID = setterProfile.userID;
+                                } else {
+                                  setterID = selectedSetter;
                                 }
 
                                 await fireBaseService.updateGymData(
@@ -443,7 +478,8 @@ Future<void> showAddNewBoulder(
       });
 }
 
-double calculateSetterPoints(CloudProfile setterProfile, String boulderGradeColour) {
+double calculateSetterPoints(
+    CloudProfile setterProfile, String boulderGradeColour) {
   // Calculate points based on the conditions
   double points = defaultSetterPoints;
   // Get the setBoulders map from the setterProfile

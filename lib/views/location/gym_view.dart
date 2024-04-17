@@ -1,7 +1,7 @@
 // ignore_for_file: library_prefixes
 
 import 'package:flutter/material.dart';
-// import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
@@ -146,6 +146,15 @@ class _GymViewState extends State<GymView> {
         if (compFilter | compView) {
           // Filter boulders where comp is true
           boulders = boulders.where((boulder) => boulder.compBoulder == true);
+        }
+
+        if (tagFilter.isNotEmpty) {
+          // Filter boulders based on tags
+          for (String selectedTag in tagFilter) {
+            boulders = boulders
+                .where((boulder) => boulder.tags!.contains(selectedTag))
+                .toList();
+          }
         }
 
         // If no filters are applied, return the original stream
@@ -388,52 +397,78 @@ class _GymViewState extends State<GymView> {
                     final allBoulders = snapshot.data as Iterable<CloudBoulder>;
 
                     return SlidingUpPanel(
-                      minHeight: slideUpMinHeight,
-                      maxHeight:
-                          MediaQuery.of(context).size.height * slideUpMaxHeight,
-                      panel: currentSettings != null && currentProfile != null
-                          ? boulderOverviewSlidingUpPanel(
-                              allBoulders, currentProfile!, constraints)
-                          : const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                      collapsed: slideUpCollapsContent(),
-                      body: GestureDetector(
-                        key: _gymKey,
-                        onTapUp: (details) {
-                          _tapping(context, constraints, details, allBoulders,
-                              currentProfile, _fireBaseService);
-                        },
-                        onDoubleTapDown: (details) {
-                          _doubleTapping(context, constraints, details);
-                          setState(() {
-                            currentScale =
-                                _controller.value.getMaxScaleOnAxis();
-                          });
-                        },
-                        child: InteractiveViewer(
-                          transformationController: _controller,
-                          minScale: 0.5,
-                          maxScale: 5.0,
-                          onInteractionEnd: (details) {
+                        minHeight: slideUpMinHeight,
+                        maxHeight: MediaQuery.of(context).size.height *
+                            slideUpMaxHeight,
+                        panel: currentSettings != null && currentProfile != null
+                            ? boulderOverviewSlidingUpPanel(
+                                allBoulders, currentProfile!, constraints)
+                            : const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                        collapsed: slideUpCollapsContent(),
+                        body: GestureDetector(
+                          key: _gymKey,
+                          onTapUp: (details) {
+                            _tapping(context, constraints, details, allBoulders,
+                                currentProfile, _fireBaseService);
+                          },
+                          onDoubleTapDown: (details) {
+                            _doubleTapping(context, constraints, details);
                             setState(() {
                               currentScale =
                                   _controller.value.getMaxScaleOnAxis();
                             });
                           },
-                          child: Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(
-                                    'assets/background/dtu_climbing.png'),
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                            child: currentSettings == null
-                                ? null
-                                : CustomPaint(
+                          child: InteractiveViewer(
+                            transformationController: _controller,
+                            minScale: 0.5,
+                            maxScale: 5.0,
+                            onInteractionEnd: (details) {
+                              setState(() {
+                                currentScale =
+                                    _controller.value.getMaxScaleOnAxis();
+                              });
+                            },
+                            //       child: Container(
+                            //         width: double.infinity,
+                            //         height: double.infinity,
+                            //         decoration: const BoxDecoration(
+                            //           image: DecorationImage(
+                            //             image: AssetImage(
+                            //                 'assets/background/dtu_climbing.png'),
+                            //             fit: BoxFit.fill,
+                            //           ),
+                            //         ),
+                            //         child: currentSettings == null
+                            //             ? null
+                            //             : CustomPaint(
+                            //                 painter: GymPainter(
+                            //                     context,
+                            //                     constraints,
+                            //                     allBoulders,
+                            //                     currentProfile!,
+                            //                     currentSettings!,
+                            //                     currentScale,
+                            //                     compView,
+                            //                     showWallRegions),
+                            //               ),
+                            //       ),
+                            //     ),
+                            //   ),
+                            // );
+
+                            child: Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              child: Stack(children: [
+                                SvgPicture.asset(
+                                  'assets/background/dtu_climbing.svg',
+                                  semanticsLabel: "background",
+                                  fit: BoxFit.fill,
+                                ),
+                                if (currentSettings != null)
+                                  CustomPaint(
                                     painter: GymPainter(
                                         context,
                                         constraints,
@@ -444,38 +479,10 @@ class _GymViewState extends State<GymView> {
                                         compView,
                                         showWallRegions),
                                   ),
+                              ]),
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-
-                    //       child: Container(
-                    //         width: double.infinity,
-                    //         height: double.infinity,
-                    //         child: Stack( children: [
-                    //           SvgPicture.asset(
-                    //             'assets/background/dtu_climbing1.svg',
-                    //             semanticsLabel: "background",
-                    //             fit: BoxFit.fill,
-
-                    //           ),
-                    //        if (currentSettings != null)
-
-                    //              CustomPaint(
-                    //                 painter: GymPainter(
-                    //                     context,
-                    //                     constraints,
-                    //                     allBoulders,
-                    //                     currentProfile!,
-                    //                     currentSettings!,
-                    //                     currentScale,
-                    //                     compView,
-                    //                     showWallRegions),
-                    //               ),
-                    //       ]),
-                    //     ),
-                    //   ),
-                    // ));
+                        ));
                   } else {
                     return const CircularProgressIndicator();
                   }
@@ -669,9 +676,9 @@ class _GymViewState extends State<GymView> {
               setCompView: setCompView,
               setComp: setCurrentComp,
             );
-          
+
           case MenuActionMain.location:
- Navigator.of(context).pushNamed(
+            Navigator.of(context).pushNamed(
               locationView,
               arguments: currentSettings!,
             );
@@ -702,9 +709,8 @@ class _GymViewState extends State<GymView> {
               child: Text("Admin"),
             ),
           if (currentProfile!.isAdmin)
-          const PopupMenuItem(
-            value: MenuActionMain.location,
-            child: Text("Change Location")),
+            const PopupMenuItem(
+                value: MenuActionMain.location, child: Text("Change Location")),
           const PopupMenuItem(
             value: MenuActionMain.comp,
             child: Text("Comp"),

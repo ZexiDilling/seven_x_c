@@ -16,6 +16,7 @@ class CloudBoulder {
   final bool hiddenGrade;
   final bool compBoulder;
   final bool gotZone;
+  final List? tags;
   final double? setterPoint;
   final String? boulderName;
   final Map<String, dynamic>? boulderChallenges;
@@ -41,6 +42,7 @@ class CloudBoulder {
     this.hiddenGrade,
     this.compBoulder,
     this.gotZone,
+    this.tags,
     this.setterPoint,
     this.boulderName,
     this.setDateBoulder,
@@ -64,6 +66,7 @@ class CloudBoulder {
         hiddenGrade = snapshot.data()[hiddenGradeFieldName] as bool,
         compBoulder = snapshot.data()[compBoulderFieldName] as bool,
         gotZone = snapshot.data()[gotZoneFieldName] as bool,
+        tags = snapshot.data()[tagsFieldName] as List?,
         setterPoint = snapshot.data()[setterPointFieldName] as double?,
         boulderName = snapshot.data()[boulderNameFieldName] as String?,
         setDateBoulder = snapshot.data()[setDateBoulderFiledName] as Timestamp,

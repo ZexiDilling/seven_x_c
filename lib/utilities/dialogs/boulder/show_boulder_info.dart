@@ -53,6 +53,7 @@ Future<bool> showBoulderInformation(
   List<String> allGradeColorChoice = [];
   String labelText = "Vote a Grade";
   bool expandPanelState = false;
+  List<String> tags = [];
 
   // size of grading circle:
   double circleWidth = 40;
@@ -845,6 +846,30 @@ Future<bool> showBoulderInformation(
                                   ),
 
                             const SizedBox(height: 30),
+                            const Text("Tags:"),
+                            if (boulder.tags != null &&
+                                boulder.tags!.isNotEmpty)
+                              Container(
+                                height: 20,
+                                width: 1000,
+                                child: SizedBox(
+                                  height: 20,
+                                  width: 1000,
+                                  child: GridView.count(
+                                    mainAxisSpacing: 10,
+                                    crossAxisSpacing: 5,
+                                    crossAxisCount: 3,
+                                    childAspectRatio: 3,
+                                    shrinkWrap: true,
+                                    children: List.generate(
+                                        boulder.tags!.length, (index) {
+                                      String tagName = boulder.tags![index];
+                                      return Text(tagName);
+                                    }),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 30),
                             challangePanel(
                                 challengesOverview,
                                 expandedStates,
