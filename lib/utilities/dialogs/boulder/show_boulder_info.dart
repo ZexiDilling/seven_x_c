@@ -108,7 +108,7 @@ Future<bool> showBoulderInformation(
     }
   }
 
-  if (gradingSystem == "coloured") {
+  if (gradingSystem == "coloured" ) {
     try {
       gradingShow = arrowDict()[boulder.gradeDifficulty]!["arrow"];
     } on Error {

@@ -387,15 +387,23 @@ Future<void> showAddNewBoulder(
                             if (currentComp != null && compView) {
                               if (newBoulder != null) {
                                 // Check if newBoulder is not already in currentComp.bouldersComp
-                                if (!currentComp.bouldersComp!
-                                    .containsKey(newBoulder.boulderID)) {
+                                if (currentComp.bouldersComp == null) {
                                   fireBaseService.updatComp(
                                       compID: currentComp.compID,
                                       bouldersComp: updateBoulderCompSet(
                                           currentComp: currentComp,
-                                          boulder: newBoulder,
-                                          existingData:
-                                              currentComp.bouldersComp));
+                                          boulder: newBoulder));
+                                } else {
+                                  if (!currentComp.bouldersComp!
+                                      .containsKey(newBoulder.boulderID)) {
+                                    fireBaseService.updatComp(
+                                        compID: currentComp.compID,
+                                        bouldersComp: updateBoulderCompSet(
+                                            currentComp: currentComp,
+                                            boulder: newBoulder,
+                                            existingData:
+                                                currentComp.bouldersComp));
+                                  }
                                 }
                               }
                             }

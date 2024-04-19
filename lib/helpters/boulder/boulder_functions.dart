@@ -385,9 +385,10 @@ Container gradingInnerCirleDrawing(double circleWidth, double circleHeight,
     child: Center(
       child: Padding(
           padding: const EdgeInsets.only(left: 0.0),
-          child: OutlineText(
-            Text(
-              capitalize(gradingShow!),
+          child: boulder.hiddenGrade == true
+          ? const Text("??") 
+          : OutlineText(
+            Text(capitalize(gradingShow!),
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: boulder.gradeColour != "black"

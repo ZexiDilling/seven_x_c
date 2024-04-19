@@ -430,34 +430,6 @@ class _GymViewState extends State<GymView> {
                                     _controller.value.getMaxScaleOnAxis();
                               });
                             },
-                            //       child: Container(
-                            //         width: double.infinity,
-                            //         height: double.infinity,
-                            //         decoration: const BoxDecoration(
-                            //           image: DecorationImage(
-                            //             image: AssetImage(
-                            //                 'assets/background/dtu_climbing.png'),
-                            //             fit: BoxFit.fill,
-                            //           ),
-                            //         ),
-                            //         child: currentSettings == null
-                            //             ? null
-                            //             : CustomPaint(
-                            //                 painter: GymPainter(
-                            //                     context,
-                            //                     constraints,
-                            //                     allBoulders,
-                            //                     currentProfile!,
-                            //                     currentSettings!,
-                            //                     currentScale,
-                            //                     compView,
-                            //                     showWallRegions),
-                            //               ),
-                            //       ),
-                            //     ),
-                            //   ),
-                            // );
-
                             child: Container(
                               width: double.infinity,
                               height: double.infinity,
@@ -568,6 +540,7 @@ class _GymViewState extends State<GymView> {
       leading: gradingColourCircle(currentSettings!, entry, colourSplit),
       children: [
         for (CloudBoulder boulder in colourBoulderSplit[entry.key] ?? [])
+          
           boulderTileList(boulder, currentProfile, constraints)
       ],
     );

@@ -14,7 +14,7 @@ Future<void> stripping(
   List<bool> sectionCheckboxes =
       List.generate(wallSections.length, (index) => false);
   List.generate(3, (index) => false);
-
+  bool hiddenBoulders = false;
   await showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -63,6 +63,25 @@ Future<void> stripping(
                       ),
                     ],
                   ),
+                  ElevatedButton(
+                    onPressed: () {
+                      hiddenBoulders = !hiddenBoulders;
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                          (Set<MaterialState> states) {
+                        if (hiddenBoulders) {
+                          // Change the color when hiddenBoulders is true
+                          return Colors
+                              .green; // Change this color to the one you prefer
+                        }
+                        return Colors
+                            .red; // Default color when hiddenBoulders is false
+                      }),
+                    ),
+                    child: const Text("Select Hidden Boulders"),
+                  ),
+
                   // Section checkboxes
                   for (int counter = 0; counter < 3; counter++)
                     Row(
@@ -198,18 +217,28 @@ Future<void> stripping(
                               ),
                               TextButton(
                                 onPressed: () async {
-                                  // Access the data from the StreamBuilder
-                                  Iterable<CloudBoulder>? boulders =
-                                      await filteredBouldersStream.first;
+                                  Iterable<CloudBoulder>? boulders;
 
+                                  // Access the data from the StreamBuilder
+                                  if (hiddenBoulders) {
+                                    boulders = await firebaseService
+                                        .getAllBoulders(true)
+                                        .first;
+                                  } else {
+                                    boulders =
+                                        await filteredBouldersStream.first;
+                                  }
+                                  // Ensure boulders is not null before proceeding
                                   for (CloudBoulder boulder in boulders) {
-                                    if (wallRegionMap[boulder.wall]!
+                                    if (wallRegionMap[
+                                            boulder.wall.toLowerCase()]!
                                         .isSelected) {
                                       await firebaseService.deleteBoulder(
                                         boulderID: boulder.boulderID,
                                       );
                                     }
                                   }
+                                
                                   Navigator.of(context).pop();
                                   Navigator.of(context).pop();
                                 },
@@ -221,7 +250,7 @@ Future<void> stripping(
                       );
                     },
                     child: const Text("Kill"),
-                  ),
+                    ),
                   const Spacer(),
                   ElevatedButton(
                     onPressed: () {
