@@ -70,11 +70,14 @@ Drawer compDrawer(
                   const Text('Sign Up Active'),
                   Checkbox(
                     value: signUp,
-                    onChanged: currentComp.activeComp
-                        ? null
-                        : (value) {
-                            signUp = !signUp;
-                          },
+                    // onChanged: currentComp.activeComp
+                    //     ? null
+                    //     : (value) {
+                    //         signUp = !signUp;
+                    //       },
+                    onChanged: (value) {
+                      signUp = !signUp;
+                    },
                   ),
                 ],
               ),
@@ -92,7 +95,7 @@ Drawer compDrawer(
                     maxPP = currentComp.maxParticipants!;
                   }
                 },
-                enabled: !currentComp.activeComp,
+                // enabled: !currentComp.activeComp,
               ),
             ),
             ListTile(
@@ -162,25 +165,27 @@ Drawer compDrawer(
             ListTile(
               title: ElevatedButton(
                 onPressed: () {
-                  currentComp.activeComp
-                      ? null
-                      : fireBaseService.updatComp(
-                          compID: currentComp.compID,
-                          signUpActiveComp: signUp,
-                          maxParticipants: maxPP);
+                  // currentComp.activeComp
+                  //     ? null
+                  //     : fireBaseService.updatComp(
+                  //         compID: currentComp.compID,
+                  //         signUpActiveComp: signUp,
+                  //         maxParticipants: maxPP);
+                  fireBaseService.updatComp(
+                      compID: currentComp.compID,
+                      signUpActiveComp: signUp,
+                      maxParticipants: maxPP);
                 },
                 child: const Text('Apply Changes'),
               ),
             ),
             ListTile(
               title: ElevatedButton(
-                onPressed: ()  {
+                onPressed: () {
                   List climbers = [];
                   if (currentComp.climbersComp != null &&
                       currentComp.climbersComp!.isNotEmpty) {
-                    climbers =
-                        currentComp.climbersComp!.values.toList();
-
+                    climbers = currentComp.climbersComp!.values.toList();
                   }
                   showRadomGetter(context, climbers: climbers);
                 },

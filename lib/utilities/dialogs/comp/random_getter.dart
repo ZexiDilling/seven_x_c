@@ -3,7 +3,6 @@ import 'dart:math' show Random;
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/other_const.dart';
 
-
 void showRadomGetter(
   BuildContext context, {
   required List climbers,
@@ -32,7 +31,7 @@ void showRadomGetter(
                       do {
                         randomIndex = random.nextInt(climbers.length);
                       } while (selectedIndices.contains(randomIndex));
-
+                      
                       selectedIndices.add(randomIndex);
 
                       Map<String, dynamic> randomClimber =

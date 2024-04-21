@@ -54,32 +54,44 @@ void showComp(
                             final currentComp = compData.elementAt(index);
                             return GestureDetector(
                               onTap: () async {
-                                if (currentComp.climbersComp!
-                                    .containsKey(currentProfile.userID)) {
-                                  setCompView(!compView);
-                                  setComp(currentComp);
-                                  Navigator.of(context).pop();
+                                if (currentComp.climbersComp == null) {
+                                  String gender = await showGetGender(context);
+                                  fireBaseService.updatComp(
+                                      compID: currentComp.compID,
+                                      climbersComp: updateCompClimbers(
+                                        currentComp: currentComp,
+                                        currentProfile: currentProfile,
+                                        gender: gender,
+                                        existingData: currentComp.climbersComp,
+                                      ));
                                 } else {
-                                  if (currentComp.climbersComp!.length <
-                                      (currentComp.maxParticipants as int)) {
-                                    String gender =
-                                        await showGetGender(context);
-                                    fireBaseService.updatComp(
-                                        compID: currentComp.compID,
-                                        climbersComp: updateCompClimbers(
-                                          currentComp: currentComp,
-                                          currentProfile: currentProfile,
-                                          gender: gender,
-                                          existingData:
-                                              currentComp.climbersComp,
-                                        ));
+                                  if (currentComp.climbersComp!
+                                      .containsKey(currentProfile.userID)) {
                                     setCompView(!compView);
                                     setComp(currentComp);
                                     Navigator.of(context).pop();
                                   } else {
-                                    showErrorDialog(
-                                        context, "Comp signup is full");
-                                    Navigator.of(context).pop();
+                                    if (currentComp.climbersComp!.length <
+                                        (currentComp.maxParticipants as int)) {
+                                      String gender =
+                                          await showGetGender(context);
+                                      fireBaseService.updatComp(
+                                          compID: currentComp.compID,
+                                          climbersComp: updateCompClimbers(
+                                            currentComp: currentComp,
+                                            currentProfile: currentProfile,
+                                            gender: gender,
+                                            existingData:
+                                                currentComp.climbersComp,
+                                          ));
+                                      setCompView(!compView);
+                                      setComp(currentComp);
+                                      Navigator.of(context).pop();
+                                    } else {
+                                      showErrorDialog(
+                                          context, "Comp signup is full");
+                                      Navigator.of(context).pop();
+                                    }
                                   }
                                 }
                               },
@@ -128,8 +140,9 @@ void showComp(
                           ElevatedButton(
                             onPressed: () {
                               // Handle "Old Comps" button click
-                              
-                              Navigator.of(context).popAndPushNamed(compResultView);
+
+                              Navigator.of(context)
+                                  .popAndPushNamed(compResultView);
                               // Add your custom logic here
                             },
                             child: const Text('Old Comps'),

@@ -109,6 +109,12 @@ Done grap:
 	Done - GradeColour/grade vs HoldColour
 	Done - gradeColour vs grade
 	Done - grade vs gradeColour
+
+Done Map changes:
+	Add list of all boulders 
+		zoom to problem when clicked
+		show Topped/flashed on the list
+
 ------------------------------------------------------------------------------------------------------------------------
 
 Missing testing:
@@ -214,11 +220,12 @@ for outside.
 	Grade them by quality ? 
 	add tags ? 
 
-	
-
 
 
 Make it possible to adjust the sections. 
+	And make it possible to draw / select corners of sections.
+Make sections in shapes instead of lines
+	So a section can be in the middle of the gym. as not all gyms are line based... 
 
 
 Low priority/ not sure:
@@ -270,11 +277,6 @@ Hide/unHide - move under comp settings ?
 rankings:
 	Make a list of Boulders set per semester both grading, hold colour, wall, section and setters
 	Make a ranking list per month, per semester, per year and overall. 
-
-Map changes:
-	Add list of all boulders (see top logger for example)
-		zoom to problem when clicked
-		show Topped/flashed on the list
 
 
 Settings:

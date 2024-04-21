@@ -57,9 +57,9 @@ List<String> sortRanking(Map<String, dynamic> compClimbers) {
 
 Map<String, dynamic> compRanking(CloudComp currentComp) {
   Map<String, dynamic> ranking = {
-    "total": {},
-    "male": {},
-    "female": {},
+    "total": <String, dynamic>{},
+    "male": <String, dynamic>{},
+    "female": <String, dynamic>{},
   };
 
   Map<String, dynamic> compClimbers = getCompClimbersRanking(currentComp);

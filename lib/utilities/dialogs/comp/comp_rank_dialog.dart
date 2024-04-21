@@ -135,7 +135,7 @@ SizedBox rankBoulders(CloudComp compData) {
 
 SizedBox rankingList(Map<String, dynamic> rankings, String gender) {
   List<String> sortedUserIds = sortRanking(rankings[gender]);
-
+  
   return SizedBox(
     height: 500,
     width: 400,
