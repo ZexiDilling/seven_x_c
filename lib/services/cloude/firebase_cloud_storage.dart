@@ -426,19 +426,21 @@ class FirebaseCloudStorage {
     }
   }
 
-  Stream<Iterable<CloudProfile>> getUserFromDisplayName(
-      String profileDisplayName) {
-    try {
-      final currentProfile = profileCollection
-          .where(displayNameFieldName, isEqualTo: profileDisplayName)
-          .snapshots()
-          .map((event) =>
-              event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
-      return currentProfile;
-    } catch (e) {
-      throw CouldNotGetSetterProfile();
-    }
+Stream<Iterable<CloudProfile>> getUserFromDisplayName(
+    String profileDisplayName) {
+  try {
+    final currentProfile = profileCollection
+        .orderBy(displayNameFieldName)
+        .startAt([profileDisplayName])
+        .endAt([profileDisplayName + '\uf8ff']) // \uf8ff is a Unicode character that is higher than any other character in the Unicode set
+        .snapshots()
+        .map((event) =>
+            event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
+    return currentProfile;
+  } catch (e) {
+    throw CouldNotGetSetterProfile();
   }
+}
 
   Stream<Iterable<CloudProfile>> getUser({required String userID}) {
     final currentProfile = profileCollection
