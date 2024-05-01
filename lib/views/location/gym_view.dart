@@ -66,7 +66,7 @@ class _GymViewState extends State<GymView> {
   CloudComp? currentComp;
   CloudSettings? currentSettings;
   CloudGymData? currentGymData;
-
+  bool showAll = false;
   late final FirebaseCloudStorage _fireBaseService;
 
   late Stream<Iterable<CloudBoulder>> filteredBouldersStream;
@@ -275,7 +275,7 @@ class _GymViewState extends State<GymView> {
                     ? const Text("MOVING A BOULDER",
                         overflow: TextOverflow.ellipsis)
                     : editing
-                        ? const Text("X")
+                        ? const Text("Edit")
                         : Column(
                             children: [
                               Text(
@@ -311,6 +311,22 @@ class _GymViewState extends State<GymView> {
                   },
                   icon: const Icon(IconManager.thropy))
               : const SizedBox(),
+           if (editing)
+            IconButton(
+              icon: Icon(
+                showAll
+                    ? IconManager.showDeactivatedBoulders
+                    : IconManager.showDeactivatedBoulders,
+                color: showAll
+                    ? IconManagerColours.active
+                    : IconManagerColours.inActive,
+              ),
+              onPressed: () {
+                setState(() {
+                  showAll = !showAll;
+                });
+              },
+            ), 
           if (editing)
             IconButton(
               icon: Icon(
@@ -449,7 +465,7 @@ class _GymViewState extends State<GymView> {
                                         currentSettings!,
                                         currentScale,
                                         compView,
-                                        showWallRegions),
+                                        showWallRegions, showAll),
                                   ),
                               ]),
                             ),

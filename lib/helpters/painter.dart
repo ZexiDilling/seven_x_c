@@ -16,6 +16,7 @@ class GymPainter extends CustomPainter {
   double currentScale;
   bool compView;
   bool showWallRegions;
+  bool showAll;
 
   GymPainter(
       this.context,
@@ -25,7 +26,8 @@ class GymPainter extends CustomPainter {
       this.currentSettings,
       this.currentScale,
       this.compView,
-      this.showWallRegions);
+      this.showWallRegions,
+      this.showAll);
   DateTime currentTime = DateTime.now();
   @override
   void paint(Canvas canvas, Size size) {
@@ -35,7 +37,7 @@ class GymPainter extends CustomPainter {
     bool userTopped = false;
     bool userFlashed = false;
     Color? glowColour;
-    if (currentScale >= boulderSingleShow) {
+    if (currentScale >= boulderSingleShow || showAll) {
       for (final CloudBoulder boulder in allBoulders) {
         DateTime setBoulderDate = boulder.setDateBoulder.toDate();
         DateTime? updatedBoulderDate = boulder.updateDateBoulder?.toDate();
@@ -101,7 +103,9 @@ class GymPainter extends CustomPainter {
             updatedBoulderDate.add(updateBoulderNotice).isAfter(currentTime) &&
             (!userTopped && !userFlashed)) {
           glowColour = updatedBoulderColour;
-        } else {glowColour = null;}
+        } else {
+          glowColour = null;
+        }
 
         // Give problems a glow, unless they have been topped
         if (glowColour != null && !userTopped) {
