@@ -4,6 +4,7 @@ import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/services/cloude/gym_data/cloud_gym_data.dart';
 
 Future<PointsData> getPoints(
+  Iterable<CloudProfile> currentSetters,
   CloudProfile currentProfile,
   CloudGymData currentGymData,
   Map<String, String> selectedTime,
@@ -770,6 +771,7 @@ Future<PointsData> getPoints(
                               amountBoulder++;
 
                               allSetterGraphSetup(
+                                  currentSetters,
                                   boulderGradeToHoldColour,
                                   boulderData,
                                   boulderGradeColourToHoldColour,
@@ -816,6 +818,7 @@ Future<PointsData> getPoints(
                                   amountBoulder++;
 
                                   allSetterGraphSetup(
+                                      currentSetters,
                                       boulderGradeToHoldColour,
                                       boulderData,
                                       boulderGradeColourToHoldColour,
@@ -864,6 +867,7 @@ Future<PointsData> getPoints(
                             amountBoulder++;
 
                             allSetterGraphSetup(
+                                currentSetters,
                                 boulderGradeToHoldColour,
                                 boulderData,
                                 boulderGradeColourToHoldColour,
@@ -915,6 +919,7 @@ Future<PointsData> getPoints(
                       amountBoulder++;
 
                       allSetterGraphSetup(
+                          currentSetters,
                           boulderGradeToHoldColour,
                           boulderData,
                           boulderGradeColourToHoldColour,
@@ -1014,6 +1019,7 @@ Future<PointsData> getPoints(
 }
 
 void allSetterGraphSetup(
+    Iterable<CloudProfile> currentSetters,
     LinkedHashMap<String, Map<int, Map<String, int>>> boulderGradeToHoldColour,
     Map<String, dynamic> boulderData,
     LinkedHashMap<String, Map<String, Map<String, int>>>
@@ -1024,16 +1030,23 @@ void allSetterGraphSetup(
     LinkedHashMap<String, Map<String, int>> boulderSetGradeColours,
     List allSetters) {
   String currentSetter = boulderData["setter"];
-  if (!allSetters.contains(currentSetter)) {
-    allSetters.add(currentSetter);
+
+  for (CloudProfile profile in currentSetters) {
+    // Check if the profile ID matches currentSetter
+    if (profile.userID == currentSetter) {
+      if (!allSetters.contains(profile.displayName)) {
+        allSetters.add(profile.displayName);
+      }
+
+      break; // Exit the loop once a match is found
+    }
   }
 
   boulderSetGradeColours["all"]![boulderData["gradeColour"]] =
       (boulderSetGradeColours["all"]![boulderData["gradeColour"]] ?? 0) + 1;
 
-boulderSetGradeColours["all"]!["total"] =
+  boulderSetGradeColours["all"]!["total"] =
       (boulderSetGradeColours["all"]!["total"] ?? 0) + 1;
-
 
   boulderGradeToHoldColour[currentSetter] ??= {};
   boulderGradeToHoldColour[currentSetter]![boulderData["gradeNumberSetter"]] ??=

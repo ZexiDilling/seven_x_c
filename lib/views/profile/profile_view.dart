@@ -26,13 +26,14 @@ class _ProfileViewState extends State<ProfileView> {
   late CloudProfile? currentProfile;
   CloudSettings? currentSettings;
   CloudGymData? currentGymData;
+  Iterable<CloudProfile>? currentSetters;
   late final FirebaseCloudStorage firebaseService;
   TimePeriod selectedTimePeriod = TimePeriod.week;
   String get userId => AuthService.firebase().currentUser!.id;
   late bool isShowingMainData;
   Map<int, String> gradeNumberToColour = {};
   String chartSelection = "maxGrade";
-
+  Map<String, String> setterMap = {};
   bool setterViewGrade = true;
   bool perTimeInterval = false;
   String graphStyle = "climber";
@@ -40,6 +41,7 @@ class _ProfileViewState extends State<ProfileView> {
   bool colourVsValue = true;
 
   Map<String, String> selectedTime = getSelectedTime(DateTime.now());
+  String displaySetter = "All";
   String selectedSetter = "All";
 
   @override
@@ -165,9 +167,19 @@ class _ProfileViewState extends State<ProfileView> {
     await _initializeCurrentProfile();
     await _initSettings();
     await _initGymData();
+    await _initSetters();
+    await _setterMapMaker();
     await _updateFirebaseData();
     _initSettingData();
   }
+
+  _setterMapMaker() {
+    for (CloudProfile profile in currentSetters!) {
+    // Check if the profile ID matches currentSetter
+      setterMap[profile.displayName] = profile.userID;
+    }
+  }
+  
 
   _initSettingData() {
     if (currentSettings!.settingsGradeColour != null) {
@@ -224,6 +236,18 @@ class _ProfileViewState extends State<ProfileView> {
     });
     return currentGymData;
   }
+
+Future<Iterable<CloudProfile>?> _initSetters() async {
+  final Stream<Iterable<CloudProfile>> tempSetters =
+      firebaseService.getSetters();
+  final Iterable<CloudProfile>? setters = await tempSetters.first;
+
+  setState(() {
+    currentSetters = setters;
+  });
+  return currentSetters;
+}
+
 
   Future<CloudProfile?> _initializeCurrentProfile() async {
     await for (final profiles
@@ -410,6 +434,7 @@ class _ProfileViewState extends State<ProfileView> {
 
                   return FutureBuilder<PointsData>(
                     future: getPoints(
+                      currentSetters!,
                       currentProfile,
                       currentGymData!,
                       selectedTime,
@@ -753,7 +778,7 @@ class _ProfileViewState extends State<ProfileView> {
                                       ],
                                     ),
                                     DropdownButton(
-                                      value: selectedSetter,
+                                      value: displaySetter,
                                       items: pointsData.allSetters
                                           .map<DropdownMenuItem<String>>(
                                               (String setter) {
@@ -765,7 +790,8 @@ class _ProfileViewState extends State<ProfileView> {
                                       onChanged: (newValue) {
                                         if (newValue != null) {
                                           setState(() {
-                                            selectedSetter = newValue;
+                                            displaySetter = newValue;
+                                            selectedSetter = setterMap[newValue]!;
                                           });
                                         }
                                       },
