@@ -7,11 +7,12 @@ const String guestSetterName = "Guest Setter";
 //ToDO move to settings
 
 // drawing Constants
-const double boulderRadius = 2.5;
+const double boulderRadius = 1;
+const double boulderHoldColour = 0.5;
 const double boulderRadiusDrawing = 15;
 const double boulderRadiusTopped = 0.50;
 const double boulderSingleShow = 2.5;
-const double boulderNewGlowRadius = 5.0;
+const double boulderNewGlowRadius = 2.5;
 const double boulderUpdatedGlowRadius = boulderNewGlowRadius;
 const Color hiddenGradeColor = Colors.white;
 const String hiddenGradeColorName = "white";
@@ -31,7 +32,7 @@ const Color newBoulderColour = Colors.purple;
 const Color updatedBoulderColour = Colors.yellow;
 const Color deactivateBoulderColor = Colors.red;
 // const Color soonToBeStrippedColour = Colors.red;   Not used yet
-const double minBoulderDistance = 10.0;
+const double minBoulderDistance = 5.0;
 
 // Points
 const double defaultSetterPoints = 10;

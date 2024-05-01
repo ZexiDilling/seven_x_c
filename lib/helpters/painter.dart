@@ -45,7 +45,7 @@ class GymPainter extends CustomPainter {
                 .settingsHoldColour![boulder.gradeColour.toLowerCase()]);
         Color? holdColour = nameToColor(
             currentSettings.settingsHoldColour![boulder.holdColour]);
-        double fadeEffect = 0.3;
+        double fadeEffect = 0.5;
         double centerX = boulder.cordX * constraints.maxWidth;
         double centerY = boulder.cordY * constraints.maxHeight;
 
@@ -121,7 +121,7 @@ class GymPainter extends CustomPainter {
         final Paint outlinePaint = Paint()
           ..color =
               (userTopped ? holdColour.withOpacity(fadeEffect) : holdColour)
-          ..strokeWidth = 1
+          ..strokeWidth = boulderHoldColour
           ..style = PaintingStyle.stroke;
 
         canvas.drawCircle(

@@ -423,14 +423,14 @@ class _GymViewState extends State<GymView> {
                           child: InteractiveViewer(
                             transformationController: _controller,
                             minScale: 0.5,
-                            maxScale: 5.0,
+                            maxScale: 10.0,
                             onInteractionEnd: (details) {
                               setState(() {
                                 currentScale =
                                     _controller.value.getMaxScaleOnAxis();
                               });
                             },
-                            child: Container(
+                            child: SizedBox(
                               width: double.infinity,
                               height: double.infinity,
                               child: Stack(children: [
