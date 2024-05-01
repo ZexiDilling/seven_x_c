@@ -27,8 +27,6 @@ Future<void> showAddNewBoulder(
     CloudSettings currentSettings,
     CloudGymData currentGymData,
     Stream<Iterable<CloudProfile>> settersStream) async {
-  bool gymSetterTeam = false;
-  bool guestSetterTeam = false;
   bool topOut = false;
   bool gotZone = false;
   bool hiddenGrade = compView;
@@ -353,11 +351,7 @@ Future<void> showAddNewBoulder(
 
                               newBoulder =
                                   await fireBaseService.createNewBoulder(
-                                      setter: gymSetterTeam == true
-                                          ? gymSetterName
-                                          : (guestSetterTeam == true
-                                              ? guestSetterName
-                                              : selectedSetter),
+                                      setter: selectedSetter,
                                       cordX: centerX / constraints.maxWidth,
                                       cordY: centerY / constraints.maxHeight,
                                       wall: wall,

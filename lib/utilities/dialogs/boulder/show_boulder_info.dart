@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/constants/challenge_const.dart';
 import 'package:seven_x_c/constants/comp_const.dart';
@@ -44,12 +45,12 @@ Future<bool> showBoulderInformation(
   bool moveBoulder = false;
   // ignore: unused_local_variable
   String selectedBoulder = "";
-  int difficultyLevel = 1;
-  String? holdColorChoice;
-  String? gradeColorChoice;
+  int difficultyLevel = boulder.gradeDifficulty;
+  String? holdColorChoice = boulder.holdColour;
+  String? gradeColorChoice = boulder.gradeColour;
   String gradeColors = "";
-  String? selectedGrade = '';
-  int? gradeValue = 0;
+  String? selectedGrade = "";
+  int? gradeValue = boulder.gradeNumberSetter;
   List<String> allGradeColorChoice = [];
   String labelText = "Vote a Grade";
   bool expandPanelState = false;
@@ -108,7 +109,7 @@ Future<bool> showBoulderInformation(
     }
   }
 
-  if (gradingSystem == "coloured" ) {
+  if (gradingSystem == "coloured") {
     try {
       gradingShow = arrowDict()[boulder.gradeDifficulty]!["arrow"];
     } on Error {
@@ -135,12 +136,8 @@ Future<bool> showBoulderInformation(
               final List<String> setters = profiles.isNotEmpty
                   ? profiles.map((profile) => profile.displayName).toList()
                   : [];
-
-              String selectedSetter = setters.isNotEmpty ? boulder.setter : '';
-
-              if (!setters.contains(selectedSetter)) {
-                selectedSetter = setters.first;
-              }
+              setters.addAll([gymSetterName, guestSetterName]);
+              String selectedSetter = boulder.setter;
 
               return StatefulBuilder(
                 builder: (BuildContext context, StateSetter setState) {
@@ -203,9 +200,14 @@ Future<bool> showBoulderInformation(
                                   visible: currentProfile.isAdmin ||
                                       currentProfile.isSetter,
                                   child: IconButton(
-                                    icon: Icon(editing
-                                        ? IconManager.editing
-                                        : IconManager.doneEdditing),
+                                    icon: Icon(
+                                      editing
+                                          ? IconManager.editing
+                                          : IconManager.editing,
+                                      color: editing
+                                          ? IconManagerColours.active
+                                          : IconManagerColours.inActive,
+                                    ),
                                     onPressed: () {
                                       labelText = editing
                                           ? "Vote a Grade"
@@ -461,7 +463,7 @@ Future<bool> showBoulderInformation(
                                 ],
                               ),
                             ),
-                            // Edeting the boulder
+                            // Deleting the boulder
                             Visibility(
                                 visible: editing,
                                 child: Column(
@@ -682,10 +684,7 @@ Future<bool> showBoulderInformation(
                                         });
                                       },
                                       items: [
-                                        const DropdownMenuItem(
-                                          value: null,
-                                          child: Text('Select Hold Color'),
-                                        ),
+                                    
                                         ...currentSettings
                                             .settingsHoldColour!.entries
                                             .map((entry) {
@@ -868,7 +867,7 @@ Future<bool> showBoulderInformation(
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 30),
+                            const SizedBox(height: 30),
                             challangePanel(
                                 challengesOverview,
                                 expandedStates,
