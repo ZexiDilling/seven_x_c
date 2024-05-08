@@ -175,11 +175,10 @@ class _ProfileViewState extends State<ProfileView> {
 
   _setterMapMaker() {
     for (CloudProfile profile in currentSetters!) {
-    // Check if the profile ID matches currentSetter
+      // Check if the profile ID matches currentSetter
       setterMap[profile.displayName] = profile.userID;
     }
   }
-  
 
   _initSettingData() {
     if (currentSettings!.settingsGradeColour != null) {
@@ -237,17 +236,16 @@ class _ProfileViewState extends State<ProfileView> {
     return currentGymData;
   }
 
-Future<Iterable<CloudProfile>?> _initSetters() async {
-  final Stream<Iterable<CloudProfile>> tempSetters =
-      firebaseService.getSetters();
-  final Iterable<CloudProfile>? setters = await tempSetters.first;
+  Future<Iterable<CloudProfile>?> _initSetters() async {
+    final Stream<Iterable<CloudProfile>> tempSetters =
+        firebaseService.getSetters();
+    final Iterable<CloudProfile>? setters = await tempSetters.first;
 
-  setState(() {
-    currentSetters = setters;
-  });
-  return currentSetters;
-}
-
+    setState(() {
+      currentSetters = setters;
+    });
+    return currentSetters;
+  }
 
   Future<CloudProfile?> _initializeCurrentProfile() async {
     await for (final profiles
@@ -791,7 +789,8 @@ Future<Iterable<CloudProfile>?> _initSetters() async {
                                         if (newValue != null) {
                                           setState(() {
                                             displaySetter = newValue;
-                                            selectedSetter = setterMap[newValue]!;
+                                            selectedSetter =
+                                                setterMap[newValue]!;
                                           });
                                         }
                                       },

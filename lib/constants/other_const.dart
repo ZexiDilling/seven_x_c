@@ -25,6 +25,7 @@ static const IconData rightArrow = Icons.arrow_right;
   static const IconData reset = Icons.refresh; 
   static const IconData flashed = Icons.flash_on; 
   static const IconData topped = Icons.keyboard_double_arrow_up; 
+
   
 }
 
@@ -34,3 +35,4 @@ class IconManagerColours {
   static const Color inActive = Colors.grey;
   static const Color active = Colors.blue;
 }
+

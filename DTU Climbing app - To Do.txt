@@ -113,7 +113,8 @@ Done grap:
 Done Map changes:
 	Add list of all boulders 
 		zoom to problem when clicked
-		show Topped/flashed on the list
+		show Topped/flashed on the list'
+	make it possible to toggle on and off the zoom effect
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -157,9 +158,6 @@ Challenges:
 
 Challenges:
 	Done - Make it possible to add old challenges to boulders. 
-
-
-
 
 boulders
 	update a boulder 
@@ -290,9 +288,6 @@ profil:
 Admin page:
 	Set take-down days for boulders / sections. 
 
-
-Map changes:
-	make it possible to toggle on and off the zoom effect
 
 setting: 
 	Keep track of DTU Setter team ?

@@ -7,3 +7,6 @@ const compCreatView = "comp/comp-creation/";
 const compResultView = "comp/comp-results/";
 const locationView = "location/location-view";
 const createLocationView = "location/create-view";
+const mapView = "location/map-view";
+const outdoorOverview = "location/outdoor-overview";
+const outdoorView = "location/outdoor-view";
