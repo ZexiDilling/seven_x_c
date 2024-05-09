@@ -104,6 +104,15 @@ const gymDataBouldersFieldName = "gymDataBoulders";
 const gymDataBouldersToppedFieldName = "gymDataBouldersTopped";
 const gymDataRoutesToppedFieldName = "gymDataRoutesTopped";
 
+//OutdoorData
+const outdoorDataNameIDFieldName = "outdoorDataNameID";
+const outdoorSectionsFieldName = "outdoorSections";
+const outdoorDataClimbersFieldName = "outdoorDataClimbers";
+const outdoorDataBouldersFieldName = "outdoorDataBoulders";
+const outdoorDataBouldersToppedFieldName = "outdoorDataBouldersTopped";
+const outdoorDataRoutesFieldName = "outdoorDataRoutes";
+const outdoorDataRoutesToppedFieldName = "outdoorDataRoutesTopped";
+
 //Location data
 const locationNameIDFieldName = "locationNameID";
 const boulderingFieldName = "bouldering";

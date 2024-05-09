@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import '../../helpters/time_calculations.dart' show TimePeriod;
-import 'package:seven_x_c/services/cloude/gym_data/cloud_settings.dart';
+import 'package:seven_x_c/services/cloude/location_data/cloud_settings.dart';
 import 'package:seven_x_c/utilities/charts/profile_chart_extra.dart';
 
 BarChartData boulderBarChart(

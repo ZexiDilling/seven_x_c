@@ -6,7 +6,7 @@ import 'package:seven_x_c/constants/slide_up_const.dart';
 import 'package:seven_x_c/helpters/bonus_functions.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
-import 'package:seven_x_c/services/cloude/gym_data/cloud_settings.dart';
+import 'package:seven_x_c/services/cloude/location_data/cloud_settings.dart';
 
 Container slideUpCollapsContent() {
   return Container(

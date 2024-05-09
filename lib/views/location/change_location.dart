@@ -7,10 +7,10 @@ import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_event.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
-import 'package:seven_x_c/services/cloude/gym_data/cloud_gym_location.dart';
+import 'package:seven_x_c/services/cloude/location_data/cloud_location_data.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
-import 'package:seven_x_c/services/cloude/gym_data/cloud_gym_data.dart';
-import 'package:seven_x_c/services/cloude/gym_data/cloud_settings.dart';
+import 'package:seven_x_c/services/cloude/location_data/cloud_gym_data.dart';
+import 'package:seven_x_c/services/cloude/location_data/cloud_settings.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/logout_dialog.dart';
 
 class LocationView extends StatefulWidget {
@@ -93,7 +93,7 @@ class _LocationViewState extends State<LocationView> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: StreamBuilder<Iterable<CloudGymLocation>>(
+        title: StreamBuilder<Iterable<CloudLocationData>>(
           stream: getFilterGymLocations(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -119,7 +119,7 @@ class _LocationViewState extends State<LocationView> {
           activityRow(),
           searchRow(),
           const SizedBox(height: 20,),
-          StreamBuilder<Iterable<CloudGymLocation>>(
+          StreamBuilder<Iterable<CloudLocationData>>(
           stream: getFilterGymLocations(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -241,7 +241,7 @@ class _LocationViewState extends State<LocationView> {
     );
   }
 
-  Widget locationListView(List<CloudGymLocation> locations) {
+  Widget locationListView(List<CloudLocationData> locations) {
     return ListView.builder(
       shrinkWrap: true,
       itemCount: locations.length,
@@ -318,7 +318,7 @@ class _LocationViewState extends State<LocationView> {
     );
   }
 
-  Stream<Iterable<CloudGymLocation>> getFilterGymLocations() {
+  Stream<Iterable<CloudLocationData>> getFilterGymLocations() {
     return firebaseService.getAllGymLocations().map((locations) {
       if (showAllLocations) {
         return locations;

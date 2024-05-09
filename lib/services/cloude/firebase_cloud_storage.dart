@@ -4,10 +4,11 @@ import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 import 'package:seven_x_c/services/cloude/cloud_storage_exceptions.dart';
-import 'package:seven_x_c/services/cloude/gym_data/cloud_gym_location.dart';
+import 'package:seven_x_c/services/cloude/location_data/cloud_location_data.dart';
+import 'package:seven_x_c/services/cloude/location_data/cloud_outdoor_data.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
-import 'package:seven_x_c/services/cloude/gym_data/cloud_gym_data.dart';
-import 'package:seven_x_c/services/cloude/gym_data/cloud_settings.dart';
+import 'package:seven_x_c/services/cloude/location_data/cloud_gym_data.dart';
+import 'package:seven_x_c/services/cloude/location_data/cloud_settings.dart';
 
 class FirebaseCloudStorage {
   final bouldersCollection = FirebaseFirestore.instance.collection("boulders");
@@ -17,6 +18,8 @@ class FirebaseCloudStorage {
       FirebaseFirestore.instance.collection("challenges");
   final settingsCollection = FirebaseFirestore.instance.collection("settings");
   final gymDataCollection = FirebaseFirestore.instance.collection("gymData");
+  final outdoorDataCollection =
+      FirebaseFirestore.instance.collection("outdoorData");
   final gymLocationCollection =
       FirebaseFirestore.instance.collection("gymLocation");
 
@@ -161,8 +164,7 @@ class FirebaseCloudStorage {
       setDateBoulderFiledName: setDateBoulder,
       updateDateBoulderFiledName: setDateBoulder,
       setterPointFieldName: setterPoint,
-      if (tags != null)
-        tagsFieldName: tags,
+      if (tags != null) tagsFieldName: tags,
       if (boulderChallenges != null)
         boulderChallengesFieldName: boulderChallenges,
       if (gradeNumberClimber != null)
@@ -426,21 +428,23 @@ class FirebaseCloudStorage {
     }
   }
 
-Stream<Iterable<CloudProfile>> getUserFromDisplayName(
-    String profileDisplayName) {
-  try {
-    final currentProfile = profileCollection
-        .orderBy(displayNameFieldName)
-        .startAt([profileDisplayName])
-        .endAt([profileDisplayName + '\uf8ff']) // \uf8ff is a Unicode character that is higher than any other character in the Unicode set
-        .snapshots()
-        .map((event) =>
-            event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
-    return currentProfile;
-  } catch (e) {
-    throw CouldNotGetSetterProfile();
+  Stream<Iterable<CloudProfile>> getUserFromDisplayName(
+      String profileDisplayName) {
+    try {
+      final currentProfile = profileCollection
+          .orderBy(displayNameFieldName)
+          .startAt([profileDisplayName])
+          .endAt([
+            profileDisplayName + '\uf8ff'
+          ]) // \uf8ff is a Unicode character that is higher than any other character in the Unicode set
+          .snapshots()
+          .map((event) =>
+              event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
+      return currentProfile;
+    } catch (e) {
+      throw CouldNotGetSetterProfile();
+    }
   }
-}
 
   Stream<Iterable<CloudProfile>> getUser({required String userID}) {
     final currentProfile = profileCollection
@@ -888,7 +892,6 @@ Stream<Iterable<CloudProfile>> getUserFromDisplayName(
   Future<CloudGymData> createGymData({
     required String gymDataID,
     required String gymDataNameID,
-    required String gymDataName,
     Map<String, dynamic>? gymDataClimbers,
     Map<String, dynamic>? gymDataBoulders,
     Map<String, dynamic>? gymDataBouldersTopped,
@@ -958,7 +961,97 @@ Stream<Iterable<CloudProfile>> getUserFromDisplayName(
     }
   }
 
-  Future<CloudGymLocation> createGymLocation({
+  Future<CloudOutdoorData> createOutdoorData({
+    required String outdoorDataID,
+    required String outdoorDataNameID,
+    Map<String, dynamic>? outdoorSections,
+    Map<String, dynamic>? outdoorDataClimbers,
+    Map<String, dynamic>? outdoorDataBoulders,
+    Map<String, dynamic>? outdoorDataBouldersTopped,
+    Map<String, dynamic>? outdoorDataRoutes,
+    Map<String, dynamic>? outdoorDataRoutesTopped,
+  }) async {
+    final document = await outdoorDataCollection.add({
+      outdoorDataNameIDFieldName: outdoorDataNameID,
+      outdoorSectionsFieldName: outdoorSections,
+      outdoorDataClimbersFieldName: outdoorDataClimbers,
+      outdoorDataBouldersFieldName: outdoorDataBoulders,
+      outdoorDataBouldersToppedFieldName: outdoorDataBouldersTopped,
+      outdoorDataRoutesFieldName: outdoorDataRoutes,
+      outdoorDataRoutesToppedFieldName: outdoorDataRoutesTopped,
+    });
+    final fetchGymData = await document.get();
+    return CloudOutdoorData(
+      outdoorDataNameID,
+      outdoorSections,
+      outdoorDataClimbers,
+      outdoorDataBoulders,
+      outdoorDataBouldersTopped,
+      outdoorDataRoutes,
+      outdoorDataRoutesTopped,
+      outdoorDataID: fetchGymData.id,
+    );
+  }
+
+  Future<void> updateOutdoorData({
+    required String outdoorDataID,
+    String? outdoorDataNameID,
+    Map<String, dynamic>? outdoorSections,
+    Map<String, dynamic>? outdoorDataClimbers,
+    Map<String, dynamic>? outdoorDataBoulders,
+    Map<String, dynamic>? outdoorDataBouldersTopped,
+    Map<String, dynamic>? outdoorDataRoutes,
+    Map<String, dynamic>? outdoorDataRoutesTopped,
+
+
+  }) async {
+    try {
+      // Create a map to store non-null fields and their values
+      final Map<String, dynamic> updatedData = {};
+
+      if (outdoorDataNameID != null) {
+        updatedData[gymDataNameIDFieldName] = outdoorDataNameID;
+      }
+
+      if (outdoorSections != null) {
+        updatedData[gymDataClimbersFieldName] = outdoorSections;
+      }
+      if (outdoorDataClimbers != null) {
+        updatedData[gymDataBouldersFieldName] = outdoorDataClimbers;
+      }
+      if (outdoorDataBoulders != null) {
+        updatedData[gymDataBouldersToppedFieldName] = outdoorDataBoulders;
+      }
+      if (outdoorDataBouldersTopped != null) {
+        updatedData[gymDataRoutesToppedFieldName] = outdoorDataBouldersTopped;
+      }
+if (outdoorDataRoutes != null) {
+        updatedData[gymDataRoutesToppedFieldName] = outdoorDataRoutes;
+      }
+
+      if (outdoorDataRoutesTopped != null) {
+        updatedData[gymDataRoutesToppedFieldName] = outdoorDataRoutesTopped;
+      }
+
+      await outdoorDataCollection.doc(outdoorDataID).update(updatedData);
+    } catch (e) {
+      throw CouldNotUpdateSettings();
+    }
+  }
+
+  Future<CloudOutdoorData?> getOutdoorData(String? gymDataNameID) async {
+    final querySnapshot = await outdoorDataCollection
+        .where(outdoorDataNameIDFieldName, isEqualTo: gymDataNameID)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      return CloudOutdoorData.fromSnapshot(querySnapshot.docs.first);
+    } else {
+      return null;
+    }
+  }
+
+  Future<CloudLocationData> createGymLocation({
     required String locationID,
     required String locationNameID,
     required bool bouldering,
@@ -990,7 +1083,7 @@ Stream<Iterable<CloudProfile>> getUserFromDisplayName(
       locationAccessFieldName: locationAccess,
     });
     final fetchGymLocation = await document.get();
-    return CloudGymLocation(
+    return CloudLocationData(
       locationNameID,
       bouldering,
       sport,
@@ -1074,21 +1167,21 @@ Stream<Iterable<CloudProfile>> getUserFromDisplayName(
     }
   }
 
-  Future<CloudGymLocation?> getGymLocation(String? locationNameID) async {
+  Future<CloudLocationData?> getGymLocation(String? locationNameID) async {
     final querySnapshot = await gymLocationCollection
         .where(locationNameIDFieldName, isEqualTo: locationNameID)
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {
-      return CloudGymLocation.fromSnapshot(querySnapshot.docs.first);
+      return CloudLocationData.fromSnapshot(querySnapshot.docs.first);
     } else {
       return null;
     }
   }
 
-  Stream<Iterable<CloudGymLocation>> getAllGymLocations() {
-    final allLocations = gymLocationCollection.snapshots().map(
-        (event) => event.docs.map((doc) => CloudGymLocation.fromSnapshot(doc)));
+  Stream<Iterable<CloudLocationData>> getAllGymLocations() {
+    final allLocations = gymLocationCollection.snapshots().map((event) =>
+        event.docs.map((doc) => CloudLocationData.fromSnapshot(doc)));
     return allLocations;
   }
 }

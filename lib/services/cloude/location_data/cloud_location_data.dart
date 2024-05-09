@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
 
 @immutable
-class CloudGymLocation {
+class CloudLocationData {
   // Basic info to find the data based on the Gym or User
   final String locationID;
   final String locationNameID;
@@ -22,7 +22,7 @@ class CloudGymLocation {
   final String? locationInfo;
   final String? locationAccess;
 
-  const CloudGymLocation(
+  const CloudLocationData(
     this.locationNameID,
     this.bouldering,
     this.sport,
@@ -39,7 +39,7 @@ class CloudGymLocation {
     required this.locationID,
   });
 
-  CloudGymLocation.fromSnapshot(
+  CloudLocationData.fromSnapshot(
       QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
       : locationID = snapshot.id,
         locationNameID = snapshot.data()[locationCountryFieldName] as String,

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
-import 'package:seven_x_c/services/cloude/gym_data/cloud_settings.dart';
+import 'package:seven_x_c/services/cloude/location_data/cloud_settings.dart';
 import 'package:seven_x_c/utilities/dialogs/admin_settings/colour_chooser.dart';
 
 class AdminPanelView extends StatefulWidget {

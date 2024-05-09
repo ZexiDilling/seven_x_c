@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/routes.dart';
 import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
-import 'package:seven_x_c/services/cloude/gym_data/cloud_settings.dart';
+
+import 'package:seven_x_c/services/cloude/location_data/cloud_outdoor_data.dart';
+import 'package:seven_x_c/services/cloude/location_data/cloud_settings.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
 class OutdoorView extends StatefulWidget {
@@ -14,7 +16,7 @@ class OutdoorView extends StatefulWidget {
 class _OutdoorView extends State<OutdoorView> {
   late CloudProfile? currentProfile;
   CloudSettings? currentSettings;
-  CloudOutdoorData? currentGymData;
+  CloudOutdoorData? currentOutdoorData;
   bool profileLoaded = false;
   late final FirebaseCloudStorage _fireBaseService;
   String get userId => AuthService.firebase().currentUser!.id;

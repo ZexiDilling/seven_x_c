@@ -1,7 +1,7 @@
 import 'dart:collection';
 import 'package:seven_x_c/helpters/time_calculations.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
-import 'package:seven_x_c/services/cloude/gym_data/cloud_gym_data.dart';
+import 'package:seven_x_c/services/cloude/location_data/cloud_gym_data.dart';
 
 Future<PointsData> getPoints(
   Iterable<CloudProfile> currentSetters,

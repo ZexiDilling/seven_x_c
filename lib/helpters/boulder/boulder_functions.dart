@@ -10,8 +10,8 @@ import 'package:seven_x_c/helpters/functions.dart'
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart'; //
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart'; //
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
-import 'package:seven_x_c/services/cloude/gym_data/cloud_gym_data.dart';
-import 'package:seven_x_c/services/cloude/gym_data/cloud_settings.dart';
+import 'package:seven_x_c/services/cloude/location_data/cloud_gym_data.dart';
+import 'package:seven_x_c/services/cloude/location_data/cloud_settings.dart';
 import 'package:seven_x_c/utilities/charts/barcharts_gradings.dart'; //
 
 Map<String, dynamic>? updateUsersVotedForGrade(
