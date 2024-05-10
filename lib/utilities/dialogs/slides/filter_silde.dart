@@ -3,6 +3,7 @@ import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/services/cloude/location_data/cloud_settings.dart';
 
+
 String? filterDropdownValue;
 bool missingFilter = false;
 bool newFilter = false;

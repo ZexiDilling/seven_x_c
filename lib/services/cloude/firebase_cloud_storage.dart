@@ -1002,8 +1002,6 @@ class FirebaseCloudStorage {
     Map<String, dynamic>? outdoorDataBouldersTopped,
     Map<String, dynamic>? outdoorDataRoutes,
     Map<String, dynamic>? outdoorDataRoutesTopped,
-
-
   }) async {
     try {
       // Create a map to store non-null fields and their values
@@ -1025,7 +1023,7 @@ class FirebaseCloudStorage {
       if (outdoorDataBouldersTopped != null) {
         updatedData[gymDataRoutesToppedFieldName] = outdoorDataBouldersTopped;
       }
-if (outdoorDataRoutes != null) {
+      if (outdoorDataRoutes != null) {
         updatedData[gymDataRoutesToppedFieldName] = outdoorDataRoutes;
       }
 
@@ -1049,6 +1047,17 @@ if (outdoorDataRoutes != null) {
     } else {
       return null;
     }
+  }
+
+  Stream<Iterable<Map<String, dynamic>?>> getAllOutdoorBoulders(
+      String locationName) {
+    final Stream<Iterable<Map<String, dynamic>?>> allBoulders;
+    allBoulders = outdoorDataCollection
+        .where(locationNameIDFieldName, isEqualTo: locationName)
+        .snapshots()
+        .map((event) => event.docs.map(
+            (doc) => CloudOutdoorData.fromSnapshot(doc).outdoorDataBoulders));
+    return allBoulders;
   }
 
   Future<CloudLocationData> createGymLocation({

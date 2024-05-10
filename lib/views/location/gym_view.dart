@@ -242,165 +242,7 @@ class _GymViewState extends State<GymView> {
       );
     }
     return Scaffold(
-      appBar: AppBar(
-        title: StreamBuilder<Iterable<CloudBoulder>>(
-          stream: getFilteredBouldersStream(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              if (currentSettings != null) {
-                return Text(currentSettings!.settingsName);
-              } else {
-                return const Text('Gym View - ??');
-              }
-            }
-
-            if (snapshot.hasError) {
-              return Text('Error:  ${snapshot.error}');
-            }
-            final bouldersCount = snapshot.data?.length ?? 0;
-            topCounter = 0;
-            for (CloudBoulder tempBoulder in snapshot.data!) {
-              if (tempBoulder.climberTopped != null) {
-                if (tempBoulder.climberTopped!.containsKey(userId)) {
-                  topCounter++;
-                }
-              }
-            }
-            return compView
-                ? Text(
-                    currentComp!.compName,
-                    style: compBarStyle,
-                  )
-                : moveBoulder
-                    ? const Text("MOVING A BOULDER",
-                        overflow: TextOverflow.ellipsis)
-                    : editing
-                        ? const Text("Edit")
-                        : Column(
-                            children: [
-                              Text(
-                                currentSettings != null
-                                    ? currentSettings!.settingsName
-                                    : "Loading...",
-                                style: appBarStyle,
-                              ),
-                              Text(
-                                '$topCounter/$bouldersCount',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ],
-                          );
-          },
-        ),
-        backgroundColor: compView
-            ? compAppBarColour
-            : editing
-                ? editingAppBarColors
-                : dtuClimbingAppBar,
-        actions: [
-          compView
-              ? IconButton(
-                  onPressed: () {
-                    showCompRankings(context,
-                        compService: _fireBaseService,
-                        currentComp: currentComp!,
-                        currentProfile: currentProfile,
-                        setCompView: setCompView);
-                  },
-                  icon: const Icon(IconManager.thropy))
-              : const SizedBox(),
-           if (editing)
-            IconButton(
-              icon: Icon(
-                showAll
-                    ? IconManager.showDeactivatedBoulders
-                    : IconManager.showDeactivatedBoulders,
-                color: showAll
-                    ? IconManagerColours.active
-                    : IconManagerColours.inActive,
-              ),
-              onPressed: () {
-                setState(() {
-                  showAll = !showAll;
-                });
-              },
-            ), 
-          if (editing)
-            IconButton(
-              icon: Icon(
-                showDeactivatedBoulders
-                    ? IconManager.showDeactivatedBoulders
-                    : IconManager.showDeactivatedBoulders,
-                color: showDeactivatedBoulders
-                    ? IconManagerColours.active
-                    : IconManagerColours.inActive,
-              ),
-              onPressed: () {
-                setState(() {
-                  showDeactivatedBoulders = !showDeactivatedBoulders;
-                });
-              },
-            ),
-          if (editing)
-            IconButton(
-              icon: Icon(
-                moveMultipleBoulders
-                    ? IconManager.moveMultipleBoulders
-                    : IconManager.moveMultipleBoulders,
-                color: moveMultipleBoulders
-                    ? IconManagerColours.active
-                    : IconManagerColours.inActive,
-              ),
-              onPressed: () {
-                setState(() {
-                  moveMultipleBoulders = !moveMultipleBoulders;
-                });
-              },
-            ),
-          if (editing)
-            IconButton(
-              icon: Icon(
-                showWallRegions ? IconManager.showWalls : IconManager.showWalls,
-                color: showWallRegions
-                    ? IconManagerColours.active
-                    : IconManagerColours.inActive,
-              ),
-              onPressed: () {
-                setState(() {
-                  showWallRegions = !showWallRegions;
-                });
-              },
-            ),
-          if (currentProfile!.isAdmin && !moveBoulder ||
-              currentProfile!.isSetter && !moveBoulder)
-            IconButton(
-              icon: Icon(
-                editing ? IconManager.editing : IconManager.editing,
-                color: editing
-                    ? IconManagerColours.active
-                    : IconManagerColours.inActive,
-              ),
-              onPressed: () {
-                setState(() {
-                  editing = !editing;
-                });
-              },
-            ),
-          if (moveBoulder)
-            IconButton(
-              icon: const Icon(IconManager.cancel),
-              onPressed: () {
-                setState(() {
-                  moveBoulder = false;
-                  selectedBoulder = "";
-                });
-              },
-            ),
-          dropDownMenu(context, currentSettings)
-        ],
-      ),
+      appBar: appBar(context),
       body: LayoutBuilder(
         builder: (context, constraints) {
           return StreamBuilder(
@@ -489,6 +331,168 @@ class _GymViewState extends State<GymView> {
               ? const CircularProgressIndicator()
               : filterDrawer(
                   context, setState, currentProfile!, currentSettings!),
+    );
+  }
+
+  AppBar appBar(BuildContext context) {
+    return AppBar(
+      title: StreamBuilder<Iterable<CloudBoulder>>(
+        stream: getFilteredBouldersStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            if (currentSettings != null) {
+              return Text(currentSettings!.settingsName);
+            } else {
+              return const Text('Gym View - ??');
+            }
+          }
+
+          if (snapshot.hasError) {
+            return Text('Error:  ${snapshot.error}');
+          }
+          final bouldersCount = snapshot.data?.length ?? 0;
+          topCounter = 0;
+          for (CloudBoulder tempBoulder in snapshot.data!) {
+            if (tempBoulder.climberTopped != null) {
+              if (tempBoulder.climberTopped!.containsKey(userId)) {
+                topCounter++;
+              }
+            }
+          }
+          return compView
+              ? Text(
+                  currentComp!.compName,
+                  style: compBarStyle,
+                )
+              : moveBoulder
+                  ? const Text("MOVING A BOULDER",
+                      overflow: TextOverflow.ellipsis)
+                  : editing
+                      ? const Text("Edit")
+                      : Column(
+                          children: [
+                            Text(
+                              currentSettings != null
+                                  ? currentSettings!.settingsName
+                                  : "Loading...",
+                              style: appBarStyle,
+                            ),
+                            Text(
+                              '$topCounter/$bouldersCount',
+                              style: const TextStyle(
+                                fontSize: 20,
+                              ),
+                            ),
+                          ],
+                        );
+        },
+      ),
+      backgroundColor: compView
+          ? compAppBarColour
+          : editing
+              ? editingAppBarColors
+              : dtuClimbingAppBar,
+      actions: [
+        compView
+            ? IconButton(
+                onPressed: () {
+                  showCompRankings(context,
+                      compService: _fireBaseService,
+                      currentComp: currentComp!,
+                      currentProfile: currentProfile,
+                      setCompView: setCompView);
+                },
+                icon: const Icon(IconManager.thropy))
+            : const SizedBox(),
+         if (editing)
+          IconButton(
+            icon: Icon(
+              showAll
+                  ? IconManager.showDeactivatedBoulders
+                  : IconManager.showDeactivatedBoulders,
+              color: showAll
+                  ? IconManagerColours.active
+                  : IconManagerColours.inActive,
+            ),
+            onPressed: () {
+              setState(() {
+                showAll = !showAll;
+              });
+            },
+          ), 
+        if (editing)
+          IconButton(
+            icon: Icon(
+              showDeactivatedBoulders
+                  ? IconManager.showDeactivatedBoulders
+                  : IconManager.showDeactivatedBoulders,
+              color: showDeactivatedBoulders
+                  ? IconManagerColours.active
+                  : IconManagerColours.inActive,
+            ),
+            onPressed: () {
+              setState(() {
+                showDeactivatedBoulders = !showDeactivatedBoulders;
+              });
+            },
+          ),
+        if (editing)
+          IconButton(
+            icon: Icon(
+              moveMultipleBoulders
+                  ? IconManager.moveMultipleBoulders
+                  : IconManager.moveMultipleBoulders,
+              color: moveMultipleBoulders
+                  ? IconManagerColours.active
+                  : IconManagerColours.inActive,
+            ),
+            onPressed: () {
+              setState(() {
+                moveMultipleBoulders = !moveMultipleBoulders;
+              });
+            },
+          ),
+        if (editing)
+          IconButton(
+            icon: Icon(
+              showWallRegions ? IconManager.showWalls : IconManager.showWalls,
+              color: showWallRegions
+                  ? IconManagerColours.active
+                  : IconManagerColours.inActive,
+            ),
+            onPressed: () {
+              setState(() {
+                showWallRegions = !showWallRegions;
+              });
+            },
+          ),
+        if (currentProfile!.isAdmin && !moveBoulder ||
+            currentProfile!.isSetter && !moveBoulder)
+          IconButton(
+            icon: Icon(
+              editing ? IconManager.editing : IconManager.editing,
+              color: editing
+                  ? IconManagerColours.active
+                  : IconManagerColours.inActive,
+            ),
+            onPressed: () {
+              setState(() {
+                editing = !editing;
+              });
+            },
+          ),
+        if (moveBoulder)
+          IconButton(
+            icon: const Icon(IconManager.cancel),
+            onPressed: () {
+              setState(() {
+                moveBoulder = false;
+                selectedBoulder = "";
+              });
+            },
+          ),
+        dropDownMenu(context, currentSettings)
+      ],
     );
   }
 
