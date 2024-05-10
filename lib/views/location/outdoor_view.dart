@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
+import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/constants/colours_thems.dart';
 import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/constants/routes.dart';
@@ -38,7 +39,9 @@ class _OutdoorView extends State<OutdoorView> {
   late final FirebaseCloudStorage _fireBaseService;
   String get userId => AuthService.firebase().currentUser!.id;
   String currentLocation = "kjugge";
+  String subLocation = "";
   Iterable? areaBoulders;
+  bool overviewMap = true;
 
   // map thingys
   final double minZoomThreshold = boulderSingleShow;
@@ -130,7 +133,18 @@ class _OutdoorView extends State<OutdoorView> {
                           collapsed: slideUpCollapsContent(),
                           body: GestureDetector(
                             key: _gymKey,
-                            onTapUp: (details) {},
+                            onTapUp: (details) {
+                              overviewMap
+                                  ? _tapSelectSubMap(
+                                      context, constraints, details)
+                                  : _tapselectedBoulder(
+                                      context,
+                                      constraints,
+                                      details,
+                                      allBoulders,
+                                      currentProfile,
+                                      _fireBaseService);
+                            },
                             onDoubleTapDown: (details) {
                               _doubleTapping(context, constraints, details);
                               setState(() {
@@ -152,11 +166,30 @@ class _OutdoorView extends State<OutdoorView> {
                                 width: double.infinity,
                                 height: double.infinity,
                                 child: Stack(children: [
-                                  SvgPicture.asset(
-                                    'assets/background/dtu_climbing.svg',
-                                    semanticsLabel: "background",
-                                    fit: BoxFit.fill,
-                                  ),
+                                  overviewMap
+                                      ? SvgPicture.asset(
+                                          'assets/background/overview_map.svg',
+                                          semanticsLabel: "background",
+                                          fit: BoxFit.fill,
+                                        )
+                                      : (() {
+                                          switch (subLocation) {
+                                            case "1":
+                                              return SvgPicture.asset(
+                                                'assets/background/selected_area_1.svg',
+                                                semanticsLabel: "background",
+                                                fit: BoxFit.fill,
+                                              );
+                                            case "2":
+                                              return SvgPicture.asset(
+                                                'assets/background/selected_area_2.svg',
+                                                semanticsLabel: "background",
+                                                fit: BoxFit.fill,
+                                              );
+                                            default:
+                                              return Container(); // or any default widget
+                                          }
+                                        })()
                                 ]),
                               ),
                             ),
@@ -175,7 +208,7 @@ class _OutdoorView extends State<OutdoorView> {
 
   AppBar appBar(BuildContext context) {
     return AppBar(
-      title: Text(currentLocation),
+      title: overviewMap ? Text(currentLocation) : Text(subLocation),
       backgroundColor: dtuClimbingAppBar,
       actions: [
         const SizedBox(),
@@ -344,7 +377,8 @@ class _OutdoorView extends State<OutdoorView> {
     });
   }
 
-  Future<void> _doubleTapping(context, constraints, details) async {
+  Future<void> _doubleTapping(BuildContext context, BoxConstraints constraints,
+      TapDownDetails details) async {
     final RenderBox referenceBox =
         _gymKey.currentContext?.findRenderObject() as RenderBox;
 
@@ -368,4 +402,217 @@ class _OutdoorView extends State<OutdoorView> {
       ..translate(-center.dx * 2.0, -center.dy * 2.0)
       ..scale(3.0);
   }
+
+  Future<void> _tapSelectSubMap(BuildContext context,
+      BoxConstraints constraints, TapUpDetails details) async {
+    final RenderBox referenceBox =
+        _gymKey.currentContext?.findRenderObject() as RenderBox;
+
+    // Convert the tap position to scene coordinates considering the transformation
+    final localPosition = referenceBox.globalToLocal(details.globalPosition);
+
+    // Create a copy of the transformation matrix and invert it
+    final Matrix4 invertedMatrix = _controller.value.clone()..invert();
+    // Create a Vector4 from the tap position
+    final VM.Vector4 tapVector =
+        VM.Vector4(localPosition.dx, localPosition.dy, 0, 1);
+
+    // Transform the tap position using the inverted matrix
+    final VM.Vector4 transformedPosition = invertedMatrix.transform(tapVector);
+    double tempCenterX = transformedPosition.x;
+    double tempCenterY = transformedPosition.y;
+
+    String? regionName;
+    String lowestRegionName = "";
+    double regionTestValue = 1;
+
+    for (final key in currentOutdoorData!.outdoorSections!.keys) {
+      final region = currentOutdoorData!.outdoorSections?[key];
+      if (region != null) {
+        double regionTop = region['regionYMaX'] as double;
+        double regionBottom = region['regionYMin'] as double;
+
+        if (regionBottom < regionTestValue) {
+          regionTestValue = regionBottom;
+          lowestRegionName = region.regionName;
+        }
+        if (tempCenterY / constraints.maxHeight >= regionBottom &&
+            tempCenterY / constraints.maxHeight <= regionTop) {
+          regionName = region.regionName;
+          break;
+        }
+      }
+    }
+    if (regionName != null) {
+      setState(() {
+        subLocation = regionName!;
+        overviewMap = false;
+      });
+    }
+  }
+
+  Future<void> _tapselectedBoulder(
+      BuildContext context,
+      BoxConstraints constraints,
+      TapUpDetails details,
+      Iterable<Map<String, dynamic>?>? allBoulders,
+      CloudProfile? currentProfile,
+      FirebaseCloudStorage fireBaseService) async {
+    final gradingSystem =
+        (currentProfile!.gradingSystem).toString().toLowerCase();
+    if (_controller.value.getMaxScaleOnAxis() >= minZoomThreshold) {
+      final RenderBox referenceBox =
+          _gymKey.currentContext?.findRenderObject() as RenderBox;
+
+      // Convert the tap position to scene coordinates considering the transformation
+      final localPosition = referenceBox.globalToLocal(details.globalPosition);
+
+      // Create a copy of the transformation matrix and invert it
+      final Matrix4 invertedMatrix = _controller.value.clone()..invert();
+      // Create a Vector4 from the tap position
+      final VM.Vector4 tapVector =
+          VM.Vector4(localPosition.dx, localPosition.dy, 0, 1);
+
+      // Transform the tap position using the inverted matrix
+      final VM.Vector4 transformedPosition =
+          invertedMatrix.transform(tapVector);
+      double minDistance =
+          minBoulderDistance; // Set a minimum distance to avoid overlap
+
+      if (editing || moveBoulder) {
+        // Check for existing circles and avoid overlap
+        double tempCenterX = transformedPosition.x;
+        double tempCenterY = transformedPosition.y;
+
+        for (final existingBoulder in allBoulders!) {
+          double distance = calculateDistance(
+            existingBoulder!["cordX"] * constraints.maxWidth,
+            existingBoulder["cordY"] * constraints.maxHeight,
+            tempCenterX,
+            tempCenterY,
+          );
+
+          if (distance < minDistance) {
+            // Adjust the X position based on the number of boulders below it
+            tempCenterX -= minBoulderDistance;
+          }
+        }
+
+        String? regionName;
+        String lowestRegionName = "";
+        double regionTestValue = 1;
+
+        for (final key in currentOutdoorData!.outdoorSections!.keys) {
+          final region = currentOutdoorData!.outdoorSections?[key];
+
+          double regionTop = region['regionYMaX'] as double;
+          double regionBottom = region['regionYMin'] as double;
+
+          if (regionBottom < regionTestValue) {
+            regionTestValue = regionBottom;
+            lowestRegionName = region.regionName;
+          }
+          if (tempCenterY / constraints.maxHeight >= regionBottom &&
+              tempCenterY / constraints.maxHeight <= regionTop) {
+            regionName = region.regionName;
+            break;
+          }
+        }
+        regionName ??= lowestRegionName;
+        if (moveBoulder) {
+          fireBaseService.updateBoulder(
+              boulderID: selectedBoulder,
+              cordX: tempCenterX / constraints.maxWidth,
+              cordY: tempCenterY / constraints.maxHeight);
+          setState(() {
+            moveBoulder = false;
+            selectedBoulder = "";
+          });
+        } else if (moveMultipleBoulders) {
+          Map<String, dynamic>? closestBoulder;
+          for (final boulders in allBoulders) {
+            double distance = ((boulders!["cordX"] * constraints.maxWidth) -
+                        transformedPosition.x)
+                    .abs() +
+                ((boulders["cordY"] * constraints.maxHeight) -
+                        transformedPosition.y)
+                    .abs();
+
+            if (distance < minDistance) {
+              minDistance = distance;
+              closestBoulder = boulders;
+            }
+            if (closestBoulder != null) {
+              setState(() {
+                moveBoulder = true;
+                selectedBoulder = closestBoulder!["boulderID"];
+              });
+            }
+          }
+        } else {
+          try {
+            setState(() {
+              addNewOutdoorClimb(
+                context,
+                constraints,
+                currentProfile,
+                tempCenterX,
+                tempCenterY,
+                subLocation,
+                gradingSystem,
+                _fireBaseService,
+                currentSettings!,
+                currentOutdoorData,
+              );
+            });
+          } catch (error) {
+            // Handle the error
+            // ignore: avoid_print
+            print(error);
+          }
+        }
+      } else {
+        Map<String, dynamic>? closestBoulder;
+        for (final boulders in allBoulders!) {
+          double distance = ((boulders!["cordX"] * constraints.maxWidth) -
+                      transformedPosition.x)
+                  .abs() +
+              ((boulders["cordY"] * constraints.maxHeight) -
+                      transformedPosition.y)
+                  .abs();
+
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestBoulder = boulders;
+          }
+          if (closestBoulder != null) {
+            List<String> challengesOverview = await _fireBaseService
+                .grabBoulderChallenges(boulderID: closestBoulder["boulderID"]);
+            challengesOverview.add("create");
+            // Tapped inside the circle, perform the desired action
+            // ignore: use_build_context_synchronously
+            final result = await showOutdoorBoulderInformation(
+              context,
+              setState,
+              closestBoulder,
+              currentProfile,
+            );
+            if (result == true) {
+              setState(() {
+                moveBoulder = true;
+                selectedBoulder = closestBoulder!["boulderID"];
+              });
+            }
+            break;
+          }
+        }
+      }
+    }
+  }
+}
+
+showOutdoorBoulderInformation(BuildContext context, void Function(VoidCallback fn) setState, Map<String, dynamic> closestBoulder, CloudProfile currentProfile) {
+}
+
+void addNewOutdoorClimb(BuildContext context, BoxConstraints constraints, CloudProfile currentProfile, double tempCenterX, double tempCenterY, String subLocation, String gradingSystem, FirebaseCloudStorage fireBaseService, CloudSettings cloudSettings, CloudOutdoorData? currentOutdoorData) {
 }
