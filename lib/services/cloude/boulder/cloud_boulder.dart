@@ -60,7 +60,7 @@ class CloudBoulder {
         holdColour = snapshot.data()[holdColourFieledName] as String,
         gradeColour = snapshot.data()[gradeColourFieledName] as String,
         gradeNumberSetter = snapshot.data()[gradingSetterFieldName] as int,
-        gradeDifficulty = snapshot.data()[gradingSetterFieldName] as int,
+        gradeDifficulty = snapshot.data()[gradeDifficultyFieldName] as int,
         topOut = snapshot.data()[topOutFieldName] as bool,
         active = snapshot.data()[activeFieldName] as bool,
         hiddenGrade = snapshot.data()[hiddenGradeFieldName] as bool,

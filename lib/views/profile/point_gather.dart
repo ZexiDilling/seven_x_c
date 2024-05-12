@@ -1031,16 +1031,28 @@ void allSetterGraphSetup(
     List allSetters) {
   String currentSetter = boulderData["setter"];
 
+ 
+
   for (CloudProfile profile in currentSetters) {
     // Check if the profile ID matches currentSetter
     if (profile.userID == currentSetter) {
       if (!allSetters.contains(profile.displayName)) {
+        
         allSetters.add(profile.displayName);
       }
 
       break; // Exit the loop once a match is found
     }
   }
+   if (!boulderSetGradeColours.containsKey(currentSetter)) {
+    boulderSetGradeColours[currentSetter] = {};
+  }
+
+  boulderSetGradeColours[currentSetter]![boulderData["gradeColour"]] =
+      (boulderSetGradeColours[currentSetter]![boulderData["gradeColour"]] ?? 0) + 1;
+
+  boulderSetGradeColours[currentSetter]!["total"] =
+      (boulderSetGradeColours[currentSetter]!["total"] ?? 0) + 1;
 
   boulderSetGradeColours["all"]![boulderData["gradeColour"]] =
       (boulderSetGradeColours["all"]![boulderData["gradeColour"]] ?? 0) + 1;

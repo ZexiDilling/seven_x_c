@@ -34,7 +34,6 @@ class _MapView extends State<MapView> {
                     // Using GestureDetector to detect tap on the marker
                     child: GestureDetector(
                       onTap: () {
-                        print("HEJ");
                         _showMarkerPopup(context); // Function to show the popup
                       },
                       child: const FlutterLogo(),

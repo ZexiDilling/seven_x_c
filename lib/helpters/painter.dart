@@ -145,7 +145,7 @@ class GymPainter extends CustomPainter {
                 color: boulder.gradeColour.toLowerCase() == "black"
                     ? Colors.white
                     : Colors.black,
-                fontSize: 3.0,
+                fontSize: 1.6,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -157,7 +157,7 @@ class GymPainter extends CustomPainter {
           textPainter.paint(
             canvas,
             Offset(centerX - textPainter.width / 2,
-                centerY - textPainter.height / 2),
+                centerY - textPainter.height / 4),
           );
         }
         if (!boulder.active) {

@@ -111,6 +111,7 @@ class FirebaseCloudStorage {
           .map((event) =>
               event.docs.map((doc) => CloudBoulder.fromSnapshot(doc)));
     }
+
     return allBoulders;
   }
 
@@ -435,7 +436,7 @@ class FirebaseCloudStorage {
           .orderBy(displayNameFieldName)
           .startAt([profileDisplayName])
           .endAt([
-            profileDisplayName + '\uf8ff'
+            '$profileDisplayName\uf8ff'
           ]) // \uf8ff is a Unicode character that is higher than any other character in the Unicode set
           .snapshots()
           .map((event) =>

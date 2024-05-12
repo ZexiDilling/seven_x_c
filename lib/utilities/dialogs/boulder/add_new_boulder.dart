@@ -227,6 +227,16 @@ Future<void> showAddNewBoulder(
                             decoration: const InputDecoration(
                                 labelText: 'Choose Setter'),
                           ),
+                           CheckboxListTile(
+                            title: const Text('Top Out'),
+                            value: topOut,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                topOut = !topOut;
+                                
+                              });
+                            },
+                          ),
                           CheckboxListTile(
                             title: const Text('Comp'),
                             value: compBoulder,
@@ -291,13 +301,13 @@ Future<void> showAddNewBoulder(
                                       ),
                                       minimumSize:
                                           MaterialStateProperty.all<Size>(
-                                        Size(double.infinity, 40.0),
+                                        const Size(double.infinity, 40.0),
                                       )),
                                   child: Padding(
                                     padding: const EdgeInsets.all(0.0),
                                     child: Text(
                                       tagName,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 10.0, color: Colors.black),
                                       // Adjust font size as needed
                                     ),

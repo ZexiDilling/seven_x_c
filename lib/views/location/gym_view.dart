@@ -254,6 +254,9 @@ class _GymViewState extends State<GymView> {
                   if (snapshot.hasData) {
                     final allBoulders = snapshot.data as Iterable<CloudBoulder>;
 
+                  
+
+
                     return SlidingUpPanel(
                         minHeight: slideUpMinHeight,
                         maxHeight: MediaQuery.of(context).size.height *

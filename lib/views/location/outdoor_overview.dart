@@ -10,6 +10,6 @@ class OutdoorOverView extends StatefulWidget {
 class _OutdoorOverView extends State<OutdoorOverView> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(    );
+    return const Scaffold(    );
   }
 }

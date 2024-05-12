@@ -177,7 +177,9 @@ class _ProfileViewState extends State<ProfileView> {
     for (CloudProfile profile in currentSetters!) {
       // Check if the profile ID matches currentSetter
       setterMap[profile.displayName] = profile.userID;
+      
     }
+    setterMap["All"] = "all";
   }
 
   _initSettingData() {
@@ -239,7 +241,7 @@ class _ProfileViewState extends State<ProfileView> {
   Future<Iterable<CloudProfile>?> _initSetters() async {
     final Stream<Iterable<CloudProfile>> tempSetters =
         firebaseService.getSetters();
-    final Iterable<CloudProfile>? setters = await tempSetters.first;
+    final Iterable<CloudProfile> setters = await tempSetters.first;
 
     setState(() {
       currentSetters = setters;
@@ -786,6 +788,7 @@ class _ProfileViewState extends State<ProfileView> {
                                         );
                                       }).toList(),
                                       onChanged: (newValue) {
+                                        
                                         if (newValue != null) {
                                           setState(() {
                                             displaySetter = newValue;
@@ -811,32 +814,33 @@ class _ProfileViewState extends State<ProfileView> {
                                         Color? diffBoxColour;
                                         switch (index) {
                                           case 0:
+                                          
                                             text =
-                                                'Green: ${pointsData.boulderSetGradeColours["all"]!["green"] ?? 0}';
+                                                'Green: ${pointsData.boulderSetGradeColours[selectedSetter]!["green"] ?? 0}';
                                             break;
                                           case 1:
                                             text =
-                                                'Yellow: ${pointsData.boulderSetGradeColours["all"]!["yellow"] ?? 0}';
+                                                'Yellow: ${pointsData.boulderSetGradeColours[selectedSetter]!["yellow"] ?? 0}';
                                             break;
                                           case 2:
                                             text =
-                                                'Blue: ${pointsData.boulderSetGradeColours["all"]!["blue"] ?? 0}';
+                                                'Blue: ${pointsData.boulderSetGradeColours[selectedSetter]!["blue"] ?? 0}';
                                             break;
                                           case 3:
                                             text =
-                                                'Purple: ${pointsData.boulderSetGradeColours["all"]!["purple"] ?? 0}';
+                                                'Purple: ${pointsData.boulderSetGradeColours[selectedSetter]!["purple"] ?? 0}';
                                           case 4:
                                             text =
-                                                'Red: ${pointsData.boulderSetGradeColours["all"]!["red"] ?? 0}';
+                                                'Red: ${pointsData.boulderSetGradeColours[selectedSetter]!["red"] ?? 0}';
                                           case 5:
                                             text =
-                                                'Black: ${pointsData.boulderSetGradeColours["all"]!["black"] ?? 0}';
+                                                'Black: ${pointsData.boulderSetGradeColours[selectedSetter]!["black"] ?? 0}';
                                           case 6:
                                             text =
-                                                'Silver: ${pointsData.boulderSetGradeColours["all"]!["silver"] ?? 0}';
+                                                'Silver: ${pointsData.boulderSetGradeColours[selectedSetter]!["silver"] ?? 0}';
                                           case 7:
                                             text =
-                                                'Total: ${pointsData.boulderSetGradeColours["all"]!["total"] ?? 0}';
+                                                'Total: ${pointsData.boulderSetGradeColours[selectedSetter]!["total"] ?? 0}';
                                         }
 
                                         // Customize the content of each grid item as needed

@@ -53,7 +53,7 @@ Future<bool> showBoulderInformation(
   int? gradeValue = boulder.gradeNumberSetter;
   List<String> allGradeColorChoice = [];
   String labelText = "Vote a Grade";
-  bool expandPanelState = false;
+  bool expandPanelState = false; 
 
   // size of grading circle:
   double circleWidth = 40;
@@ -684,7 +684,6 @@ Future<bool> showBoulderInformation(
                                         });
                                       },
                                       items: [
-                                    
                                         ...currentSettings
                                             .settingsHoldColour!.entries
                                             .map((entry) {
@@ -702,6 +701,7 @@ Future<bool> showBoulderInformation(
                                 )),
                             const SizedBox(width: 20),
                             // Grading set up:
+
                             gradingSystem == "coloured"
                                 ? Column(
                                     children: [
@@ -847,7 +847,7 @@ Future<bool> showBoulderInformation(
                             const Text("Tags:"),
                             if (boulder.tags != null &&
                                 boulder.tags!.isNotEmpty)
-                              Container(
+                              SizedBox(
                                 height: 20,
                                 width: 1000,
                                 child: SizedBox(

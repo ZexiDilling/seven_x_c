@@ -452,7 +452,6 @@ List climbTags() {
     "Cut Feet",
     "Dead Point",
     "Layback",
-    "Lock Off",
     "Pinchy",
     "Pocket",
     "Powerfull",
@@ -461,6 +460,7 @@ List climbTags() {
     "Technical",
     "Reachy",
     "Short Friendly",
-    "Undercling"
+    "Crack",
+    "BullShit"
   ];
 }
