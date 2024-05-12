@@ -177,7 +177,7 @@ Map<int, Map<String, String>> allGrading = {
   27: {"french": "9b+", "v_grade": "V16"}
 };
 
-Map<int, Map<String, String>> arrowDict() {
+Map<int, Map<String, dynamic>> arrowDict() {
   return {
     1: {"arrow": "↓", "difficulty": "Really Easy"},
     2: {"arrow": "↘", "difficulty": "Kinda Easy"},

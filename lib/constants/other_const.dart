@@ -25,7 +25,11 @@ static const IconData rightArrow = Icons.arrow_right;
   static const IconData reset = Icons.refresh; 
   static const IconData flashed = Icons.flash_on; 
   static const IconData topped = Icons.keyboard_double_arrow_up; 
-
+  static const IconData arrowGradReallyEasy = Icons.arrow_downward; 
+  static const IconData arrowGradKindaEasy = Icons.arrow_downward_rounded; 
+  static const IconData arrowGradMedium = Icons.swap_horizontal_circle; 
+  static const IconData arrowGradKindaHard = Icons.arrow_upward_rounded; 
+  static const IconData arrowGradReallyHard = Icons.arrow_upward; 
   
 }
 
