@@ -20,6 +20,7 @@ import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 import 'package:seven_x_c/utilities/dialogs/auth/logout_dialog.dart';
 import 'package:seven_x_c/utilities/dialogs/slides/comp_slide.dart';
 import 'package:seven_x_c/utilities/dialogs/slides/slide_up.dart';
+import 'package:seven_x_c/utilities/polygone/polygone_painter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:vector_math/vector_math_64.dart' as VM;
 
@@ -39,9 +40,12 @@ class _OutdoorView extends State<OutdoorView> {
   late final FirebaseCloudStorage _fireBaseService;
   String get userId => AuthService.firebase().currentUser!.id;
   String currentLocation = "kjugge";
+  String locationOverview = "KjuggeOverview";
   String subLocation = "";
   Iterable? areaBoulders;
   bool overviewMap = true;
+  bool detailMap = false;
+  bool regionPainter = false;
 
   // map thingys
   final double minZoomThreshold = boulderSingleShow;
@@ -134,16 +138,25 @@ class _OutdoorView extends State<OutdoorView> {
                           body: GestureDetector(
                             key: _gymKey,
                             onTapUp: (details) {
-                              overviewMap
-                                  ? _tapSelectSubMap(
-                                      context, constraints, details)
-                                  : _tapselectedBoulder(
-                                      context,
-                                      constraints,
-                                      details,
-                                      allBoulders,
-                                      currentProfile,
-                                      _fireBaseService);
+                              regionPainter
+                                  ? overviewMap
+                                      ? drawRegions(
+                                          'assets/background/$locationOverview.jpg')
+                                      : drawRegions(
+                                          'assets/background/$subLocation.jpg')
+                                  : overviewMap
+                                      ? _tapSelectSubMap(
+                                          context, constraints, details)
+                                      : detailMap
+                                          ? _tapSelectSubMap(
+                                              context, constraints, details)
+                                          : _tapselectedBoulder(
+                                              context,
+                                              constraints,
+                                              details,
+                                              allBoulders,
+                                              currentProfile,
+                                              _fireBaseService);
                             },
                             onDoubleTapDown: (details) {
                               _doubleTapping(context, constraints, details);
@@ -167,27 +180,20 @@ class _OutdoorView extends State<OutdoorView> {
                                 height: double.infinity,
                                 child: Stack(children: [
                                   overviewMap
-                                      ? SvgPicture.asset(
-                                          'assets/background/overview_map.svg',
-                                          semanticsLabel: "background",
+                                      ? Image.asset(
+                                          'assets/background/$locationOverview.jpg',
                                           fit: BoxFit.fill,
                                         )
                                       : (() {
-                                          switch (subLocation) {
-                                            case "1":
-                                              return SvgPicture.asset(
-                                                'assets/background/selected_area_1.svg',
-                                                semanticsLabel: "background",
-                                                fit: BoxFit.fill,
-                                              );
-                                            case "2":
-                                              return SvgPicture.asset(
-                                                'assets/background/selected_area_2.svg',
-                                                semanticsLabel: "background",
-                                                fit: BoxFit.fill,
-                                              );
-                                            default:
-                                              return Container(); // or any default widget
+                                          if (subLocation.isNotEmpty) {
+                                            final imagePath =
+                                                'assets/background/$subLocation.jpg';
+                                            return Image.asset(
+                                              imagePath,
+                                              fit: BoxFit.fill,
+                                            );
+                                          } else {
+                                            return Container(); // or any default widget
                                           }
                                         })()
                                 ]),
@@ -266,6 +272,20 @@ class _OutdoorView extends State<OutdoorView> {
               setState(() {
                 moveBoulder = false;
                 selectedBoulder = "";
+              });
+            },
+          ),
+          if (currentProfile!.isAdmin)
+          IconButton(
+            icon: Icon(
+              editing ? IconManager.editing : IconManager.editing,
+              color: editing
+                  ? IconManagerColours.active
+                  : IconManagerColours.inActive,
+            ),
+            onPressed: () {
+              setState(() {
+                regionPainter = !regionPainter;
               });
             },
           ),
@@ -447,6 +467,7 @@ class _OutdoorView extends State<OutdoorView> {
       setState(() {
         subLocation = regionName!;
         overviewMap = false;
+        detailMap = !detailMap;
       });
     }
   }
@@ -611,8 +632,20 @@ class _OutdoorView extends State<OutdoorView> {
   }
 }
 
-showOutdoorBoulderInformation(BuildContext context, void Function(VoidCallback fn) setState, Map<String, dynamic> closestBoulder, CloudProfile currentProfile) {
-}
+showOutdoorBoulderInformation(
+    BuildContext context,
+    void Function(VoidCallback fn) setState,
+    Map<String, dynamic> closestBoulder,
+    CloudProfile currentProfile) {}
 
-void addNewOutdoorClimb(BuildContext context, BoxConstraints constraints, CloudProfile currentProfile, double tempCenterX, double tempCenterY, String subLocation, String gradingSystem, FirebaseCloudStorage fireBaseService, CloudSettings cloudSettings, CloudOutdoorData? currentOutdoorData) {
-}
+void addNewOutdoorClimb(
+    BuildContext context,
+    BoxConstraints constraints,
+    CloudProfile currentProfile,
+    double tempCenterX,
+    double tempCenterY,
+    String subLocation,
+    String gradingSystem,
+    FirebaseCloudStorage fireBaseService,
+    CloudSettings cloudSettings,
+    CloudOutdoorData? currentOutdoorData) {}

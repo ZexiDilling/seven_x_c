@@ -1,2 +1,7 @@
 19-02-2024
 - uses stuck in limbo after not verifying E-mail
+    -Fixed... due to region restricktion. 
+
+
+17-05-2024
+- Database for something dose not get updated properly, so users can't see change in top-status. 
