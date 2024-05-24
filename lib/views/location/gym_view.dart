@@ -676,7 +676,7 @@ class _GymViewState extends State<GymView> {
           case MenuActionMain.location:
             Navigator.of(context).pushNamed(
               // locationView,
-              mapView,
+              outdoorView,
               arguments: currentSettings!,
             );
         }

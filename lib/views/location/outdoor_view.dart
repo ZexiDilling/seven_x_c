@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
+// import 'package:flutter_svg/svg.dart';
 import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/constants/colours_thems.dart';
 import 'package:seven_x_c/constants/other_const.dart';
+import 'package:seven_x_c/constants/outdoor_info.dart';
+import 'package:seven_x_c/constants/outdoor_info.dart';
 import 'package:seven_x_c/constants/routes.dart';
 import 'package:seven_x_c/constants/slide_up_const.dart';
 import 'package:seven_x_c/enums/menu_action.dart';
@@ -60,6 +62,11 @@ class _OutdoorView extends State<OutdoorView> {
   bool moveBoulder = false;
   bool moveMultipleBoulders = false;
   String selectedBoulder = "";
+  List offsets = [];
+  Map<String, List<List<Offset>>> convertedPolygons = {
+    "overview": [],
+    "sublocation": [],
+  };
 
   @override
   void initState() {
@@ -73,6 +80,7 @@ class _OutdoorView extends State<OutdoorView> {
     await _initializeCurrentProfile();
     // await _initSettings();
     await _initOutdoorData();
+    convertedPolygons = convertPolygons(outsideRegions);
     // _initSettingData();
   }
 
@@ -140,8 +148,9 @@ class _OutdoorView extends State<OutdoorView> {
                             onTapUp: (details) {
                               regionPainter
                                   ? overviewMap
-                                      ? drawRegions(
-                                          'assets/background/$locationOverview.jpg')
+                                      ? print("hej")
+                                      // drawRegions(
+                                      //     'assets/background/$locationOverview.jpg')
                                       : drawRegions(
                                           'assets/background/$subLocation.jpg')
                                   : overviewMap
@@ -195,7 +204,10 @@ class _OutdoorView extends State<OutdoorView> {
                                           } else {
                                             return Container(); // or any default widget
                                           }
-                                        })()
+                                        })(),
+                                  CustomPaint(
+                                      painter: RegionPainter(
+                                          outsideRegions, constraints))
                                 ]),
                               ),
                             ),
@@ -275,11 +287,11 @@ class _OutdoorView extends State<OutdoorView> {
               });
             },
           ),
-          if (currentProfile!.isAdmin)
+        if (currentProfile!.isAdmin)
           IconButton(
             icon: Icon(
               editing ? IconManager.editing : IconManager.editing,
-              color: editing
+              color: regionPainter
                   ? IconManagerColours.active
                   : IconManagerColours.inActive,
             ),
@@ -442,30 +454,20 @@ class _OutdoorView extends State<OutdoorView> {
     double tempCenterX = transformedPosition.x;
     double tempCenterY = transformedPosition.y;
 
-    String? regionName;
-    String lowestRegionName = "";
-    double regionTestValue = 1;
+    // print("Offset(${tempCenterX/constraints.maxWidth}, ${tempCenterY/constraints.maxHeight})");
+    // dynamic offset = (tempCenterX / constraints.maxWidth, tempCenterY / constraints.maxHeight);
+    // offsets.add(offset);
+    // print(offsets);
+    final tappedPolygon = outsideRegions.firstWhere(
+      (region) {
+        return _isPointInsidePolygon(tempCenterX, tempCenterY,
+            region.regionPolygonOverview, constraints);
+      },
+    );
 
-    for (final key in currentOutdoorData!.outdoorSections!.keys) {
-      final region = currentOutdoorData!.outdoorSections?[key];
-      if (region != null) {
-        double regionTop = region['regionYMaX'] as double;
-        double regionBottom = region['regionYMin'] as double;
-
-        if (regionBottom < regionTestValue) {
-          regionTestValue = regionBottom;
-          lowestRegionName = region.regionName;
-        }
-        if (tempCenterY / constraints.maxHeight >= regionBottom &&
-            tempCenterY / constraints.maxHeight <= regionTop) {
-          regionName = region.regionName;
-          break;
-        }
-      }
-    }
-    if (regionName != null) {
+    if (tappedPolygon != null) {
       setState(() {
-        subLocation = regionName!;
+        subLocation = tappedPolygon.imageName;
         overviewMap = false;
         detailMap = !detailMap;
       });
@@ -630,6 +632,46 @@ class _OutdoorView extends State<OutdoorView> {
       }
     }
   }
+
+  Map<String, List<List<Offset>>> convertPolygons(
+      List<OutsideRegion>? outsideRegions) {
+    if (outsideRegions != null) {
+      for (var region in outsideRegions) {
+        List<Offset> polygonOverview =
+            region.regionPolygonOverview.map((point) {
+          return Offset(point.dx, point.dy); // Access dx and dy properties
+        }).toList();
+        convertedPolygons["overview"]!.add(polygonOverview);
+
+        List<Offset> polygonSublocation =
+            region.regionPolygonSublocation.map((point) {
+          return Offset(point.dx, point.dy); // Access dx and dy properties
+        }).toList();
+        convertedPolygons["sublocation"]!.add(polygonSublocation);
+      }
+    }
+    return convertedPolygons;
+  }
+}
+
+bool _isPointInsidePolygon(tempCenterX, tempCenterY, List<Offset> polygon,
+    BoxConstraints constraints) {
+  int i, j = polygon.length - 1;
+  bool isInside = false;
+
+  for (i = 0; i < polygon.length; i++) {
+    if ((polygon[i].dy * constraints.maxHeight > tempCenterY) != (polygon[j].dy * constraints.maxHeight > tempCenterY) &&
+        (tempCenterX <
+            (polygon[j].dx * constraints.maxWidth - polygon[i].dx * constraints.maxWidth) *
+                    (tempCenterY - polygon[i].dy * constraints.maxHeight) /
+                    (polygon[j].dy * constraints.maxHeight - polygon[i].dy * constraints.maxHeight) +
+                polygon[i].dx * constraints.maxWidth)) {
+      isInside = !isInside;
+    }
+    j = i;
+  }
+
+  return isInside;
 }
 
 showOutdoorBoulderInformation(

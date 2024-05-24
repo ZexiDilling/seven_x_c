@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:seven_x_c/constants/outdoor_info.dart';
 
-List<Offset> currentRegionVertices = []; // To store vertices of the current region
-
-
+// List<Offset> currentRegionVertices = []; // To store vertices of the current region
+List<Offset> currentRegionVertices = [Offset(50, 50), Offset(100, 100), Offset(150, 50)];
 
 // Function to draw the regions/polygons on the map
-Widget drawRegions(background) {
+Widget drawRegions(String background) {
   return Stack(
     children: [
       // Existing background image
@@ -14,33 +14,61 @@ Widget drawRegions(background) {
         fit: BoxFit.fill,
       ),
       // Draw polygons dynamically using the vertices
-      CustomPaint(
-        painter: RegionPainter(currentRegionVertices),
-      ),
+
+      
     ],
   );
 }
-
-// CustomPainter to draw the regions/polygons
 class RegionPainter extends CustomPainter {
-  final List<Offset> vertices;
+  final List<OutsideRegion> outsideRegions; final dynamic constraints;
 
-  RegionPainter(this.vertices);
+  RegionPainter(this.outsideRegions, this.constraints);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.blue
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
+    final selectedPaint = Paint()
+      ..color = Colors.green // Change color for selected region
+      ..style = PaintingStyle.stroke // Fill the region
+      ..strokeWidth = 2;
 
-    if (vertices.length > 1) {
-      Path path = Path();
-      path.moveTo(vertices.first.dx, vertices.first.dy);
-      for (int i = 1; i < vertices.length; i++) {
-        path.lineTo(vertices[i].dx, vertices[i].dy);
+    final unselectedPaint = Paint()
+      ..color = Colors.blue // Change color for unselected region
+      ..style = PaintingStyle.stroke // Fill the region
+      ..strokeWidth = 0.5;
+
+    final textPainter = TextPainter(
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
+
+    for (var region in outsideRegions) {
+      final paint = region.overviewMap ? selectedPaint : unselectedPaint;
+
+      final regionPolygon = region.regionPolygonOverview; // Use regionPolygonOverview for drawing
+      if (regionPolygon.length > 2) {
+        Path path = Path();
+        path.moveTo(regionPolygon.first.dx * constraints.maxWidth, regionPolygon.first.dy * constraints.maxHeight);
+        for (int i = 1; i < regionPolygon.length; i++) {
+          path.lineTo(regionPolygon[i].dx * constraints.maxWidth, regionPolygon[i].dy * constraints.maxHeight);
+        }
+        path.close();
+
+        canvas.drawPath(path, paint);
+
+        // Write regionNumber in the middle of the polygon
+        final centerX = regionPolygon.map((offset) => offset.dx).reduce((a, b) => a + b) / regionPolygon.length;
+        final centerY = regionPolygon.map((offset) => offset.dy).reduce((a, b) => a + b) / regionPolygon.length;
+
+        textPainter.text = TextSpan(
+          text: region.regionIndicator.toString(),
+          style: TextStyle(color: Colors.red, fontSize: 15),
+        );
+        textPainter.layout();
+        textPainter.paint(
+          canvas,
+          Offset(centerX * constraints.maxWidth - textPainter.width / 2, centerY * constraints.maxHeight - textPainter.height / 2),
+        );
       }
-      canvas.drawPath(path, paint);
     }
   }
 
@@ -49,3 +77,4 @@ class RegionPainter extends CustomPainter {
     return true;
   }
 }
+
