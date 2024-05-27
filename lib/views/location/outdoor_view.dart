@@ -80,7 +80,7 @@ class _OutdoorView extends State<OutdoorView> {
     await _initializeCurrentProfile();
     // await _initSettings();
     await _initOutdoorData();
-    convertedPolygons = convertPolygons(outsideRegions);
+    // convertedPolygons = convertPolygons(outsideRegions);
     // _initSettingData();
   }
 
@@ -159,21 +159,22 @@ class _OutdoorView extends State<OutdoorView> {
                                       : detailMap
                                           ? _tapSelectSubMap(
                                               context, constraints, details)
-                                          : _tapselectedBoulder(
-                                              context,
-                                              constraints,
-                                              details,
-                                              allBoulders,
-                                              currentProfile,
-                                              _fireBaseService);
+                                          : print(detailMap);
+                              // _tapselectedBoulder(
+                              //     context,
+                              //     constraints,
+                              //     details,
+                              //     allBoulders,
+                              //     currentProfile,
+                              //     _fireBaseService);
                             },
-                            onDoubleTapDown: (details) {
-                              _doubleTapping(context, constraints, details);
-                              setState(() {
-                                currentScale =
-                                    _controller.value.getMaxScaleOnAxis();
-                              });
-                            },
+                            // onDoubleTapDown: (details) {
+                            //   _doubleTapping(context, constraints, details);
+                            //   setState(() {
+                            //     currentScale =
+                            //         _controller.value.getMaxScaleOnAxis();
+                            //   });
+                            // },
                             child: InteractiveViewer(
                               transformationController: _controller,
                               minScale: 0.5,
@@ -207,7 +208,10 @@ class _OutdoorView extends State<OutdoorView> {
                                         })(),
                                   CustomPaint(
                                       painter: RegionPainter(
-                                          outsideRegions, constraints))
+                                          outsideRegions,
+                                          constraints,
+                                          overviewMap,
+                                          subLocation))
                                 ]),
                               ),
                             ),
@@ -453,25 +457,44 @@ class _OutdoorView extends State<OutdoorView> {
     final VM.Vector4 transformedPosition = invertedMatrix.transform(tapVector);
     double tempCenterX = transformedPosition.x;
     double tempCenterY = transformedPosition.y;
-
+    // offsets = [];
     // print("Offset(${tempCenterX/constraints.maxWidth}, ${tempCenterY/constraints.maxHeight})");
     // dynamic offset = (tempCenterX / constraints.maxWidth, tempCenterY / constraints.maxHeight);
     // offsets.add(offset);
     // print(offsets);
-    final tappedPolygon = outsideRegions.firstWhere(
-      (region) {
-        return _isPointInsidePolygon(tempCenterX, tempCenterY,
-            region.regionPolygonOverview, constraints);
-      },
-    );
+    var tappedPolygon;
 
-    if (tappedPolygon != null) {
-      setState(() {
-        subLocation = tappedPolygon.imageName;
-        overviewMap = false;
-        detailMap = !detailMap;
-      });
+    if (overviewMap) {
+      tappedPolygon = outsideRegions.firstWhere(
+        (region) {
+          return _isPointInsidePolygon(tempCenterX, tempCenterY,
+              region.regionPolygonOverview, constraints);
+        },
+        // Handle case where no region is found
+      );
+    } else if (detailMap) {
+      for (var region in outsideRegions) {
+        // Properly declare region
+        if (region.regionLocation == subLocation) {
+          // Use == for comparison
+          tappedPolygon = outsideRegions.firstWhere(
+            (region) {
+              return _isPointInsidePolygon(tempCenterX, tempCenterY,
+                  region.regionPolygonSublocation, constraints);
+            },
+            // Handle case where no region is found
+          );
+          break; // Exit the loop if a region is found
+        }
+      }
     }
+
+    print(tappedPolygon.imageName);
+    setState(() {
+      subLocation = tappedPolygon.imageName;
+      overviewMap = false;
+      detailMap = !detailMap;
+    });
   }
 
   Future<void> _tapselectedBoulder(
@@ -660,11 +683,14 @@ bool _isPointInsidePolygon(tempCenterX, tempCenterY, List<Offset> polygon,
   bool isInside = false;
 
   for (i = 0; i < polygon.length; i++) {
-    if ((polygon[i].dy * constraints.maxHeight > tempCenterY) != (polygon[j].dy * constraints.maxHeight > tempCenterY) &&
+    if ((polygon[i].dy * constraints.maxHeight > tempCenterY) !=
+            (polygon[j].dy * constraints.maxHeight > tempCenterY) &&
         (tempCenterX <
-            (polygon[j].dx * constraints.maxWidth - polygon[i].dx * constraints.maxWidth) *
+            (polygon[j].dx * constraints.maxWidth -
+                        polygon[i].dx * constraints.maxWidth) *
                     (tempCenterY - polygon[i].dy * constraints.maxHeight) /
-                    (polygon[j].dy * constraints.maxHeight - polygon[i].dy * constraints.maxHeight) +
+                    (polygon[j].dy * constraints.maxHeight -
+                        polygon[i].dy * constraints.maxHeight) +
                 polygon[i].dx * constraints.maxWidth)) {
       isInside = !isInside;
     }
