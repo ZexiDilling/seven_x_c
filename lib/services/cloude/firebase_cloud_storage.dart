@@ -1038,9 +1038,9 @@ class FirebaseCloudStorage {
     }
   }
 
-  Future<CloudOutdoorData?> getOutdoorData(String? gymDataNameID) async {
+  Future<CloudOutdoorData?> getOutdoorData(String? outdoorDataNameID) async {
     final querySnapshot = await outdoorDataCollection
-        .where(outdoorDataNameIDFieldName, isEqualTo: gymDataNameID)
+        .where(outdoorDataNameIDFieldName, isEqualTo: outdoorDataNameID)
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {

@@ -6,7 +6,6 @@ import 'package:seven_x_c/constants/boulder_info.dart';
 import 'package:seven_x_c/constants/colours_thems.dart';
 import 'package:seven_x_c/constants/other_const.dart';
 import 'package:seven_x_c/constants/outdoor_info.dart';
-import 'package:seven_x_c/constants/outdoor_info.dart';
 import 'package:seven_x_c/constants/routes.dart';
 import 'package:seven_x_c/constants/slide_up_const.dart';
 import 'package:seven_x_c/enums/menu_action.dart';
@@ -14,6 +13,7 @@ import 'package:seven_x_c/services/auth/auth_service.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_bloc.dart';
 import 'package:seven_x_c/services/auth/bloc/auth_event.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
+import 'package:seven_x_c/utilities/dialogs/boulder/add_new_outdoor_boulder.dart';
 import 'package:seven_x_c/utilities/dialogs/slides/filter_silde.dart';
 
 import 'package:seven_x_c/services/cloude/location_data/cloud_outdoor_data.dart';
@@ -43,6 +43,7 @@ class _OutdoorView extends State<OutdoorView> {
   String get userId => AuthService.firebase().currentUser!.id;
   String currentLocation = "kjugge";
   String locationOverview = "KjuggeOverview";
+  String supArea = "";
   String subLocation = "";
   Iterable? areaBoulders;
   bool overviewMap = true;
@@ -107,7 +108,7 @@ class _OutdoorView extends State<OutdoorView> {
 
   Future<CloudOutdoorData?> _initOutdoorData() async {
     final CloudOutdoorData? tempOutdoorData =
-        await _fireBaseService.getOutdoorData(currentProfile!.settingsID);
+        await _fireBaseService.getOutdoorData(currentLocation);
     setState(() {
       currentOutdoorData = tempOutdoorData;
     });
@@ -159,14 +160,13 @@ class _OutdoorView extends State<OutdoorView> {
                                       : detailMap
                                           ? _tapSelectSubMap(
                                               context, constraints, details)
-                                          : print(detailMap);
-                              // _tapselectedBoulder(
-                              //     context,
-                              //     constraints,
-                              //     details,
-                              //     allBoulders,
-                              //     currentProfile,
-                              //     _fireBaseService);
+                                          : _tapselectedBoulder(
+                                              context,
+                                              constraints,
+                                              details,
+                                              allBoulders,
+                                              currentProfile,
+                                              _fireBaseService);
                             },
                             // onDoubleTapDown: (details) {
                             //   _doubleTapping(context, constraints, details);
@@ -288,20 +288,6 @@ class _OutdoorView extends State<OutdoorView> {
               setState(() {
                 moveBoulder = false;
                 selectedBoulder = "";
-              });
-            },
-          ),
-        if (currentProfile!.isAdmin)
-          IconButton(
-            icon: Icon(
-              editing ? IconManager.editing : IconManager.editing,
-              color: regionPainter
-                  ? IconManagerColours.active
-                  : IconManagerColours.inActive,
-            ),
-            onPressed: () {
-              setState(() {
-                regionPainter = !regionPainter;
               });
             },
           ),
@@ -489,7 +475,6 @@ class _OutdoorView extends State<OutdoorView> {
       }
     }
 
-    print(tappedPolygon.imageName);
     setState(() {
       subLocation = tappedPolygon.imageName;
       overviewMap = false;
@@ -504,6 +489,7 @@ class _OutdoorView extends State<OutdoorView> {
       Iterable<Map<String, dynamic>?>? allBoulders,
       CloudProfile? currentProfile,
       FirebaseCloudStorage fireBaseService) async {
+        
     final gradingSystem =
         (currentProfile!.gradingSystem).toString().toLowerCase();
     if (_controller.value.getMaxScaleOnAxis() >= minZoomThreshold) {
@@ -518,7 +504,6 @@ class _OutdoorView extends State<OutdoorView> {
       // Create a Vector4 from the tap position
       final VM.Vector4 tapVector =
           VM.Vector4(localPosition.dx, localPosition.dy, 0, 1);
-
       // Transform the tap position using the inverted matrix
       final VM.Vector4 transformedPosition =
           invertedMatrix.transform(tapVector);
@@ -529,7 +514,6 @@ class _OutdoorView extends State<OutdoorView> {
         // Check for existing circles and avoid overlap
         double tempCenterX = transformedPosition.x;
         double tempCenterY = transformedPosition.y;
-
         for (final existingBoulder in allBoulders!) {
           double distance = calculateDistance(
             existingBoulder!["cordX"] * constraints.maxWidth,
@@ -544,27 +528,11 @@ class _OutdoorView extends State<OutdoorView> {
           }
         }
 
-        String? regionName;
-        String lowestRegionName = "";
-        double regionTestValue = 1;
 
-        for (final key in currentOutdoorData!.outdoorSections!.keys) {
-          final region = currentOutdoorData!.outdoorSections?[key];
+        // for (final items in currentOutdoorData!.outdoorSections![subLocation]["sublocation"]) {
+          
+        // }
 
-          double regionTop = region['regionYMaX'] as double;
-          double regionBottom = region['regionYMin'] as double;
-
-          if (regionBottom < regionTestValue) {
-            regionTestValue = regionBottom;
-            lowestRegionName = region.regionName;
-          }
-          if (tempCenterY / constraints.maxHeight >= regionBottom &&
-              tempCenterY / constraints.maxHeight <= regionTop) {
-            regionName = region.regionName;
-            break;
-          }
-        }
-        regionName ??= lowestRegionName;
         if (moveBoulder) {
           fireBaseService.updateBoulder(
               boulderID: selectedBoulder,
@@ -607,7 +575,7 @@ class _OutdoorView extends State<OutdoorView> {
                 subLocation,
                 gradingSystem,
                 _fireBaseService,
-                currentSettings!,
+                currentSettings,
                 currentOutdoorData,
               );
             });
@@ -706,14 +674,4 @@ showOutdoorBoulderInformation(
     Map<String, dynamic> closestBoulder,
     CloudProfile currentProfile) {}
 
-void addNewOutdoorClimb(
-    BuildContext context,
-    BoxConstraints constraints,
-    CloudProfile currentProfile,
-    double tempCenterX,
-    double tempCenterY,
-    String subLocation,
-    String gradingSystem,
-    FirebaseCloudStorage fireBaseService,
-    CloudSettings cloudSettings,
-    CloudOutdoorData? currentOutdoorData) {}
+
