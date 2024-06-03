@@ -248,6 +248,7 @@ Future<bool> showBoulderInformation(
                                     Checkbox(
                                       value: topped,
                                       onChanged: (bool? value) {
+                                        
                                         setState(() {
                                           topped = value ?? false;
 
@@ -278,6 +279,7 @@ Future<bool> showBoulderInformation(
                                           } else {
                                             flashed = false;
                                             repeats = 0;
+                                            print("JEK");
                                             updateUserUndoTop(
                                                 fireBaseService,
                                                 currentProfile,

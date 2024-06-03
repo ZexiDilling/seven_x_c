@@ -6,7 +6,15 @@ import 'package:seven_x_c/constants/boulder_const.dart';
 import 'package:seven_x_c/constants/boulder_info.dart'; //
 import 'package:seven_x_c/helpters/bonus_functions.dart';
 import 'package:seven_x_c/helpters/functions.dart'
-    show capitalize, removeDateBoulderToppedMap, removeRepeatFromBoulder, updateClimberToppedMap, updateDateBoulderToppedMap, updateGymDataToppes, updatePoints, updateRepeatBoulder;
+    show
+        capitalize,
+        removeDateBoulderToppedMap,
+        removeRepeatFromBoulder,
+        updateClimberToppedMap,
+        updateDateBoulderToppedMap,
+        updateGymDataToppes,
+        updatePoints,
+        updateRepeatBoulder;
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart'; //
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart'; //
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
@@ -42,13 +50,14 @@ Map<String, dynamic>? updateUsersVotedForGrade(
 
 void updateUserReapet(FirebaseCloudStorage userService,
     CloudProfile currentProfile, CloudBoulder boulder, int newRepeats) {
-  int currentRepeats =
-      boulder.climberTopped![currentProfile.userID]["repeats"];
+  int currentRepeats = boulder.climberTopped![currentProfile.userID]["repeats"];
   double orgBoulderPoints = 0.0;
   try {
-  orgBoulderPoints =
-      boulder.climberTopped![currentProfile.userID]["boulderPoints"];}
-      on Error {orgBoulderPoints = 0.0;}
+    orgBoulderPoints =
+        boulder.climberTopped![currentProfile.userID]["boulderPoints"];
+  } on Error {
+    orgBoulderPoints = 0.0;
+  }
   double orgRepeatPoints =
       boulder.climberTopped![currentProfile.userID]["boulderPoints"] ?? 0;
   double repeatPoints;
@@ -56,28 +65,30 @@ void updateUserReapet(FirebaseCloudStorage userService,
   if (newRepeats > currentRepeats) {
     repeatPoints = calculateRepeatPoints(
         currentProfile, boulder, newRepeats, orgBoulderPoints);
-double newRepeatPoints = orgRepeatPoints + repeatPoints;
-userService.updateUser(
-    currentProfile: currentProfile,
+    double newRepeatPoints = orgRepeatPoints + repeatPoints;
+    userService.updateUser(
+      currentProfile: currentProfile,
       boulderPoints: updatePoints(
           points: newRepeatPoints, existingData: currentProfile.boulderPoints),
-      repeatBoulders: updateRepeatBoulder(currentUser: currentProfile, boulder: boulder, existingData: currentProfile.repeatBoulders),
-      );
+      repeatBoulders: updateRepeatBoulder(
+          currentUser: currentProfile,
+          boulder: boulder,
+          existingData: currentProfile.repeatBoulders),
+    );
   } else {
     repeatPoints = -calculateRepeatPoints(
         currentProfile, boulder, newRepeats, orgBoulderPoints);
-        double newRepeatPoints = orgRepeatPoints + repeatPoints;
-        userService.updateUser(
-    currentProfile: currentProfile,
+    double newRepeatPoints = orgRepeatPoints + repeatPoints;
+    userService.updateUser(
+      currentProfile: currentProfile,
       boulderPoints: updatePoints(
           points: newRepeatPoints, existingData: currentProfile.boulderPoints),
-      repeatBoulders: removeRepeatFromBoulder(currentUser: currentProfile, boulder: boulder, existingData: currentProfile.repeatBoulders),
-      );
+      repeatBoulders: removeRepeatFromBoulder(
+          currentUser: currentProfile,
+          boulder: boulder,
+          existingData: currentProfile.repeatBoulders),
+    );
   }
-
-  
-  
-
 }
 
 double calculateRepeatPoints(CloudProfile currentProfile, CloudBoulder boulder,
@@ -98,16 +109,20 @@ int checkGrade(CloudProfile currentProfile, String boulderID, String style) {
   int comparedMonth = currentDate.month.toInt();
   // String currentMonth = comparedMonth.toString();
   int boulderGrade = 0;
-  for (var month in currentProfile.dateBoulderTopped![year]!) {
-    for (var week in currentProfile.dateBoulderTopped![year]![month]) {
-      if (comparedMonth - month < 2) {
-        for (var day in currentProfile.dateBoulderTopped![year]![month][week]) {
-          for (var boulder in currentProfile.dateBoulderTopped![year]![month]
-              [week][day]) {
-            boulderGrade = currentProfile.dateBoulderTopped![year]![month][week]
-                [day][boulder]["gradeSetter"];
-            if (maxValue < boulderGrade) {
-              maxValue = boulderGrade;
+
+  for (var month in currentProfile.dateBoulderTopped![year]!.keys) {
+    for (var week in currentProfile.dateBoulderTopped![year]![month].keys) {
+      if (comparedMonth - int.parse(month) < 2) {
+        for (var day
+            in currentProfile.dateBoulderTopped![year]![month][week].keys) {
+          for (var boulder in currentProfile
+              .dateBoulderTopped![year]![month][week][day].keys) {
+            if (boulder != "maxToppedGrade" && boulder != "maxFlahsedGrade") {
+              boulderGrade = currentProfile.dateBoulderTopped![year]![month]
+                  [week][day][boulder]["gradeNumber"];
+              if (maxValue < boulderGrade) {
+                maxValue = boulderGrade;
+              }
             }
           }
         }
@@ -215,8 +230,8 @@ void updateUserRemovedFlashed(
           boulderPoints: boulderPoints,
           maxFlahsedGrade: maxFlahsedGrade,
           existingData: currentProfile.dateBoulderTopped));
-        
-    firebaseService.updateGymData(
+
+  firebaseService.updateGymData(
       gymDataID: currentGymData.gymDataID,
       gymDataBouldersTopped: updateGymDataToppes(
           currentProfile: currentProfile,
@@ -278,14 +293,13 @@ void updateUserUndoTop(
           maxToppedGrade: maxToppedGrade,
           existingData: currentProfile.dateBoulderTopped));
 
-    firebaseService.updateGymData(
+  firebaseService.updateGymData(
       gymDataID: currentGymData.gymDataID,
       gymDataBouldersTopped: updateGymDataToppes(
           currentProfile: currentProfile,
           boulder: boulder,
           flashed: false,
           existingData: currentGymData.gymDataBouldersTopped));
-          
 }
 
 void updateUserTopped(
@@ -386,24 +400,26 @@ Container gradingInnerCirleDrawing(double circleWidth, double circleHeight,
       child: Padding(
           padding: const EdgeInsets.only(left: 0.0),
           child: boulder.hiddenGrade == true
-          ? const Text("??") 
-          : OutlineText(
-            Text(capitalize(gradingShow!),
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: boulder.gradeColour != "black"
-                    ? Colors.black
-                    : Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: (gradingShow.length > 3 || gradingShow.contains('/'))
-                    ? 10 // Font size for the text in the grading cirle. Changes size depending on text length
-                    : 15,
-              ),
-            ),
-            strokeWidth: 3,
-            strokeColor: Colors.white54,
-            overflow: TextOverflow.ellipsis,
-          )),
+              ? const Text("??")
+              : OutlineText(
+                  Text(
+                    capitalize(gradingShow!),
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: boulder.gradeColour != "black"
+                          ? Colors.black
+                          : Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: (gradingShow.length > 3 ||
+                              gradingShow.contains('/'))
+                          ? 10 // Font size for the text in the grading cirle. Changes size depending on text length
+                          : 15,
+                    ),
+                  ),
+                  strokeWidth: 3,
+                  strokeColor: Colors.white54,
+                  overflow: TextOverflow.ellipsis,
+                )),
     ),
   );
 }
