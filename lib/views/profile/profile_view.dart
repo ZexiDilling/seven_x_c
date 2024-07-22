@@ -812,6 +812,7 @@ class _ProfileViewState extends State<ProfileView> {
                                           (BuildContext context, int index) {
                                         String text = '';
                                         Color? diffBoxColour;
+                                        if (selectedSetter == "All") {selectedSetter = "all";}
                                         switch (index) {
                                           case 0:
                                           

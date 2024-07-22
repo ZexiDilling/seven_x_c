@@ -375,6 +375,7 @@ Future<PointsData> getPoints(
                 gotData = false;
               }
             case TimePeriod.week:
+             
               var weekData =
                   currentProfile.dateBoulderTopped![selectedTime["year"]]
                       [selectedTime["month"]][selectedTime["week"]];
@@ -401,6 +402,7 @@ Future<PointsData> getPoints(
                   boulderClimbedColours[dayOfWeek] ??= {};
                 }
               }
+              print("HEJ");
               if (weekData != null) {
                 for (var dayNumber in List.generate(7, (index) => index + 1)) {
                   DateTime currentDate =
@@ -408,8 +410,10 @@ Future<PointsData> getPoints(
                   String day = currentDate.day.toString();
                   String dayOfWeek = dateToDay[day]!;
                   var dayData = weekData[day];
+                  print("HEJ");
                   if (dayData != null) {
                     daysClimbed++;
+                    print("HEJ");
                     for (var boulder in dayData.keys) {
                       if (boulder != "maxToppedGrade" &&
                           boulder != "maxFlahsedGrade") {
@@ -471,7 +475,7 @@ Future<PointsData> getPoints(
               }
           }
         }
-      case "setter":
+      case "setter": 
         if (currentProfile.dateBoulderSet != null) {
           switch (selectedTimePeriod) {
             case TimePeriod.year:
@@ -885,9 +889,11 @@ Future<PointsData> getPoints(
                 }
               }
             case TimePeriod.week:
+
               var weekData =
                   currentGymData.gymDataBoulders![selectedTime["year"]]
                       [selectedTime["month"]][selectedTime["week"]];
+              print("ARE WE HERE = ");
               // Iterate over all possible days in the week
 
               // Calculate the date based on ISO week number and weekday
