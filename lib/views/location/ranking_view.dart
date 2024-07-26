@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:seven_x_c/constants/colours_thems.dart';
 import 'package:seven_x_c/constants/graph_const.dart';
 import 'package:seven_x_c/constants/other_const.dart';
@@ -194,22 +195,6 @@ class _RankViewState extends State<RankView> with TickerProviderStateMixin {
           final details = entry[1];
           final userBoulderBreakdown = rankingData.boulderBreakDown[user];
 
-          // List<PieChartSectionData> pieChartSections = [];
-          // if (userBoulderBreakdown != null) {
-          //  final totalClimbs = userBoulderBreakdown.values
-          //     .map((value) => value as int)
-          //     .reduce((a, b) => a + b);
-          //   pieChartSections =
-          //       userBoulderBreakdown.entries.map<PieChartSectionData>((entry) {
-          //     final percentage = (entry.value / totalClimbs) * 100;
-          //     return PieChartSectionData(
-          //       value: percentage,
-          //       // title: '${percentage.toStringAsFixed(1)}%',
-          //       color: getColorForGrade(entry.key),
-          //     );
-          //   }).toList();
-          // }
-
           List<PieChartSectionData> pieChartSections = [];
         if (userBoulderBreakdown != null) {
           pieChartSections = userBoulderBreakdown.entries.map<PieChartSectionData>((entry) {
@@ -266,13 +251,16 @@ class _RankViewState extends State<RankView> with TickerProviderStateMixin {
 
   List<Widget> get headlines {
     return <Widget>[
-      const SizedBox(
-        width: 200,
-        child: Text(
-          "Boulders",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            decoration: TextDecoration.underline,
+      const Padding(
+        padding: EdgeInsets.all(8),
+        child: SizedBox(
+          width: 125,
+          child: Text(
+            "Boulders",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              decoration: TextDecoration.underline,
+            ),
           ),
         ),
       ),
@@ -315,18 +303,18 @@ class _RankViewState extends State<RankView> with TickerProviderStateMixin {
               rankingSelected = "boulderRankingsByAmount";
             });
           }),
-      TextButton(
-          style: TextButton.styleFrom(
-            backgroundColor: rankingSelected == "challengeRankings"
-                ? buttonBackgroundColorActive
-                : buttonBackgroundColorInactibe,
-          ),
-          child: const Text('Challenge'),
-          onPressed: () {
-            setState(() {
-              rankingSelected = "challengeRankings";
-            });
-          }),
+      // TextButton(
+      //     style: TextButton.styleFrom(
+      //       backgroundColor: rankingSelected == "challengeRankings"
+      //           ? buttonBackgroundColorActive
+      //           : buttonBackgroundColorInactibe,
+      //     ),
+      //     child: const Text('Challenge'),
+      //     onPressed: () {
+      //       setState(() {
+      //         rankingSelected = "challengeRankings";
+      //       });
+      //     }),
       TextButton(
           style: TextButton.styleFrom(
             backgroundColor: rankingSelected == "setterRankingsByPoints"
