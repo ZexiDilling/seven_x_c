@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:seven_x_c/constants/colours_thems.dart';
 import 'package:seven_x_c/constants/graph_const.dart';
@@ -164,7 +165,8 @@ class _RankViewState extends State<RankView> with TickerProviderStateMixin {
                                   height: 37,
                                 ),
                                 rankingData.gotData
-                                    ? rankingLayout(rankingData, currentProfile!)
+                                    ? rankingLayout(
+                                        rankingData, currentProfile!)
                                     : const Text(
                                         "No Data for selected time periode")
                               ],
@@ -176,38 +178,91 @@ class _RankViewState extends State<RankView> with TickerProviderStateMixin {
       ),
     );
   }
-SizedBox rankingLayout(RankingData rankingData, CloudProfile currentProfile) {
-  int nameLength = 25; 
-  return SizedBox(
-    height: 500,
-    child: ListView.builder(
-      itemCount: rankingData.rankings.length,
-      itemBuilder: (context, index) {
-        final entry = rankingData.rankings[index].split(' - ');
-        final isCurrentUser = entry[0] == currentProfile.displayName;
-        final user = entry[0].length > nameLength ? entry[0].substring(0, nameLength) : entry[0];
-        final details = entry[1];
 
-        return Container(
-          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(5),
-            color: isCurrentUser ? Colors.blue[100] : Colors.white,
-          ),
-          child: ListTile(
-            title: Text(
-              user,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+  SizedBox rankingLayout(RankingData rankingData, CloudProfile currentProfile) {
+    int nameLength = 25;
+    return SizedBox(
+      height: 500,
+      child: ListView.builder(
+        itemCount: rankingData.rankings.length,
+        itemBuilder: (context, index) {
+          final entry = rankingData.rankings[index].split(' - ');
+          final isCurrentUser = entry[0] == currentProfile.displayName;
+          final user = entry[0].length > nameLength
+              ? entry[0].substring(0, nameLength)
+              : entry[0];
+          final details = entry[1];
+          final userBoulderBreakdown = rankingData.boulderBreakDown[user];
+
+          // List<PieChartSectionData> pieChartSections = [];
+          // if (userBoulderBreakdown != null) {
+          //  final totalClimbs = userBoulderBreakdown.values
+          //     .map((value) => value as int)
+          //     .reduce((a, b) => a + b);
+          //   pieChartSections =
+          //       userBoulderBreakdown.entries.map<PieChartSectionData>((entry) {
+          //     final percentage = (entry.value / totalClimbs) * 100;
+          //     return PieChartSectionData(
+          //       value: percentage,
+          //       // title: '${percentage.toStringAsFixed(1)}%',
+          //       color: getColorForGrade(entry.key),
+          //     );
+          //   }).toList();
+          // }
+
+          List<PieChartSectionData> pieChartSections = [];
+        if (userBoulderBreakdown != null) {
+          pieChartSections = userBoulderBreakdown.entries.map<PieChartSectionData>((entry) {
+            return PieChartSectionData(
+              value: entry.value.toDouble(),
+              color: getColorForGrade(entry.key),
+               showTitle: false,
+            );
+          }).toList();
+        }
+
+          return Container(
+            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(5),
+              color: isCurrentUser ? Colors.blue[100] : Colors.white,
             ),
-            subtitle: Text(details),
-          ),
-        );
-      },
-    ),
-  );
-}
-
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(details),
+                      ],
+                    ),
+                  ),
+                  if (userBoulderBreakdown != null &&
+                      userBoulderBreakdown.isNotEmpty)
+                    SizedBox(
+                      width: 75,
+                      height: 75,
+                      child: PieChart(
+                        PieChartData(
+                          sections: pieChartSections,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   List<Widget> get headlines {
     return <Widget>[
@@ -444,5 +499,24 @@ SizedBox rankingLayout(RankingData rankingData, CloudProfile currentProfile) {
         );
       },
     );
+  }
+
+  Color getColorForGrade(String grade) {
+    switch (grade) {
+      case 'green':
+        return Colors.green;
+      case 'yellow':
+        return Colors.yellow;
+      case 'blue':
+        return Colors.blue;
+      case "purple":
+        return Colors.purple;
+      case 'red':
+        return Color.fromARGB(255, 211, 20, 7);
+      case "black":
+        return Colors.black;
+      default:
+        return Colors.grey;
+    }
   }
 }
