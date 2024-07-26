@@ -273,136 +273,11 @@ class _ProfileViewState extends State<ProfileView> {
       ),
       body: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 25.0),
-                child: DropdownButton<TimePeriod>(
-                  value: selectedTimePeriod,
-                  onChanged: (TimePeriod? newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        selectedTimePeriod = newValue;
-                      });
-                    }
-                  },
-                  items: TimePeriod.values.map((TimePeriod value) {
-                    return DropdownMenuItem<TimePeriod>(
-                      value: value,
-                      child: Text(timePeriodStrings[value]!),
-                    );
-                  }).toList(),
-                ),
-              ),
-              const Text("Per Time"),
-              Checkbox(
-                value: perTimeInterval,
-                onChanged: (value) {
-                  if (chartSelection == "maxGrade") {
-                    setState(() {
-                      perTimeInterval = value ?? false;
-                    });
-                  }
-                },
-                activeColor:
-                    chartSelection == "maxGrade" ? Colors.blue : Colors.grey,
-                checkColor: chartSelection == "maxGrade"
-                    ? Colors.white
-                    : const Color.fromARGB(255, 233, 229, 229),
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
-              ),
-              IconButton(
-                onPressed: () {
-                  _showCharExplanation(context);
-                },
-                icon: const Icon(IconManager.info),
-              ),
-              IconButton(
-                onPressed: () {
-                  selectedTime = getSelectedTime(DateTime.now());
-                  setState(() {
-                    selectedTime = selectedTime;
-                  });
-                },
-                icon: const Icon(IconManager.reset),
-              ),
-            ],
-          ),
+          time_periode_selector(context),
           const SizedBox(
             height: 25,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                onPressed: () {
-                  switch (selectedTimePeriod) {
-                    case TimePeriod.week:
-                      selectedTime = weekAdjustment(selectedTime, false);
-
-                    case TimePeriod.month:
-                      selectedTime = montAdjustment(selectedTime, false);
-
-                    case TimePeriod.semester:
-                      selectedTime = semesterAdjustment(selectedTime, false);
-                    case TimePeriod.year:
-                      selectedTime = yearAdjustment(selectedTime, false);
-                  }
-                  setState(() {
-                    selectedTime = selectedTime;
-                  });
-                },
-                icon: const Icon(IconManager.leftArrow),
-                iconSize: iconSizeChart,
-              ),
-              Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: switch (selectedTimePeriod) {
-                    TimePeriod.week => Text(
-                        weekLable(selectedTime),
-                        style: const TextStyle(fontSize: 18.0),
-                      ),
-                    TimePeriod.month => Text(
-                        monthLable(selectedTime),
-                        style: const TextStyle(fontSize: 18.0),
-                      ),
-                    TimePeriod.semester => Text(
-                        semesterLable(selectedTime),
-                        style: const TextStyle(fontSize: 18.0),
-                      ),
-                    TimePeriod.year => Text(
-                        yearLable(selectedTime),
-                        style: const TextStyle(fontSize: 18.0),
-                      ),
-                  }),
-              Visibility(
-                visible: true,
-                child: IconButton(
-                  onPressed: () {
-                    switch (selectedTimePeriod) {
-                      case TimePeriod.week:
-                        selectedTime = weekAdjustment(selectedTime, true);
-
-                      case TimePeriod.month:
-                        selectedTime = montAdjustment(selectedTime, true);
-
-                      case TimePeriod.semester:
-                        selectedTime = semesterAdjustment(selectedTime, true);
-                      case TimePeriod.year:
-                        selectedTime = yearAdjustment(selectedTime, true);
-                    }
-                    setState(() {
-                      selectedTime = selectedTime;
-                    });
-                  },
-                  icon: const Icon(IconManager.rightArrow),
-                  iconSize: iconSizeChart,
-                ),
-              ),
-            ],
-          ),
+          time_selector(),
           const SizedBox(
             height: 25,
           ),
@@ -466,87 +341,7 @@ class _ProfileViewState extends State<ProfileView> {
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
-                                children: <Widget>[
-                                  TextButton(
-                                      style: TextButton.styleFrom(
-                                        backgroundColor:
-                                            chartSelection == "maxGrade"
-                                                ? buttonBackgroundColorActive
-                                                : buttonBackgroundColorInactibe,
-                                      ),
-                                      child: const Text('Max Grade'),
-                                      onPressed: () {
-                                        setState(() {
-                                          graphStyle = "climber";
-                                          chartSelection = "maxGrade";
-                                        });
-                                      }),
-                                  TextButton(
-                                      style: TextButton.styleFrom(
-                                        backgroundColor:
-                                            chartSelection == "climbs"
-                                                ? buttonBackgroundColorActive
-                                                : buttonBackgroundColorInactibe,
-                                      ),
-                                      child: const Text('Climbs'),
-                                      onPressed: () {
-                                        setState(() {
-                                          graphStyle = "climber";
-                                          chartSelection = "climbs";
-                                        });
-                                      }),
-                                  Visibility(
-                                    visible: currentProfile.isSetter,
-                                    child: TextButton(
-                                        style: TextButton.styleFrom(
-                                          backgroundColor: chartSelection ==
-                                                  "AllSetterData"
-                                              ? buttonBackgroundColorActive
-                                              : buttonBackgroundColorInactibe,
-                                        ),
-                                        child: const Text('All Setter Data'),
-                                        onPressed: () {
-                                          setState(() {
-                                            graphStyle = "allSetterData";
-                                            chartSelection = "AllSetterData";
-                                          });
-                                        }),
-                                  ),
-                                  Visibility(
-                                    visible: currentProfile.isSetter,
-                                    child: TextButton(
-                                        style: TextButton.styleFrom(
-                                          backgroundColor: chartSelection ==
-                                                  "SetterData"
-                                              ? buttonBackgroundColorActive
-                                              : buttonBackgroundColorInactibe,
-                                        ),
-                                        child: const Text('Own Setter Data'),
-                                        onPressed: () {
-                                          setState(() {
-                                            graphStyle = "setter";
-                                            chartSelection = "SetterData";
-                                          });
-                                        }),
-                                  ),
-                                  Visibility(
-                                    visible: currentProfile.isSetter,
-                                    child: TextButton(
-                                        style: TextButton.styleFrom(
-                                          backgroundColor: chartSelection ==
-                                                  "SetterDataPie"
-                                              ? buttonBackgroundColorActive
-                                              : buttonBackgroundColorInactibe,
-                                        ),
-                                        child: const Text('Setter Pie'),
-                                        onPressed: () {
-                                          setState(() {
-                                            graphStyle = "setter";
-                                            chartSelection = "SetterDataPie";
-                                          });
-                                        }),
-                                  )
-                                ],
+                                children: button_layout(currentProfile),
                               ),
                             ),
                             const SizedBox(
@@ -878,6 +673,223 @@ class _ProfileViewState extends State<ProfileView> {
         ],
       ),
     );
+  }
+
+  List<Widget> button_layout(CloudProfile currentProfile) {
+    return <Widget>[
+                                TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor:
+                                          chartSelection == "maxGrade"
+                                              ? buttonBackgroundColorActive
+                                              : buttonBackgroundColorInactibe,
+                                    ),
+                                    child: const Text('Max Grade'),
+                                    onPressed: () {
+                                      setState(() {
+                                        graphStyle = "climber";
+                                        chartSelection = "maxGrade";
+                                      });
+                                    }),
+                                TextButton(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor:
+                                          chartSelection == "climbs"
+                                              ? buttonBackgroundColorActive
+                                              : buttonBackgroundColorInactibe,
+                                    ),
+                                    child: const Text('Climbs'),
+                                    onPressed: () {
+                                      setState(() {
+                                        graphStyle = "climber";
+                                        chartSelection = "climbs";
+                                      });
+                                    }),
+                                Visibility(
+                                  visible: currentProfile.isSetter,
+                                  child: TextButton(
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: chartSelection ==
+                                                "AllSetterData"
+                                            ? buttonBackgroundColorActive
+                                            : buttonBackgroundColorInactibe,
+                                      ),
+                                      child: const Text('All Setter Data'),
+                                      onPressed: () {
+                                        setState(() {
+                                          graphStyle = "allSetterData";
+                                          chartSelection = "AllSetterData";
+                                        });
+                                      }),
+                                ),
+                                Visibility(
+                                  visible: currentProfile.isSetter,
+                                  child: TextButton(
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: chartSelection ==
+                                                "SetterData"
+                                            ? buttonBackgroundColorActive
+                                            : buttonBackgroundColorInactibe,
+                                      ),
+                                      child: const Text('Own Setter Data'),
+                                      onPressed: () {
+                                        setState(() {
+                                          graphStyle = "setter";
+                                          chartSelection = "SetterData";
+                                        });
+                                      }),
+                                ),
+                                Visibility(
+                                  visible: currentProfile.isSetter,
+                                  child: TextButton(
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: chartSelection ==
+                                                "SetterDataPie"
+                                            ? buttonBackgroundColorActive
+                                            : buttonBackgroundColorInactibe,
+                                      ),
+                                      child: const Text('Setter Pie'),
+                                      onPressed: () {
+                                        setState(() {
+                                          graphStyle = "setter";
+                                          chartSelection = "SetterDataPie";
+                                        });
+                                      }),
+                                )
+                              ];
+  }
+
+  Row time_selector() {
+    return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              onPressed: () {
+                switch (selectedTimePeriod) {
+                  case TimePeriod.week:
+                    selectedTime = weekAdjustment(selectedTime, false);
+
+                  case TimePeriod.month:
+                    selectedTime = montAdjustment(selectedTime, false);
+
+                  case TimePeriod.semester:
+                    selectedTime = semesterAdjustment(selectedTime, false);
+                  case TimePeriod.year:
+                    selectedTime = yearAdjustment(selectedTime, false);
+                }
+                setState(() {
+                  selectedTime = selectedTime;
+                });
+              },
+              icon: const Icon(IconManager.leftArrow),
+              iconSize: iconSizeChart,
+            ),
+            Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: switch (selectedTimePeriod) {
+                  TimePeriod.week => Text(
+                      weekLable(selectedTime),
+                      style: const TextStyle(fontSize: 18.0),
+                    ),
+                  TimePeriod.month => Text(
+                      monthLable(selectedTime),
+                      style: const TextStyle(fontSize: 18.0),
+                    ),
+                  TimePeriod.semester => Text(
+                      semesterLable(selectedTime),
+                      style: const TextStyle(fontSize: 18.0),
+                    ),
+                  TimePeriod.year => Text(
+                      yearLable(selectedTime),
+                      style: const TextStyle(fontSize: 18.0),
+                    ),
+                }),
+            Visibility(
+              visible: true,
+              child: IconButton(
+                onPressed: () {
+                  switch (selectedTimePeriod) {
+                    case TimePeriod.week:
+                      selectedTime = weekAdjustment(selectedTime, true);
+
+                    case TimePeriod.month:
+                      selectedTime = montAdjustment(selectedTime, true);
+
+                    case TimePeriod.semester:
+                      selectedTime = semesterAdjustment(selectedTime, true);
+                    case TimePeriod.year:
+                      selectedTime = yearAdjustment(selectedTime, true);
+                  }
+                  setState(() {
+                    selectedTime = selectedTime;
+                  });
+                },
+                icon: const Icon(IconManager.rightArrow),
+                iconSize: iconSizeChart,
+              ),
+            ),
+          ],
+        );
+  }
+
+  Row time_periode_selector(BuildContext context) {
+    return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 25.0),
+              child: DropdownButton<TimePeriod>(
+                value: selectedTimePeriod,
+                onChanged: (TimePeriod? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      selectedTimePeriod = newValue;
+                    });
+                  }
+                },
+                items: TimePeriod.values.map((TimePeriod value) {
+                  return DropdownMenuItem<TimePeriod>(
+                    value: value,
+                    child: Text(timePeriodStrings[value]!),
+                  );
+                }).toList(),
+              ),
+            ),
+            const Text("Per Time"),
+            Checkbox(
+              value: perTimeInterval,
+              onChanged: (value) {
+                if (chartSelection == "maxGrade") {
+                  setState(() {
+                    perTimeInterval = value ?? false;
+                  });
+                }
+              },
+              activeColor:
+                  chartSelection == "maxGrade" ? Colors.blue : Colors.grey,
+              checkColor: chartSelection == "maxGrade"
+                  ? Colors.white
+                  : const Color.fromARGB(255, 233, 229, 229),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              visualDensity: VisualDensity.compact,
+            ),
+            IconButton(
+              onPressed: () {
+                _showCharExplanation(context);
+              },
+              icon: const Icon(IconManager.info),
+            ),
+            IconButton(
+              onPressed: () {
+                selectedTime = getSelectedTime(DateTime.now());
+                setState(() {
+                  selectedTime = selectedTime;
+                });
+              },
+              icon: const Icon(IconManager.reset),
+            ),
+          ],
+        );
   }
 }
 
