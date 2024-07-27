@@ -59,7 +59,9 @@ dependencies:
   flutter_svg: ^2.0.10+1
   flutter_map: ^7.0.2
   latlong2: ^0.9.1
-  
+  rxdart: ^0.28.0
+
+
 
 dev_dependencies:
   flutter_test:

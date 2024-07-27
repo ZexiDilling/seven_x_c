@@ -1,13 +1,11 @@
-import 'dart:collection';
-
 import 'package:seven_x_c/helpters/time_calculations.dart';
 import 'package:seven_x_c/services/cloude/firebase_cloud_storage.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
 
-Future<List<String>> getRankingsBasedOnCriteria(
+Future<RankingData> getRankingsBasedOnCriteria(
   FirebaseCloudStorage userService,
   TimePeriod selectedTimePeriod,
-  String criteria,
+  String rankingSelected,
   Map<String, String> selectedTime,
 ) async {
   try {
@@ -15,6 +13,8 @@ Future<List<String>> getRankingsBasedOnCriteria(
     Iterable<CloudProfile> users = await userService.getAllUsers().first;
     // Filter users based on different criteria
     Map<String, dynamic> filteredRankings = {};
+    Map<String, dynamic> boulderBreakDown = {};
+    String sortMethod = "";
 
     if (users.isNotEmpty) {
       for (var user in users) {
@@ -22,23 +22,34 @@ Future<List<String>> getRankingsBasedOnCriteria(
         int amount = 0;
         Map<String, dynamic>? rankingData;
         String amountText = "";
-        switch (criteria) {
+        Map<String, int> tempBoulderBreakDown = {};
+
+        switch (rankingSelected) {
           case 'boulderRankingsByPoints':
             rankingData = user.dateBoulderTopped;
             amountText = "Tops";
+            sortMethod = "points";
           case 'boulderRankingsByAmount':
             rankingData = user.dateBoulderTopped;
             amountText = "Tops";
+            sortMethod = "amount";
           case 'challengeRankings':
             rankingData = null;
-          case 'setterRankingsByAmount':
+          case 'setterRankingsByPoints':
             rankingData = user.dateBoulderSet;
             amountText = "Set";
-          case "setterRankingsByPoints":
+            sortMethod = "points";
+          case "setterRankingsByAmount":
             rankingData = user.dateBoulderSet;
             amountText = "Set";
+            sortMethod = "amount";
         }
+
         if (rankingData != null) {
+          //   print(user.displayName);
+          //   print(user.userID);
+          // print(rankingData);
+          //   print(selectedTime);
           switch (selectedTimePeriod) {
             case TimePeriod.year:
               var yearData = rankingData[selectedTime["year"]];
@@ -64,6 +75,12 @@ Future<List<String>> getRankingsBasedOnCriteria(
                                     dayData[boulder];
                                 points += boulderData["points"];
                                 amount += 1;
+                                String grade = boulderData["gradeColour"];
+                                if (tempBoulderBreakDown.containsKey(grade)) {
+                                 tempBoulderBreakDown[grade] =  tempBoulderBreakDown[grade]! + 1;
+                                } else {
+                                  tempBoulderBreakDown[grade] = 1;
+                                }
                               }
                             }
                           }
@@ -101,6 +118,12 @@ Future<List<String>> getRankingsBasedOnCriteria(
                                         dayData[boulder];
                                     points += boulderData["points"];
                                     amount += 1;
+                                    String grade = boulderData["gradeColour"];
+                                    if (tempBoulderBreakDown.containsKey(grade)) {
+                                     tempBoulderBreakDown[grade] =  tempBoulderBreakDown[grade]! + 1;
+                                    } else {
+                                      tempBoulderBreakDown[grade] = 1;
+                                    }
                                   }
                                 }
                               }
@@ -143,8 +166,13 @@ Future<List<String>> getRankingsBasedOnCriteria(
                               Map<String, dynamic> boulderData =
                                   dayData[boulder];
                               points += boulderData["points"];
-
                               amount += 1;
+                              String grade = boulderData["gradeColour"];
+                              if (tempBoulderBreakDown.containsKey(grade)) {
+                               tempBoulderBreakDown[grade] =  tempBoulderBreakDown[grade]! + 1;
+                              } else {
+                                tempBoulderBreakDown[grade] = 1;
+                              }
                             }
                           }
                         }
@@ -172,57 +200,97 @@ Future<List<String>> getRankingsBasedOnCriteria(
               DateTime startOfWeek = getStartDateOfWeek(year, week);
 
               if (weekData != null) {
-                if (user.displayName == "Charlie") {}
                 for (var dayNumber in List.generate(7, (index) => index + 1)) {
                   DateTime currentDate =
                       startOfWeek.add(Duration(days: dayNumber - 1));
                   String day = currentDate.day.toString();
-                  if (user.displayName == "Charlie") {}
                   var dayData = weekData[day];
-                  if (user.displayName == "Charlie") {}
                   if (dayData != null) {
                     for (var boulder in dayData.keys) {
                       if (boulder != "maxToppedGrade" &&
                           boulder != "maxFlahsedGrade") {
                         Map<String, dynamic> boulderData = dayData[boulder];
                         points += boulderData["points"];
-
                         amount += 1;
+                        String grade = boulderData["gradeColour"];
+                        if (tempBoulderBreakDown.containsKey(grade)) {
+                          tempBoulderBreakDown[grade] = tempBoulderBreakDown[grade]! + 1;
+                        } else {
+                          tempBoulderBreakDown[grade] = 1;
+                        }
                       }
                     }
                   }
                 }
               }
           }
-                  user.isAnonymous == true
-            ? filteredRankings["Anonymous"] = "points: $points - $amountText: $amount"
-            : filteredRankings[user.displayName] = "points: $points - $amountText: $amount";
-        }
+          String userName = "";
+          user.isAnonymous == true
+              ? userName = "Anonymous"
+              : userName = user.displayName;
 
+          filteredRankings[userName] = {};
+          filteredRankings[userName]["rankings"] = "points: $points - $amountText: $amount";
+          if (amount < 1) {boulderBreakDown[userName] = null;} else {boulderBreakDown[userName] = tempBoulderBreakDown; }
+           
+        }
       }
     }
 
-    return mapSorter(filteredRankings);
+    return RankingData(
+        gotData: true, rankings: mapSorter(filteredRankings, sortMethod), boulderBreakDown: boulderBreakDown);
   } catch (e) {
-    return [];
+    return RankingData(gotData: false, rankings: [], boulderBreakDown: {});
   }
 }
 
-List<String> mapSorter(Map<String, dynamic> filteredRankings) {
-  var sortedKeys = filteredRankings.keys.toList(growable: false)
-    ..sort((k1, k2) => filteredRankings[k1].compareTo(filteredRankings[k2]));
+List<String> mapSorter(Map<String, dynamic> filteredRankings, String sortBy) {
+  // Parse points and amount from the string value
+  List<MapEntry<String, dynamic>> parsedEntries =
+      filteredRankings.entries.map((entry) {
+    final value = entry.value["rankings"];
+    final pointsMatch = RegExp(r'points: (\d+)').firstMatch(value);
+    final amountMatch = RegExp(r'(\w+): (\d+)').allMatches(value).last;
 
-  LinkedHashMap sortedMap = LinkedHashMap.fromIterable(sortedKeys,
-      key: (k) => k, value: (k) => filteredRankings[k]);
+    final points = pointsMatch != null ? int.parse(pointsMatch.group(1)!) : 0;
+    // ignore: unnecessary_null_comparison
+    final amount = amountMatch != null ? int.parse(amountMatch.group(2)!) : 0;
+
+    return MapEntry(
+        entry.key, {'points': points, 'amount': amount, 'value': value});
+  }).toList();
+
+  // Sort based on the selected criteria
+  parsedEntries.sort((a, b) {
+    final aValue = a.value;
+    final bValue = b.value;
+
+    if (sortBy == 'points') {
+      return bValue['points'].compareTo(aValue['points']);
+    } else if (sortBy == 'amount') {
+      return bValue['amount'].compareTo(aValue['amount']);
+    } else {
+      return 0; // Default case, no sorting
+    }
+  });
 
   List<String> resultList = [];
 
-  // Iterate over the sorted map and create a list of strings
-  for (var entry in sortedMap.entries) {
-    String keyValueString = "${entry.key} - ${entry.value}";
-    resultList.add(keyValueString);
+  // Create the result list from the sorted entries
+  for (var entry in parsedEntries) {
+    if (sortBy == 'points') {
+      resultList.add("${entry.key} - Points: ${entry.value['points']}");
+    } else if (sortBy == 'amount') {
+      resultList.add("${entry.key} - Amount: ${entry.value['amount']}");
+    }
   }
 
-  // Print the result list
   return resultList;
+}
+
+class RankingData {
+  bool gotData;
+  List<String> rankings;
+  Map<String, dynamic> boulderBreakDown;
+  RankingData({required this.gotData, required this.rankings, required this.boulderBreakDown});
 }

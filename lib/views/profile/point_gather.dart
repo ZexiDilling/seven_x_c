@@ -375,6 +375,7 @@ Future<PointsData> getPoints(
                 gotData = false;
               }
             case TimePeriod.week:
+             
               var weekData =
                   currentProfile.dateBoulderTopped![selectedTime["year"]]
                       [selectedTime["month"]][selectedTime["week"]];
@@ -471,7 +472,7 @@ Future<PointsData> getPoints(
               }
           }
         }
-      case "setter":
+      case "setter": 
         if (currentProfile.dateBoulderSet != null) {
           switch (selectedTimePeriod) {
             case TimePeriod.year:
@@ -885,6 +886,7 @@ Future<PointsData> getPoints(
                 }
               }
             case TimePeriod.week:
+
               var weekData =
                   currentGymData.gymDataBoulders![selectedTime["year"]]
                       [selectedTime["month"]][selectedTime["week"]];

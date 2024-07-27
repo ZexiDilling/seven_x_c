@@ -15,10 +15,10 @@ import 'package:seven_x_c/views/location/create_location.dart';
 import 'package:seven_x_c/views/location/gym_view.dart';
 import 'package:seven_x_c/views/location/outdoor_overview.dart';
 import 'package:seven_x_c/views/location/outdoor_view.dart';
-import 'package:seven_x_c/views/location/ranking_view.dart';
 import 'package:seven_x_c/views/location/change_location.dart';
 import 'package:seven_x_c/views/comp/comp_result_view.dart';
 import 'package:seven_x_c/views/comp/comp_setup_view.dart';
+import 'package:seven_x_c/views/location/ranking_view.dart';
 import 'package:seven_x_c/views/map/map_view.dart';
 import 'package:seven_x_c/views/profile/profile_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'

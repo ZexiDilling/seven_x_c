@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
 import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
@@ -222,14 +223,39 @@ class FirebaseCloudStorage {
   }
 
 // User data
-  Stream<Iterable<CloudProfile>> getAllUsers() {
-    final allUsers = profileCollection
+  // Stream<Iterable<CloudProfile>> getAllUsers() {
+  //   final allUsers = profileCollection
+  //       .where(boulderPointsFieldName, isGreaterThan: 0)
+  //       .snapshots()
+  //       .map(
+  //           (event) => event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
+  //   return allUsers;
+  // }
+
+   Stream<Iterable<CloudProfile>> getAllUsers() {
+    final boulderQuery = profileCollection
         .where(boulderPointsFieldName, isGreaterThan: 0)
         .snapshots()
-        .map(
-            (event) => event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
-    return allUsers;
+        .map((event) => event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
+
+    final setterQuery = profileCollection
+        .where(setterPointsFieldName, isGreaterThan: 0)
+        .snapshots()
+        .map((event) => event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
+
+    // Combine the two streams and merge their results
+    return Rx.combineLatest2(
+      boulderQuery,
+      setterQuery,
+      (Iterable<CloudProfile> boulderProfiles, Iterable<CloudProfile> setterProfiles) {
+        final allProfiles = <CloudProfile>{}; // Using a set to avoid duplicates
+        allProfiles.addAll(boulderProfiles);
+        allProfiles.addAll(setterProfiles);
+        return allProfiles;
+      },
+    );
   }
+   
 
   Future<void> deleteUser({required String ownerUserId}) async {
     try {
