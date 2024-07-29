@@ -97,11 +97,11 @@ class _RankViewState extends State<RankView> with TickerProviderStateMixin {
       ),
       body: Column(
         children: [
-          time_periode_selector(context),
+          _timePeriodeSelector(context),
           const SizedBox(
             height: 25,
           ),
-          time_selector(),
+          _timeSelector(),
           const SizedBox(
             height: 25,
           ),
@@ -342,7 +342,7 @@ class _RankViewState extends State<RankView> with TickerProviderStateMixin {
     ];
   }
 
-  Row time_selector() {
+  Row _timeSelector() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -415,7 +415,7 @@ class _RankViewState extends State<RankView> with TickerProviderStateMixin {
     );
   }
 
-  Row time_periode_selector(BuildContext context) {
+  Row _timePeriodeSelector(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -500,7 +500,7 @@ class _RankViewState extends State<RankView> with TickerProviderStateMixin {
       case "purple":
         return Colors.purple;
       case 'red':
-        return Color.fromARGB(255, 211, 20, 7);
+        return const Color.fromARGB(255, 211, 20, 7);
       case "black":
         return Colors.black;
       default:

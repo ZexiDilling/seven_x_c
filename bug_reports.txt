@@ -5,3 +5,7 @@
 
 17-05-2024
 - Database for something dose not get updated properly, so users can't see change in top-status. 
+
+
+290724
+- for some reason some boulders is not added to a profile

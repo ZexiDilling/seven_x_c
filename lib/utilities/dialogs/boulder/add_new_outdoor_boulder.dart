@@ -27,7 +27,7 @@ Future<void> addNewOutdoorClimb(
   // const gradingSystem = "french";
   // const gradingSystem = "v_grade";
   String? gradeColorChoice;
-  String? holdColorChoice;
+
   String? gradeColors = "";
   var gradeValue = 0;
   List<String> allGradeColorChoice = [];
@@ -45,13 +45,15 @@ Future<void> addNewOutdoorClimb(
                 children: [
                   Text("Location - $subLocation"),
                   Text("Grading Style - $gradingSystem"),
-                   Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(5, (index) {
                       return IconButton(
                         icon: Icon(
                           Icons.star,
-                          color: index < selectedRating ? Colors.amber : Colors.grey,
+                          color: index < selectedRating
+                              ? Colors.amber
+                              : Colors.grey,
                         ),
                         onPressed: () {
                           setState(() {
@@ -163,66 +165,61 @@ Future<void> addNewOutdoorClimb(
                                       ))
                           ],
                         ),
-                        SizedBox(
-                            height: 500,
-                            width: 1000,
-                            child: GridView.count(
-                              mainAxisSpacing: 10,
-                              crossAxisSpacing: 5,
-                              crossAxisCount: 3,
-                              childAspectRatio: 3,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              children:
-                                  List.generate(climbTags().length, (index) {
-                                String tagName = climbTags()[index];
-                                bool isSelected = tags.contains(tagName);
-                                return ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      if (isSelected) {
-                                        tags.remove(tagName);
-                                      } else {
-                                        tags.add(tagName);
-                                      }
-                                    });
-                                  },
-                                  style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all<Color>(
-                                        isSelected
-                                            ? Colors.green
-                                            : Colors
-                                                .blue, // Change colors as needed
-                                      ),
-                                      shape: MaterialStateProperty.all<
-                                          OutlinedBorder>(
-                                        RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              10.0), // Adjust radius as needed
-                                        ),
-                                      ),
-                                      padding: MaterialStateProperty.all<
-                                          EdgeInsetsGeometry>(
-                                        EdgeInsets.zero,
-                                      ),
-                                      minimumSize:
-                                          MaterialStateProperty.all<Size>(
-                                        const Size(double.infinity, 40.0),
-                                      )),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(0.0),
-                                    child: Text(
-                                      tagName,
-                                      style: const TextStyle(
-                                          fontSize: 10.0, color: Colors.black),
-                                      // Adjust font size as needed
-                                    ),
-                                  ),
-                                );
-                              }),
+                  SizedBox(
+                    height: 500,
+                    width: 1000,
+                    child: GridView.count(
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 5,
+                      crossAxisCount: 3,
+                      childAspectRatio: 3,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: List.generate(climbTags().length, (index) {
+                        String tagName = climbTags()[index];
+                        bool isSelected = tags.contains(tagName);
+                        return ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              if (isSelected) {
+                                tags.remove(tagName);
+                              } else {
+                                tags.add(tagName);
+                              }
+                            });
+                          },
+                          style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                isSelected
+                                    ? Colors.green
+                                    : Colors.blue, // Change colors as needed
+                              ),
+                              shape: MaterialStateProperty.all<OutlinedBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      10.0), // Adjust radius as needed
+                                ),
+                              ),
+                              padding:
+                                  MaterialStateProperty.all<EdgeInsetsGeometry>(
+                                EdgeInsets.zero,
+                              ),
+                              minimumSize: MaterialStateProperty.all<Size>(
+                                const Size(double.infinity, 40.0),
+                              )),
+                          child: Padding(
+                            padding: const EdgeInsets.all(0.0),
+                            child: Text(
+                              tagName,
+                              style: const TextStyle(
+                                  fontSize: 10.0, color: Colors.black),
+                              // Adjust font size as needed
                             ),
                           ),
+                        );
+                      }),
+                    ),
+                  ),
                 ],
               ),
             ),
