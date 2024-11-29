@@ -1,6 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:seven_x_c/constants/colours_thems.dart';
 import 'package:seven_x_c/constants/graph_const.dart';
 import 'package:seven_x_c/constants/other_const.dart';

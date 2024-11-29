@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
+import 'package:seven_x_c/services/cloude/boulder/cloud_outdorr_boulder.dart';
 import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/cloud_storage_constants.dart';
@@ -23,6 +24,8 @@ class FirebaseCloudStorage {
       FirebaseFirestore.instance.collection("outdoorData");
   final gymLocationCollection =
       FirebaseFirestore.instance.collection("gymLocation");
+  final outdoorBoulderCollection =
+      FirebaseFirestore.instance.collection("outdoorBoulders");
 
 // Boulder data
   Future<void> deleteBoulder({required String boulderID}) async {
@@ -222,32 +225,94 @@ class FirebaseCloudStorage {
     }
   }
 
-// User data
-  // Stream<Iterable<CloudProfile>> getAllUsers() {
-  //   final allUsers = profileCollection
-  //       .where(boulderPointsFieldName, isGreaterThan: 0)
-  //       .snapshots()
-  //       .map(
-  //           (event) => event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
-  //   return allUsers;
-  // }
+  Future<CloudOutdoorBoulder> createNewOutdoorBoulder({
+    required double outdoorCordX,
+    required double outdoorCordY,
+    required String outdoorBoulderDataNameID,
+    required String outdoorBoulderSections,
+    required String outdoorGradeColour,
+    required int outdoorGradeNumberSetter,
+    required int outdoorGradeDifficulty,
+    required bool outdoorTopOut,
+    required bool outdoorActive,
+    List? outdoorTags,
+    String? outdoorBoulderName,
+    String? outdoorSetter,
+    int? outdoorRating,
+    Map<String, dynamic>? outdoorGradeNumberClimbers,
+    Map<String, dynamic>? outdoorRatingClimbers,
+    Map<String, dynamic>? outdoorClimberTopped,
+    Timestamp? outdoorSetDateBoulder,
+    String? outdoorBoulderInfo,
+  }) async {
+    final document = await outdoorBoulderCollection.add({
+      outdoorCordXFieldName: outdoorCordX,
+      outdoorCordYFieldName: outdoorCordY,
+      outdoorBoulderDataNameIDFieldName: outdoorBoulderDataNameID,
+      outdoorBoulderSectionsFieldName: outdoorBoulderSections,
+      outdoorGradeColourFieldName: outdoorGradeColour,
+      outdoorGradeNumberSetterFieldName: outdoorGradeNumberSetter,
+      outdoorGradeDifficultyFieldName: outdoorGradeDifficulty,
+      outdoorTopOutFieldName: outdoorTopOut,
+      outdoorActiveFieldName: outdoorActive,
+      if (outdoorTags != null) outdoorTagsFieldName: outdoorTags,
+      if (outdoorBoulderName != null)
+        outdoorBoulderNameFieldName: outdoorBoulderName,
+      if (outdoorSetter != null) outdoorSetterFieldName: outdoorSetter,
+      if (outdoorRating != null) outdoorRatingFieldName: outdoorRating,
+      if (outdoorGradeNumberClimbers != null)
+        outdoorGradeNumberClimbersFieldName: outdoorGradeNumberClimbers,
+      if (outdoorRatingClimbers != null)
+        outdoorRatingClimbersFieldName: outdoorRatingClimbers,
+      if (outdoorClimberTopped != null)
+        outdoorClimberToppedFieldName: outdoorClimberTopped,
+      if (outdoorSetDateBoulder != null)
+        outdoorSetDateBoulderFieldName: outdoorSetDateBoulder,
+        if (outdoorBoulderInfo != null)
+        outdoorBoulderInfoFieldName: outdoorBoulderInfo
+    });
+    final fetchOutdoorBoulder = await document.get();
+    return CloudOutdoorBoulder(
+        outdoorCordX,
+        outdoorCordY,
+        outdoorBoulderDataNameID,
+        outdoorBoulderSections,
+        outdoorGradeColour,
+        outdoorGradeNumberSetter,
+        outdoorGradeDifficulty,
+        outdoorTopOut,
+        outdoorActive,
+        outdoorTags,
+        outdoorBoulderName,
+        outdoorSetter,
+        outdoorRating,
+        outdoorGradeNumberClimbers,
+        outdoorRatingClimbers,
+        outdoorClimberTopped,
+        outdoorSetDateBoulder,
+        outdoorBoulderInfo,
+        outdoorBoulderID: fetchOutdoorBoulder.id);
+  }
 
-   Stream<Iterable<CloudProfile>> getAllUsers() {
+  Stream<Iterable<CloudProfile>> getAllUsers() {
     final boulderQuery = profileCollection
         .where(boulderPointsFieldName, isGreaterThan: 0)
         .snapshots()
-        .map((event) => event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
+        .map(
+            (event) => event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
 
     final setterQuery = profileCollection
         .where(setterPointsFieldName, isGreaterThan: 0)
         .snapshots()
-        .map((event) => event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
+        .map(
+            (event) => event.docs.map((doc) => CloudProfile.fromSnapshot(doc)));
 
     // Combine the two streams and merge their results
     return Rx.combineLatest2(
       boulderQuery,
       setterQuery,
-      (Iterable<CloudProfile> boulderProfiles, Iterable<CloudProfile> setterProfiles) {
+      (Iterable<CloudProfile> boulderProfiles,
+          Iterable<CloudProfile> setterProfiles) {
         final allProfiles = <CloudProfile>{}; // Using a set to avoid duplicates
         allProfiles.addAll(boulderProfiles);
         allProfiles.addAll(setterProfiles);
@@ -255,7 +320,6 @@ class FirebaseCloudStorage {
       },
     );
   }
-   
 
   Future<void> deleteUser({required String ownerUserId}) async {
     try {
@@ -1039,23 +1103,23 @@ class FirebaseCloudStorage {
       }
 
       if (outdoorSections != null) {
-        updatedData[gymDataClimbersFieldName] = outdoorSections;
+        updatedData[outdoorSectionsFieldName] = outdoorSections;
       }
       if (outdoorDataClimbers != null) {
-        updatedData[gymDataBouldersFieldName] = outdoorDataClimbers;
+        updatedData[outdoorDataClimbersFieldName] = outdoorDataClimbers;
       }
       if (outdoorDataBoulders != null) {
-        updatedData[gymDataBouldersToppedFieldName] = outdoorDataBoulders;
+        updatedData[outdoorDataBouldersFieldName] = outdoorDataBoulders;
       }
       if (outdoorDataBouldersTopped != null) {
-        updatedData[gymDataRoutesToppedFieldName] = outdoorDataBouldersTopped;
+        updatedData[outdoorDataBouldersToppedFieldName] = outdoorDataBouldersTopped;
       }
       if (outdoorDataRoutes != null) {
-        updatedData[gymDataRoutesToppedFieldName] = outdoorDataRoutes;
+        updatedData[outdoorDataRoutesFieldName] = outdoorDataRoutes;
       }
 
       if (outdoorDataRoutesTopped != null) {
-        updatedData[gymDataRoutesToppedFieldName] = outdoorDataRoutesTopped;
+        updatedData[outdoorDataRoutesToppedFieldName] = outdoorDataRoutesTopped;
       }
 
       await outdoorDataCollection.doc(outdoorDataID).update(updatedData);
@@ -1079,8 +1143,9 @@ class FirebaseCloudStorage {
   Stream<Iterable<Map<String, dynamic>?>> getAllOutdoorBoulders(
       String locationName) {
     final Stream<Iterable<Map<String, dynamic>?>> allBoulders;
+    
     allBoulders = outdoorDataCollection
-        .where(locationNameIDFieldName, isEqualTo: locationName)
+        .where(outdoorDataNameIDFieldName, isEqualTo: locationName)
         .snapshots()
         .map((event) => event.docs.map(
             (doc) => CloudOutdoorData.fromSnapshot(doc).outdoorDataBoulders));

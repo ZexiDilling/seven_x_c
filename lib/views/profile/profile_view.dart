@@ -373,6 +373,7 @@ class _ProfileViewState extends State<ProfileView> {
 
                             if (pointsSnapshot.hasData) {
                               _pointsData = pointsSnapshot.data;
+                              
                             }
                             // Access the PointsData object from the snapshot
                             PointsData pointsData = _pointsData!;
@@ -446,7 +447,9 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Column _buildAllSetterData(PointsData pointsData) {
+
     return Column(
+      
       children: [
         Row(
           children: [
@@ -462,6 +465,7 @@ class _ProfileViewState extends State<ProfileView> {
                 }),
           ],
         ),
+        
         Row(
           children: [
             const Text("GradeColour/GradeValue"),
@@ -475,7 +479,9 @@ class _ProfileViewState extends State<ProfileView> {
                   );
                 }),
           ],
+          
         ),
+        
         DropdownButton(
           value: displaySetter,
           items: pointsData.allSetters

@@ -24,6 +24,7 @@ import 'package:seven_x_c/utilities/dialogs/slides/comp_slide.dart';
 import 'package:seven_x_c/utilities/dialogs/slides/slide_up.dart';
 import 'package:seven_x_c/utilities/polygone/polygone_painter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+// ignore: library_prefixes
 import 'package:vector_math/vector_math_64.dart' as VM;
 
 GlobalKey _gymKey = GlobalKey();
@@ -45,6 +46,7 @@ class _OutdoorView extends State<OutdoorView> {
   String locationOverview = "KjuggeOverview";
   String supArea = "";
   String subLocation = "";
+  String previousSubLocation = "";
   Iterable? areaBoulders;
   bool overviewMap = true;
   bool detailMap = false;
@@ -56,6 +58,8 @@ class _OutdoorView extends State<OutdoorView> {
   double currentScale = 1.0;
   int topCounter = 0;
   bool filterEnabled = false;
+  String gradingSystem = "";
+  
 
   // editing the area
   bool editing = false;
@@ -70,6 +74,16 @@ class _OutdoorView extends State<OutdoorView> {
   };
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void resetZoom() {
+    _controller.value = Matrix4.identity();
+  }
+
+  @override
   void initState() {
     _fireBaseService = FirebaseCloudStorage();
 
@@ -79,12 +93,22 @@ class _OutdoorView extends State<OutdoorView> {
 
   Future<void> _initializeData() async {
     await _initializeCurrentProfile();
-    // await _initSettings();
+    await _initSettings();
     await _initOutdoorData();
     // convertedPolygons = convertPolygons(outsideRegions);
     // _initSettingData();
+    gradingSystem =
+        (currentProfile!.gradingSystem).toString().toLowerCase();
+    if (gradingSystem == "coloured") {gradingSystem = "french";}
   }
-
+  Future<CloudSettings?> _initSettings() async {
+    final CloudSettings? tempSettings =
+        await _fireBaseService.getSettings(currentProfile!.settingsID);
+    setState(() {
+      currentSettings = tempSettings;
+    });
+    return currentSettings;
+  }
   Future<CloudProfile?> _initializeCurrentProfile() async {
     await for (final profiles
         in _fireBaseService.getUser(userID: userId.toString())) {
@@ -148,12 +172,11 @@ class _OutdoorView extends State<OutdoorView> {
                             key: _gymKey,
                             onTapUp: (details) {
                               regionPainter
-                                  ? overviewMap
-                                      ? print("hej")
-                                      // drawRegions(
-                                      //     'assets/background/$locationOverview.jpg')
-                                      : drawRegions(
-                                          'assets/background/$subLocation.jpg')
+                                  ?
+                                  // drawRegions(
+                                  //     'assets/background/$locationOverview.jpg')
+                                  drawRegions(
+                                      'assets/background/$subLocation.jpg')
                                   : overviewMap
                                       ? _tapSelectSubMap(
                                           context, constraints, details)
@@ -168,13 +191,13 @@ class _OutdoorView extends State<OutdoorView> {
                                               currentProfile,
                                               _fireBaseService);
                             },
-                            // onDoubleTapDown: (details) {
-                            //   _doubleTapping(context, constraints, details);
-                            //   setState(() {
-                            //     currentScale =
-                            //         _controller.value.getMaxScaleOnAxis();
-                            //   });
-                            // },
+                            onDoubleTapDown: (details) {
+                              _doubleTapping(context, constraints, details);
+                              setState(() {
+                                currentScale =
+                                    _controller.value.getMaxScaleOnAxis();
+                              });
+                            },
                             child: InteractiveViewer(
                               transformationController: _controller,
                               minScale: 0.5,
@@ -206,12 +229,16 @@ class _OutdoorView extends State<OutdoorView> {
                                             return Container(); // or any default widget
                                           }
                                         })(),
+                                        
                                   CustomPaint(
                                       painter: RegionPainter(
+                                        currentSettings!,
                                           outsideRegions,
                                           constraints,
                                           overviewMap,
-                                          subLocation))
+                                          detailMap,
+                                          subLocation,
+                                          allBoulders!, gradingSystem))
                                 ]),
                               ),
                             ),
@@ -230,6 +257,28 @@ class _OutdoorView extends State<OutdoorView> {
 
   AppBar appBar(BuildContext context) {
     return AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          overviewMap
+              ? Navigator.pop(context)
+              : detailMap
+                  ? setState(() {
+                      subLocation = previousSubLocation;
+                      previousSubLocation = "";
+                      overviewMap = true;
+                      detailMap = !detailMap;
+                      resetZoom();
+                    })
+                  : setState(() {
+                      subLocation = previousSubLocation;
+                      previousSubLocation = "KjuggeOverview";
+                      overviewMap = false;
+                      detailMap = !detailMap;
+                      resetZoom();
+                    });
+        },
+      ),
       title: overviewMap ? Text(currentLocation) : Text(subLocation),
       backgroundColor: dtuClimbingAppBar,
       actions: [
@@ -296,12 +345,14 @@ class _OutdoorView extends State<OutdoorView> {
     );
   }
 
-  PopupMenuButton<MenuActionMain> dropDownMenu(
+  void loadPreviousImage() {}
+
+  PopupMenuButton<MenuActionOutDoor> dropDownMenu(
       BuildContext context, CloudSettings? currentSettings) {
-    return PopupMenuButton<MenuActionMain>(
+    return PopupMenuButton<MenuActionOutDoor>(
       onSelected: (value) async {
         switch (value) {
-          case MenuActionMain.logout:
+          case MenuActionOutDoor.logout:
             final shouldLogout = await showLogOutDialog(context);
             if (shouldLogout) {
               // ignore: use_build_context_synchronously
@@ -310,58 +361,55 @@ class _OutdoorView extends State<OutdoorView> {
                   );
               break;
             }
-          case MenuActionMain.settings:
+          case MenuActionOutDoor.settings:
             Navigator.of(context).pushNamed(profileSettings).then((_) {
               _initializeData();
             });
             break;
 
-          case MenuActionMain.adminPanel:
+          case MenuActionOutDoor.adminPanel:
             Navigator.of(context).pushNamed(adminPanel);
-          case MenuActionMain.rankings:
+          case MenuActionOutDoor.rankings:
             Navigator.of(context).pushNamed(rankView);
-          case MenuActionMain.profile:
+          case MenuActionOutDoor.profile:
             Navigator.of(context).pushNamed(
               profileView,
               arguments: currentSettings!,
             );
 
-          case MenuActionMain.location:
+          case MenuActionOutDoor.location:
             Navigator.of(context).pushNamed(
               // locationView,
               mapView,
               arguments: currentSettings!,
             );
-          case MenuActionMain.stripping:
-          // TODO: Handle this case.
-          case MenuActionMain.comp:
-          // TODO: Handle this case.
         }
       },
       itemBuilder: (context) {
         return [
           const PopupMenuItem(
-            value: MenuActionMain.profile,
+            value: MenuActionOutDoor.profile,
             child: Text("Profile"),
           ),
           const PopupMenuItem(
-            value: MenuActionMain.rankings,
+            value: MenuActionOutDoor.rankings,
             child: Text("Rankings"),
           ),
           const PopupMenuItem(
-            value: MenuActionMain.settings,
+            value: MenuActionOutDoor.settings,
             child: Text("Settings"),
           ),
           if (currentProfile!.isAdmin)
             const PopupMenuItem(
-              value: MenuActionMain.adminPanel,
+              value: MenuActionOutDoor.adminPanel,
               child: Text("Admin"),
             ),
           if (currentProfile!.isAdmin)
             const PopupMenuItem(
-                value: MenuActionMain.location, child: Text("Change Location")),
+                value: MenuActionOutDoor.location,
+                child: Text("Change Location")),
           const PopupMenuItem(
-            value: MenuActionMain.logout,
+            value: MenuActionOutDoor.logout,
             child: Text("Log out"),
           ),
         ];
@@ -448,6 +496,7 @@ class _OutdoorView extends State<OutdoorView> {
     // dynamic offset = (tempCenterX / constraints.maxWidth, tempCenterY / constraints.maxHeight);
     // offsets.add(offset);
     // print(offsets);
+    // ignore: prefer_typing_uninitialized_variables
     var tappedPolygon;
 
     if (overviewMap) {
@@ -476,9 +525,11 @@ class _OutdoorView extends State<OutdoorView> {
     }
 
     setState(() {
+      previousSubLocation = subLocation;
       subLocation = tappedPolygon.imageName;
       overviewMap = false;
       detailMap = !detailMap;
+      resetZoom();
     });
   }
 
@@ -489,9 +540,9 @@ class _OutdoorView extends State<OutdoorView> {
       Iterable<Map<String, dynamic>?>? allBoulders,
       CloudProfile? currentProfile,
       FirebaseCloudStorage fireBaseService) async {
-        
     final gradingSystem =
         (currentProfile!.gradingSystem).toString().toLowerCase();
+
     if (_controller.value.getMaxScaleOnAxis() >= minZoomThreshold) {
       final RenderBox referenceBox =
           _gymKey.currentContext?.findRenderObject() as RenderBox;
@@ -514,26 +565,39 @@ class _OutdoorView extends State<OutdoorView> {
         // Check for existing circles and avoid overlap
         double tempCenterX = transformedPosition.x;
         double tempCenterY = transformedPosition.y;
-        for (final existingBoulder in allBoulders!) {
-          double distance = calculateDistance(
-            existingBoulder!["cordX"] * constraints.maxWidth,
-            existingBoulder["cordY"] * constraints.maxHeight,
-            tempCenterX,
-            tempCenterY,
-          );
+        bool allEntriesAreEmpty = true;
+        if (allBoulders != null && allBoulders.isNotEmpty) {
+          // Check if all entries in allBoulders are empty maps
+          
 
-          if (distance < minDistance) {
-            // Adjust the X position based on the number of boulders below it
-            tempCenterX -= minBoulderDistance;
+          for (final boulder in allBoulders) {
+            if (boulder != null && boulder.isNotEmpty) {
+              allEntriesAreEmpty = false;
+              break;
+            }
           }
         }
 
+        if (!allEntriesAreEmpty) {
+          for (final existingBoulder in allBoulders!) {
+            double distance = calculateDistance(
+              existingBoulder!["cordX"] * constraints.maxWidth,
+              existingBoulder["cordY"] * constraints.maxHeight,
+              tempCenterX,
+              tempCenterY,
+            );
+
+            if (distance < minDistance) {
+              // Adjust the X position based on the number of boulders below it
+              tempCenterX -= minBoulderDistance;
+            }
+          }
+        }
 
         // for (final items in currentOutdoorData!.outdoorSections![subLocation]["sublocation"]) {
-          
-        // }
 
-        if (moveBoulder) {
+        // }
+        if (moveBoulder && allBoulders != null && allBoulders.isNotEmpty) {
           fireBaseService.updateBoulder(
               boulderID: selectedBoulder,
               cordX: tempCenterX / constraints.maxWidth,
@@ -542,7 +606,9 @@ class _OutdoorView extends State<OutdoorView> {
             moveBoulder = false;
             selectedBoulder = "";
           });
-        } else if (moveMultipleBoulders) {
+        } else if (moveMultipleBoulders &&
+            allBoulders != null &&
+            allBoulders.isNotEmpty) {
           Map<String, dynamic>? closestBoulder;
           for (final boulders in allBoulders) {
             double distance = ((boulders!["cordX"] * constraints.maxWidth) -
@@ -564,6 +630,7 @@ class _OutdoorView extends State<OutdoorView> {
             }
           }
         } else {
+          
           try {
             setState(() {
               addNewOutdoorClimb(
@@ -606,6 +673,7 @@ class _OutdoorView extends State<OutdoorView> {
             // Tapped inside the circle, perform the desired action
             // ignore: use_build_context_synchronously
             final result = await showOutdoorBoulderInformation(
+              // ignore: use_build_context_synchronously
               context,
               setState,
               closestBoulder,
@@ -673,5 +741,3 @@ showOutdoorBoulderInformation(
     void Function(VoidCallback fn) setState,
     Map<String, dynamic> closestBoulder,
     CloudProfile currentProfile) {}
-
-

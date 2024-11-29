@@ -51,6 +51,7 @@ Future<PointsData> getPoints(
   String maxBoulderClimbedColour = "";
   String maxBoulderFlashedColour = "";
   // bool perTimeInterval = false;
+
   try {
     switch (graphStyle) {
       case "climber":
@@ -375,15 +376,38 @@ Future<PointsData> getPoints(
                 gotData = false;
               }
             case TimePeriod.week:
-             
-              var weekData =
-                  currentProfile.dateBoulderTopped![selectedTime["year"]]
-                      [selectedTime["month"]][selectedTime["week"]];
-              // Iterate over all possible days in the week
-              // Calculate the date based on ISO week number and weekday
               int year = int.parse(selectedTime["year"]!);
               int week = int.parse(selectedTime["week"]!);
+
               DateTime startOfWeek = getStartDateOfWeek(year, week);
+              DateTime endOfWeek = getEndDateOfWeek(year, week);
+
+              bool spansMultipleMonths = startOfWeek.month != endOfWeek.month;
+
+              Map<String, dynamic>? weekData;
+
+              if (spansMultipleMonths) {
+                // Get data for both months
+                var firstMonthData =
+                    currentGymData.gymDataBoulders![selectedTime["year"]]
+                        [startOfWeek.month.toString()]?[selectedTime["week"]];
+                var secondMonthData =
+                    currentGymData.gymDataBoulders![selectedTime["year"]]
+                        [endOfWeek.month.toString()]?[selectedTime["week"]];
+
+                // Combine the data from both months
+                weekData = {};
+                if (firstMonthData != null) {
+                  weekData.addAll(firstMonthData);
+                }
+                if (secondMonthData != null) {
+                  weekData.addAll(secondMonthData);
+                }
+              } else {
+                // Get data for a single month
+                weekData = currentGymData.gymDataBoulders![selectedTime["year"]]
+                    [selectedTime["month"]][selectedTime["week"]];
+              }
               Map<String, String> dateToDay = {};
               for (var dayNumber in List.generate(7, (index) => index + 1)) {
                 // Calculate the date based on ISO week number and weekday
@@ -472,7 +496,7 @@ Future<PointsData> getPoints(
               }
           }
         }
-      case "setter": 
+      case "setter":
         if (currentProfile.dateBoulderSet != null) {
           switch (selectedTimePeriod) {
             case TimePeriod.year:
@@ -668,15 +692,38 @@ Future<PointsData> getPoints(
                 }
               }
             case TimePeriod.week:
-              var weekData =
-                  currentProfile.dateBoulderSet![selectedTime["year"]]
-                      [selectedTime["month"]][selectedTime["week"]];
-              // Iterate over all possible days in the week
-
-              // Calculate the date based on ISO week number and weekday
               int year = int.parse(selectedTime["year"]!);
               int week = int.parse(selectedTime["week"]!);
+
               DateTime startOfWeek = getStartDateOfWeek(year, week);
+              DateTime endOfWeek = getEndDateOfWeek(year, week);
+
+              bool spansMultipleMonths = startOfWeek.month != endOfWeek.month;
+
+              Map<String, dynamic>? weekData;
+
+              if (spansMultipleMonths) {
+                // Get data for both months
+                var firstMonthData =
+                    currentGymData.gymDataBoulders![selectedTime["year"]]
+                        [startOfWeek.month.toString()]?[selectedTime["week"]];
+                var secondMonthData =
+                    currentGymData.gymDataBoulders![selectedTime["year"]]
+                        [endOfWeek.month.toString()]?[selectedTime["week"]];
+
+                // Combine the data from both months
+                weekData = {};
+                if (firstMonthData != null) {
+                  weekData.addAll(firstMonthData);
+                }
+                if (secondMonthData != null) {
+                  weekData.addAll(secondMonthData);
+                }
+              } else {
+                // Get data for a single month
+                weekData = currentGymData.gymDataBoulders![selectedTime["year"]]
+                    [selectedTime["month"]][selectedTime["week"]];
+              }
               Map<String, String> dateToDay = {};
               for (var dayNumber in List.generate(7, (index) => index + 1)) {
                 // Calculate the date based on ISO week number and weekday
@@ -886,16 +933,37 @@ Future<PointsData> getPoints(
                 }
               }
             case TimePeriod.week:
-
-              var weekData =
-                  currentGymData.gymDataBoulders![selectedTime["year"]]
-                      [selectedTime["month"]][selectedTime["week"]];
-              // Iterate over all possible days in the week
-
-              // Calculate the date based on ISO week number and weekday
               int year = int.parse(selectedTime["year"]!);
               int week = int.parse(selectedTime["week"]!);
+
               DateTime startOfWeek = getStartDateOfWeek(year, week);
+              DateTime endOfWeek = getEndDateOfWeek(year, week);
+
+              bool spansMultipleMonths = startOfWeek.month != endOfWeek.month;
+
+              Map<String, dynamic>? weekData;
+
+              if (spansMultipleMonths) {
+                // Get data for both months
+                var firstMonthData =
+                    currentGymData.gymDataBoulders![selectedTime["year"]]
+                        [startOfWeek.month.toString()]?[selectedTime["week"]];   
+                var secondMonthData =
+                    currentGymData.gymDataBoulders![selectedTime["year"]]
+                        [endOfWeek.month.toString()]?[selectedTime["week"]];
+                // Combine the data from both months
+                weekData = {};
+                if (firstMonthData != null) {
+                  weekData.addAll(firstMonthData);
+                }
+                if (secondMonthData != null) {
+                  weekData.addAll(secondMonthData);
+                }
+              } else {
+                // Get data for a single month
+                weekData = currentGymData.gymDataBoulders![selectedTime["year"]]
+                    [selectedTime["month"]][selectedTime["week"]];
+              }
               Map<String, String> dateToDay = {};
               for (var dayNumber in List.generate(7, (index) => index + 1)) {
                 // Calculate the date based on ISO week number and weekday
@@ -907,6 +975,7 @@ Future<PointsData> getPoints(
 
                 dateToDay[currentDay] = dayOfWeek;
               }
+
               if (weekData != null) {
                 for (var dayNumber in List.generate(7, (index) => index + 1)) {
                   DateTime currentDate =
@@ -917,7 +986,6 @@ Future<PointsData> getPoints(
                     daysSetting++;
                     for (var boulder in dayData.keys) {
                       Map<String, dynamic> boulderData = dayData[boulder];
-
                       amountBoulder++;
 
                       allSetterGraphSetup(
@@ -1033,69 +1101,78 @@ void allSetterGraphSetup(
     List allSetters) {
   String currentSetter = boulderData["setter"];
 
- 
-
   for (CloudProfile profile in currentSetters) {
     // Check if the profile ID matches currentSetter
     if (profile.userID == currentSetter) {
       if (!allSetters.contains(profile.displayName)) {
-        
         allSetters.add(profile.displayName);
       }
 
       break; // Exit the loop once a match is found
     }
   }
-   if (!boulderSetGradeColours.containsKey(currentSetter)) {
+  if (!boulderSetGradeColours.containsKey(currentSetter)) {
     boulderSetGradeColours[currentSetter] = {};
   }
+  // ignore: prefer_typing_uninitialized_variables
+  var gradeColour;
+  // ignore: prefer_typing_uninitialized_variables
+  var gradeNumber;
 
-  boulderSetGradeColours[currentSetter]![boulderData["gradeColour"]] =
-      (boulderSetGradeColours[currentSetter]![boulderData["gradeColour"]] ?? 0) + 1;
+  try {
+    if (boulderData["joker"]) {
+      gradeColour = "joker";
+      gradeNumber = "?";
+    } else {
+      gradeColour = boulderData["gradeColour"];
+      gradeNumber = boulderData["gradeNumberSetter"];
+    }
+  } catch (e) {
+    gradeColour = boulderData["gradeColour"];
+    gradeNumber = boulderData["gradeNumberSetter"];
+  }
+
+  boulderSetGradeColours[currentSetter]![gradeColour] =
+      (boulderSetGradeColours[currentSetter]![gradeColour] ?? 0) + 1;
 
   boulderSetGradeColours[currentSetter]!["total"] =
       (boulderSetGradeColours[currentSetter]!["total"] ?? 0) + 1;
 
-  boulderSetGradeColours["all"]![boulderData["gradeColour"]] =
-      (boulderSetGradeColours["all"]![boulderData["gradeColour"]] ?? 0) + 1;
+  boulderSetGradeColours["all"]![gradeColour] =
+      (boulderSetGradeColours["all"]![gradeColour] ?? 0) + 1;
 
   boulderSetGradeColours["all"]!["total"] =
       (boulderSetGradeColours["all"]!["total"] ?? 0) + 1;
 
   boulderGradeToHoldColour[currentSetter] ??= {};
-  boulderGradeToHoldColour[currentSetter]![boulderData["gradeNumberSetter"]] ??=
-      {};
-  boulderGradeToHoldColour[currentSetter]![boulderData["gradeNumberSetter"]]![
+  boulderGradeToHoldColour[currentSetter]![gradeNumber] ??= {};
+  boulderGradeToHoldColour[currentSetter]![gradeNumber]![
       boulderData["holdColour"]] = (boulderGradeToHoldColour[currentSetter]![
-              boulderData["gradeNumberSetter"]]![boulderData["holdColour"]] ??
+              gradeNumber]![boulderData["holdColour"]] ??
           0) +
       1;
   boulderGradeColourToHoldColour[currentSetter] ??= {};
-  boulderGradeColourToHoldColour[currentSetter]![boulderData["gradeColour"]] ??=
-      {};
-  boulderGradeColourToHoldColour[currentSetter]![boulderData["gradeColour"]]![
-          boulderData["holdColour"]] =
-      (boulderGradeColourToHoldColour[currentSetter]![
-                  boulderData["gradeColour"]]![boulderData["holdColour"]] ??
-              0) +
-          1;
+  boulderGradeColourToHoldColour[currentSetter]![gradeColour] ??= {};
+  boulderGradeColourToHoldColour[currentSetter]![gradeColour]![
+      boulderData["holdColour"]] = (boulderGradeColourToHoldColour[
+              currentSetter]![gradeColour]![boulderData["holdColour"]] ??
+          0) +
+      1;
   boulderHoldColourToGrade[currentSetter] ??= {};
   boulderHoldColourToGrade[currentSetter]![boulderData["holdColour"]] ??= {};
   boulderHoldColourToGrade[currentSetter]![boulderData["holdColour"]]![
-          boulderData["gradeNumberSetter"]] =
-      (boulderHoldColourToGrade[currentSetter]![boulderData["holdColour"]]![
-                  boulderData["gradeNumberSetter"]] ??
-              0) +
-          1;
+      gradeNumber] = (boulderHoldColourToGrade[currentSetter]![
+              boulderData["holdColour"]]![gradeNumber] ??
+          0) +
+      1;
   boulderHoldColourToGradeColour[currentSetter] ??= {};
   boulderHoldColourToGradeColour[currentSetter]![boulderData["holdColour"]] ??=
       {};
   boulderHoldColourToGradeColour[currentSetter]![boulderData["holdColour"]]![
-          boulderData["gradeColour"]] =
-      (boulderHoldColourToGradeColour[currentSetter]![
-                  boulderData["holdColour"]]![boulderData["gradeColour"]] ??
-              0) +
-          1;
+      gradeColour] = (boulderHoldColourToGradeColour[currentSetter]![
+              boulderData["holdColour"]]![gradeColour] ??
+          0) +
+      1;
 }
 
 void setterGraphSetup(

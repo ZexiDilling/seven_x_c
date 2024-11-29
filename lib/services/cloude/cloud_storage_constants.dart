@@ -113,6 +113,26 @@ const outdoorDataBouldersToppedFieldName = "outdoorDataBouldersTopped";
 const outdoorDataRoutesFieldName = "outdoorDataRoutes";
 const outdoorDataRoutesToppedFieldName = "outdoorDataRoutesTopped";
 
+//outdoorBoulders
+const outdoorCordXFieldName = "outdoorCordX";
+const outdoorCordYFieldName = "outdoorCordY";
+const outdoorBoulderDataNameIDFieldName = "outdoorBoulderDataNameID";
+const outdoorBoulderSectionsFieldName = "outdoorBoulderSections";
+const outdoorGradeColourFieldName = "outdoorGradeColour";
+const outdoorGradeNumberSetterFieldName = "outdoorGradeNumberSetter";
+const outdoorGradeDifficultyFieldName = "outdoorGradeDifficulty";
+const outdoorTopOutFieldName = "outdoorTopOut";
+const outdoorActiveFieldName = "outdoorActive";
+const outdoorTagsFieldName = "outdoorTags";
+const outdoorBoulderNameFieldName = "outdoorBoulderName";
+const outdoorSetterFieldName = "outdoorSetter";
+const outdoorRatingFieldName = "outdoorRating";
+const outdoorGradeNumberClimbersFieldName = "outdoorGradeNumberClimbers";
+const outdoorRatingClimbersFieldName = "outdoorRatingClimbers";
+const outdoorClimberToppedFieldName = "outdoorClimberTopped";
+const outdoorSetDateBoulderFieldName = "outdoorSetDateBoulder";
+const outdoorBoulderInfoFieldName = "outdoorBoulderInfo";
+
 //Location data
 const locationNameIDFieldName = "locationNameID";
 const boulderingFieldName = "bouldering";
@@ -127,3 +147,4 @@ const locationHomepageFieldName = "locationHomepage";
 const locationEmailFieldName = "locationEmail";
 const locationInfoFieldName = "locationInfo";
 const locationAccessFieldName = "locationAccess";
+
