@@ -36,10 +36,7 @@ DateTime calculateDateThreshold(TimePeriod timePeriod) {
     case TimePeriod.year:
       // Return the first day of the current month 12 months ago
       return currentTime.subtract(
-          const Duration(days: 30 * 12)); // Assuming 30 days in a month
-
-    default:
-      return DateTime(0); // Or handle the default case accordingly
+          const Duration(days: 30 * 12)); // Or handle the default case accordingly
   }
 }
 

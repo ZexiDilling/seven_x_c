@@ -496,9 +496,9 @@ Map<int, Color> generateGradeColors(Map<int, Map<String, String>> allGrading,
 Color getDarkerShade(Color originalColor, double factor) {
   assert(factor >= 0 && factor <= 1, 'Factor should be between 0 and 1');
 
-  int red = (originalColor.red * (1 - factor)).round();
-  int green = (originalColor.green * (1 - factor)).round();
-  int blue = (originalColor.blue * (1 - factor)).round();
+  int red = (originalColor.r * (1 - factor)).round();
+  int green = (originalColor.g * (1 - factor)).round();
+  int blue = (originalColor.b * (1 - factor)).round();
 
   return Color.fromRGBO(red, green, blue, 1);
 }

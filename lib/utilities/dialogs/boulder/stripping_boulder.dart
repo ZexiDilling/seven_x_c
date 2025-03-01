@@ -68,8 +68,8 @@ Future<void> stripping(
                       hiddenBoulders = !hiddenBoulders;
                     },
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                          (Set<MaterialState> states) {
+                      backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                          (Set<WidgetState> states) {
                         if (hiddenBoulders) {
                           // Change the color when hiddenBoulders is true
                           return Colors

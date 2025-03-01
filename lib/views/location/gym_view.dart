@@ -862,6 +862,7 @@ class _GymViewState extends State<GymView> {
             // Tapped inside the circle, perform the desired action
             // ignore: use_build_context_synchronously
             final result = await showBoulderInformation(
+                // ignore: use_build_context_synchronously
                 context,
                 setState,
                 closestBoulder,

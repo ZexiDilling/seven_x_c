@@ -16,8 +16,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
       final email = event.email;
       if (email == null) {
+
         return;
       }
+
       emit(const AuthStateForgotPassword(
         exception: null,
         hasSentEmail: false,
@@ -26,13 +28,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       bool didSendEmail;
       Exception? exception;
       try {
+
         await provider.sendPasswordReset(toEmail: email);
         didSendEmail = true;
         exception = null;
+
       } on Exception catch (e) {
         didSendEmail = false;
         exception = e;
+
       }
+
       emit(AuthStateForgotPassword(
         exception: exception,
         hasSentEmail: didSendEmail,

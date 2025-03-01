@@ -155,22 +155,22 @@ Future<void> addNewOutdoorClimb(
                             });
                           },
                           style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
+                              backgroundColor: WidgetStateProperty.all<Color>(
                                 isSelected
                                     ? Colors.green
                                     : Colors.blue, // Change colors as needed
                               ),
-                              shape: MaterialStateProperty.all<OutlinedBorder>(
+                              shape: WidgetStateProperty.all<OutlinedBorder>(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(
                                       10.0), // Adjust radius as needed
                                 ),
                               ),
                               padding:
-                                  MaterialStateProperty.all<EdgeInsetsGeometry>(
+                                  WidgetStateProperty.all<EdgeInsetsGeometry>(
                                 EdgeInsets.zero,
                               ),
-                              minimumSize: MaterialStateProperty.all<Size>(
+                              minimumSize: WidgetStateProperty.all<Size>(
                                 const Size(double.infinity, 40.0),
                               )),
                           child: Padding(

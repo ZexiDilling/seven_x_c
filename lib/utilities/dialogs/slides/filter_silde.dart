@@ -135,21 +135,21 @@ ListTile specFilterCheck(setState) {
                   });
                 },
                 style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
+                    backgroundColor: WidgetStateProperty.all<Color>(
                       isSelected
                           ? Colors.green
                           : Colors.blue, // Change colors as needed
                     ),
-                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                    shape: WidgetStateProperty.all<OutlinedBorder>(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
                             10.0), // Adjust radius as needed
                       ),
                     ),
-                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                    padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                       EdgeInsets.zero,
                     ),
-                    minimumSize: MaterialStateProperty.all<Size>(
+                    minimumSize: WidgetStateProperty.all<Size>(
                       const Size(double.infinity, 40.0),
                     )),
                 child: Padding(
@@ -237,7 +237,7 @@ List<Widget> _createColorRows(setState, CloudSettings currentSettings) {
             height: 40,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isSelected ? color : color.withOpacity(0.5),
+              color: isSelected ? color : color.withValues(alpha: (10)),
               border: Border.all(
                 color: Colors.white,
                 width: 0.0,

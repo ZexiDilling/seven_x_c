@@ -47,7 +47,7 @@ class GymPainter extends CustomPainter {
                 .settingsHoldColour![boulder.gradeColour.toLowerCase()]);
         Color? holdColour = nameToColor(
             currentSettings.settingsHoldColour![boulder.holdColour]);
-        double fadeEffect = 0.5;
+        double fadeEffect = 5;
         double centerX = boulder.cordX * constraints.maxWidth;
         double centerY = boulder.cordY * constraints.maxHeight;
 
@@ -69,7 +69,7 @@ class GymPainter extends CustomPainter {
         // Fade if user have topped the boulder
         final Paint paint = Paint()
           ..color =
-              (userTopped ? gradeColour.withOpacity(fadeEffect) : gradeColour)
+              (userTopped ? gradeColour.withValues(alpha: (fadeEffect)) : gradeColour)
           ..style = PaintingStyle.fill;
         canvas.drawCircle(
           Offset(centerX, centerY),
@@ -110,7 +110,7 @@ class GymPainter extends CustomPainter {
         // Give problems a glow, unless they have been topped
         if (glowColour != null && !userTopped) {
           final Paint glowPaint = Paint()
-            ..color = newBoulderColour.withOpacity(0.2)
+            ..color = newBoulderColour.withValues(alpha: 0.5)
             ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.2);
 
           canvas.drawCircle(
@@ -124,7 +124,7 @@ class GymPainter extends CustomPainter {
         // Colour the outer ring
         final Paint outlinePaint = Paint()
           ..color =
-              (userTopped ? holdColour.withOpacity(fadeEffect) : holdColour)
+              (userTopped ? holdColour.withValues(alpha: (fadeEffect)) : holdColour)
           ..strokeWidth = boulderHoldColour
           ..style = PaintingStyle.stroke;
 
@@ -162,7 +162,7 @@ class GymPainter extends CustomPainter {
         }
         if (!boulder.active) {
           final Paint glowPaint = Paint()
-            ..color = deactivateBoulderColor.withOpacity(0.2);
+            ..color = deactivateBoulderColor.withValues(alpha: (fadeEffect));
           // ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.2);
 
           canvas.drawCircle(
@@ -302,7 +302,7 @@ class GymPainter extends CustomPainter {
         // add glow if needed
         if (glowForMapMarkings[wall.wallName] != null) {
           final Paint glowPaint = Paint()
-            ..color = newBoulderColour.withOpacity(0.2)
+            ..color = newBoulderColour.withValues(alpha: (0.3))
             ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.2);
 
           canvas.drawCircle(

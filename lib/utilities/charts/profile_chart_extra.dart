@@ -30,8 +30,9 @@ Widget leftTitles(double value, TitleMeta meta) {
     text = '${value.toInt()}';
   }
   return SideTitleWidget(
-    axisSide: meta.axisSide,
+    fitInside: const SideTitleFitInsideData(enabled: true, axisPosition: 0, parentAxisSize: 0, distanceFromEdge: 0) ,
     space: 4,
+    meta: meta,
     child: Text(
       text,
       style: style,
@@ -224,13 +225,12 @@ Widget bottomTitles(
         }
         break;
 
-      default:
-        break;
-    }
+      }
   }
 
   return SideTitleWidget(
-    axisSide: meta.axisSide,
+    fitInside: const SideTitleFitInsideData(enabled: true, axisPosition: 0, parentAxisSize: 0, distanceFromEdge: 0) ,
+    meta: meta,
     child: Transform.rotate(
       angle: -45 * (3.1415926535 / 180), // Rotate text by -45 degrees
       child: Text(text, style: style),
@@ -249,12 +249,14 @@ SideTitleWidget getGradeLabel(
       text = allGrading[index]![gradingSystem.toLowerCase()] ?? "";
     }
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      fitInside: const SideTitleFitInsideData(enabled: true, axisPosition: 0, parentAxisSize: 0, distanceFromEdge: 0) ,
+      meta: meta,
       child: Text(text),
     );
   }
   return SideTitleWidget(
-    axisSide: meta.axisSide,
+    fitInside: const SideTitleFitInsideData(enabled: true, axisPosition: 0, parentAxisSize: 0, distanceFromEdge: 0) ,
+      meta: meta,
     child: Text(value.toString()),
   );
 }

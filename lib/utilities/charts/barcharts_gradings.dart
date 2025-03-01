@@ -152,5 +152,5 @@ Widget getBottomTitlesNumberGrade(
   }
 
   // ignore: sort_child_properties_last
-  return SideTitleWidget(child: text, axisSide: meta.axisSide);
+  return SideTitleWidget(child: text, meta: meta, fitInside: const SideTitleFitInsideData(enabled: true, axisPosition: 0, parentAxisSize: 0, distanceFromEdge: 0) );
 }

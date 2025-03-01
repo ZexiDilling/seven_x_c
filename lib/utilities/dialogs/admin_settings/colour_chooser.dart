@@ -37,7 +37,7 @@ showColorPickerDialog(
 
         return ColorData(
           name: colorName,
-          alpha: colorValues["alpha"] ?? 255,
+          alpha: colorValues["alpha"] ?? 10,
           red: colorValues["red"] ?? 0,
           green: colorValues["green"] ?? 0,
           blue: colorValues["blue"] ?? 0,
@@ -46,7 +46,7 @@ showColorPickerDialog(
       [];
 
   colorsFromFirebase
-      .add(ColorData(name: "New", alpha: 255, red: 0, green: 0, blue: 0));
+      .add(ColorData(name: "New", alpha: 10, red: 0, green: 0, blue: 0));
 
   String selectedColorName = colorsFromFirebase.last.name;
   Color selectedColor = colorsFromFirebase.last.toColor();
@@ -155,10 +155,10 @@ showColorPickerDialog(
                 children: [
                   TextButton(
                     onPressed: () {
-                      int alpha = selectedColor.alpha;
-                      int red = selectedColor.red;
-                      int green = selectedColor.green;
-                      int blue = selectedColor.blue;
+                      int alpha = selectedColor.a as int;
+                      int red = selectedColor.r as int;
+                      int green = selectedColor.g as int;
+                      int blue = selectedColor.b as int;
                       String colourName = nameController.text;
 
                       int? minGradeInt = tryParseInt(selectedMinGrade);
@@ -210,10 +210,10 @@ showColorPickerDialog(
                   ),
                   TextButton(
                     onPressed: () {
-                      int alpha = selectedColor.alpha;
-                      int red = selectedColor.red;
-                      int green = selectedColor.green;
-                      int blue = selectedColor.blue;
+                      int alpha = selectedColor.a as int;
+                      int red = selectedColor.r as int;
+                      int green = selectedColor.g as int;
+                      int blue = selectedColor.b as int;
                       String colourName = nameController.text;
 
                       int? minGradeInt = tryParseInt(selectedMinGrade);

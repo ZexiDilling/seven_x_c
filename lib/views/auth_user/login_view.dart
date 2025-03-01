@@ -115,8 +115,15 @@ class _LoginView extends State<LoginView> {
                 ),
                 TextButton(
                   onPressed: () {
+                    final email = _email.text.trim(); // Get the entered email
+                        if (email.isEmpty) {
+
+      showErrorDialog(context, "Please enter your email before resetting.");
+      return; // Stop if no email is entered
+    }
+
                     context.read<AuthBloc>().add(
-                          const AuthEventForgotPassword(),
+                          AuthEventForgotPassword(email: email),
                         );
                   },
                   child: const Text(

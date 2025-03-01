@@ -33,7 +33,9 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
+        
         if (state is AuthStateForgotPassword) {
+
           if (state.hasSentEmail) {
             _controller.clear();
             await showPasswordResetSentDialog(context);
@@ -62,7 +64,12 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                 ),
                 TextButton(
                     onPressed: () {
-                      final email = _controller.text;
+                      final email = _controller.text.trim();
+
+                          if (email.isEmpty) {
+
+      return; // Prevent sending empty email
+    }
                       context
                           .read<AuthBloc>()
                           .add(AuthEventForgotPassword(email: email));

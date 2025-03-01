@@ -777,15 +777,7 @@ Future<PointsData> getPoints(
                 gotData = false;
               }
 
-            default:
-              gotData = false;
-              pointsBoulder = 0;
-              pointsSetter = 0;
-              pointsChallenges = 0;
-              amountBoulder = 0;
-              amountSetter = 0;
-              amountChallenges = 0;
-          }
+            }
         }
 
       case "allSetterData":
@@ -1004,15 +996,7 @@ Future<PointsData> getPoints(
                 gotData = false;
               }
 
-            default:
-              gotData = false;
-              pointsBoulder = 0;
-              pointsSetter = 0;
-              pointsChallenges = 0;
-              amountBoulder = 0;
-              amountSetter = 0;
-              amountChallenges = 0;
-          }
+            }
         }
 
       default:
