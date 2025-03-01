@@ -279,7 +279,6 @@ Future<bool> showBoulderInformation(
                                           } else {
                                             flashed = false;
                                             repeats = 0;
-                                            print("JEK");
                                             updateUserUndoTop(
                                                 fireBaseService,
                                                 currentProfile,
@@ -309,7 +308,7 @@ Future<bool> showBoulderInformation(
                                                   attempts);
                                             } else {
                                               showErrorDialog(context,
-                                                  "Comp have beel closed");
+                                                  "Comp have been closed");
                                             }
                                           }
                                           if (flashed) {

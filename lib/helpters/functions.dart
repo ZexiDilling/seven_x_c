@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:seven_x_c/constants/comp_const.dart';
 import 'package:seven_x_c/helpters/time_calculations.dart';
 import 'package:seven_x_c/services/cloude/boulder/cloud_boulder.dart';
+import 'package:seven_x_c/services/cloude/boulder/cloud_outdorr_boulder.dart';
 import 'package:seven_x_c/services/cloude/challenges/cloud_challenges.dart';
 import 'package:seven_x_c/services/cloude/comp/cloud_comp.dart';
 import 'package:seven_x_c/services/cloude/profile/cloud_profile.dart';
@@ -359,6 +360,57 @@ Map<String, dynamic> updateBoulderCompSet({
   return boulderComp;
 }
 
+Map<String, dynamic> updateOutdoorDataBoulders(
+    {required String boulderId,
+    CloudOutdoorBoulder? newOutdoorBoulder,
+    Map<String, dynamic>? existingData}) {
+  var initRating;
+  var setter;
+  var gradeColour;
+  var gradeNumberSetter;
+  var gradeDifficulty;
+  var subLocation;
+  var tags;
+  var climberRating;
+  var gradeNumberClimber;
+  var cordX;
+  var cordY;
+
+  if (newOutdoorBoulder != null) {
+    initRating = newOutdoorBoulder.outdoorRating;
+    climberRating = newOutdoorBoulder.outdoorRatingClimbers;
+    gradeColour = newOutdoorBoulder.outdoorGradeColour;
+    gradeNumberSetter = newOutdoorBoulder.outdoorGradeNumberSetter;
+    gradeNumberClimber = newOutdoorBoulder.outdoorGradeNumberClimbers;
+    gradeDifficulty = newOutdoorBoulder.outdoorGradeDifficulty;
+    subLocation = newOutdoorBoulder.outdoorBoulderSections;
+    setter = newOutdoorBoulder.outdoorSetter;
+    tags = newOutdoorBoulder.outdoorTags;
+    cordX = newOutdoorBoulder.outdoorCordX;
+    cordY = newOutdoorBoulder.outdoorCordY;
+  }
+
+  Map<String, dynamic> newData = {
+    "initRating": initRating,
+    "climberRating": climberRating,
+    "gradeNumberSetter": gradeNumberSetter,
+    "gradeNumberClimber": gradeNumberClimber,
+    "gradeColour": gradeColour,
+    "gradeDifficulty": gradeDifficulty,
+    "location": subLocation,
+    "setter": setter,
+    "tags": tags,
+    "cordX": cordX,
+    "cordY": cordY,
+  };
+
+  Map<String, dynamic> setBoulder = existingData ?? {};
+
+  setBoulder[boulderId] = newData;
+
+  return setBoulder;
+}
+
 Map<String, dynamic> removeDateBoulderSet(
     {required CloudProfile setterProfile,
     CloudBoulder? boulder,
@@ -370,19 +422,17 @@ Map<String, dynamic> removeDateBoulderSet(
   String boulderDay = "";
 
   String boulderID = boulder!.boulderID;
- 
-    
-    DateTime boulderDate =
-        setterProfile.setBoulders![boulderID]["setDateBoulder"];
-    boulderYear = boulderDate.year.toString();
-    boulderMonth = boulderDate.month.toString();
-    boulderWeek = grabIsoWeekNumber(boulderDate).toString();
-    boulderDay = boulderDate.day.toString();
 
-    setterProfile.setBoulders![boulderID]["gradeNumberSetter"];
+  DateTime boulderDate =
+      setterProfile.setBoulders![boulderID]["setDateBoulder"];
+  boulderYear = boulderDate.year.toString();
+  boulderMonth = boulderDate.month.toString();
+  boulderWeek = grabIsoWeekNumber(boulderDate).toString();
+  boulderDay = boulderDate.day.toString();
 
-    setterProfile.setBoulders![boulderID]["gradeDifficulty"] ?? 1;
-  
+  setterProfile.setBoulders![boulderID]["gradeNumberSetter"];
+
+  setterProfile.setBoulders![boulderID]["gradeDifficulty"] ?? 1;
 
   setBoulder[boulderYear][boulderMonth][boulderWeek][boulderDay]
       .remove(boulderID.toString());
@@ -761,11 +811,13 @@ Map<String, dynamic> updateGymDataBoulders(
   String boulderWeek = "";
   String boulderDay = "";
   String boulderID = "";
+  bool joker;
 
   var holdColour;
   var gradeColour;
   var gradeNumberSetter;
   var gradeDifficulty;
+  
 
   Timestamp boulderTimeStamp = newBoulder.setDateBoulder;
   DateTime boulderDate = boulderTimeStamp.toDate();
@@ -778,13 +830,15 @@ Map<String, dynamic> updateGymDataBoulders(
   gradeNumberSetter = newBoulder.gradeNumberSetter;
   gradeDifficulty = newBoulder.gradeDifficulty;
   boulderID = newBoulder.boulderID;
+  joker = newBoulder.hiddenGrade;
 
   Map<String, dynamic> newData = {
     "holdColour": holdColour,
     "gradeColour": gradeColour,
     "gradeNumberSetter": gradeNumberSetter,
     "gradeDifficulty": gradeDifficulty,
-    "setter": setterID
+    "setter": setterID,
+    "joker": joker
   };
 
   Map<String, dynamic> gymDataBoulders = existingData ?? {};

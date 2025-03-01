@@ -191,6 +191,7 @@ Future<RankingData> getRankingsBasedOnCriteria(
                   break;
                 }
               }
+              
               var weekData = rankingData[selectedTime["year"]]
                   [selectedTime["month"]][selectedTime["week"]];
               // Iterate over all possible days in the week

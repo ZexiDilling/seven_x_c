@@ -447,6 +447,8 @@ List climbTags() {
   return [
     "Crimpy",
     "Juggy",
+    "balance",
+    "slab",
     "Dyno",
     "Compression",
     "Cut Feet",

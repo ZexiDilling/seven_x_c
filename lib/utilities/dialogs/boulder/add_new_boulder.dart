@@ -227,13 +227,12 @@ Future<void> showAddNewBoulder(
                             decoration: const InputDecoration(
                                 labelText: 'Choose Setter'),
                           ),
-                           CheckboxListTile(
+                          CheckboxListTile(
                             title: const Text('Top Out'),
                             value: topOut,
                             onChanged: (bool? value) {
                               setState(() {
                                 topOut = !topOut;
-                                
                               });
                             },
                           ),
